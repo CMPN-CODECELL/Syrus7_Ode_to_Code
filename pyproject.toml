@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "krishinirnay"
+version = "0.1.0"
+description = "KrishiNirnay Division 1 - Data Engineering and Price Forecasting"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "pandas>=2.2,<3",
+    "numpy>=1.26,<3",
+    "scikit-learn>=1.5,<2",
+    "xgboost>=2.1,<4",
+    "pyarrow>=17,<23",
+    "pydantic>=2.8,<3",
+    "python-dateutil>=2.9,<3",
+    "requests>=2.32,<3",
+    "joblib>=1.4,<2",
+    "jsonschema>=4.23,<5",
+    "pytest>=8.3,<9",
+]
+
+[tool.setuptools.packages.find]
+include = ["services*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
