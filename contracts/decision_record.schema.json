@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KrishiNirnayDecisionRecord",
+  "description": "Immutable single source of truth DecisionRecord for KrishiNirnay",
+  "type": "object",
+  "required": [
+    "request_id",
+    "engine_version",
+    "data_snapshot_id",
+    "rules_version",
+    "forecast_model_version",
+    "calibration_version",
+    "cost_config_version",
+    "weather_snapshot_id",
+    "route_snapshot_id",
+    "timestamp",
+    "baseline",
+    "chosen",
+    "risk",
+    "warnings",
+    "assumptions",
+    "source_refs",
+    "explanation"
+  ],
+  "properties": {
+    "request_id": { "type": "string" },
+    "engine_version": { "type": "string" },
+    "data_snapshot_id": { "type": "string" },
+    "rules_version": { "type": "string" },
+    "forecast_model_version": { "type": "string" },
+    "calibration_version": { "type": "string" },
+    "cost_config_version": { "type": "string" },
+    "weather_snapshot_id": { "type": "string" },
+    "route_snapshot_id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "baseline": {
+      "type": "object",
+      "required": ["market", "sale_day", "net_total"],
+      "properties": {
+        "market": { "type": "string" },
+        "sale_day": { "type": "string", "format": "date" },
+        "net_total": { "type": "number" },
+        "gross_revenue": { "type": "number" },
+        "quantity_sold_qtl": { "type": "number" },
+        "price_inr_per_qtl": { "type": "number" },
+        "costs": { "type": "object" }
+      }
+    },
+    "chosen": {
+      "type": "object",
+      "required": ["action", "market", "sale_day", "net_total", "gain_total", "gain_pct"],
+      "properties": {
+        "action": { "type": "string", "enum": ["SELL_NOW", "WAIT", "GO", "INSUFFICIENT_EVIDENCE"] },
+        "market": { "type": "string" },
+        "sale_day": { "type": "string", "format": "date" },
+        "net_total": { "type": "number" },
+        "gain_total": { "type": "number" },
+        "gain_pct": { "type": "number" },
+        "probability_beat_baseline": { "type": ["number", "null"] },
+        "reservation_price": { "type": ["number", "null"] },
+        "required_gain_pct": { "type": "number" },
+        "quantity_sold_qtl": { "type": "number" },
+        "holding_days": { "type": "integer" },
+        "costs": { "type": "object" }
+      }
+    },
+    "forecast": { "type": "object" },
+    "risk": {
+      "type": "object",
+      "required": ["overall", "score", "flags"],
+      "properties": {
+        "overall": { "type": "string", "enum": ["GREEN", "YELLOW", "RED"] },
+        "score": { "type": "number" },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "status", "score", "weight", "reason"],
+            "properties": {
+              "name": { "type": "string" },
+              "status": { "type": "string", "enum": ["GREEN", "YELLOW", "RED"] },
+              "score": { "type": "number" },
+              "weight": { "type": "number" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "overrides_applied": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["param", "value", "status"],
+        "properties": {
+          "param": { "type": "string" },
+          "value": {},
+          "status": { "type": "string" },
+          "source": { "type": ["string", "null"] },
+          "last_verified": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "source": { "type": "string" },
+          "ref": { "type": "string" },
+          "fetched_at": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "explanation": {
+      "type": "object",
+      "required": ["why", "key_drivers", "evidence"],
+      "properties": {
+        "why": { "type": "array", "items": { "type": "string" } },
+        "key_drivers": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "object" }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "hysteresis_applied": { "type": "boolean" }
+  }
+}

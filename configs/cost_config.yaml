@@ -1,0 +1,113 @@
+# KrishiNirnay — Cost Configuration
+# Version: 1.0.0
+# Authority: SYRUS_PS02_MASTER.md & SYRUS_PS02_DIVISION_2_DECISION_RISK_ENGINE.md
+cost_config_version: "1.0.0"
+price_unit: "INR_PER_QUINTAL"
+quantity_unit: "QUINTAL"
+
+transport:
+  round_trip_factor: 2.0 # Billed round-trip factor
+  round_trip_factor_meta:
+    status: "ASSUMPTION"
+    source: "Common Maharashtra rural transporter contract practice"
+    last_verified: null
+  default_rate_per_km: 12.0 # INR/km
+  default_rate_meta:
+    status: "ASSUMPTION"
+    source: "Representative light commercial vehicle per-km hiring rate"
+    last_verified: null
+  default_avg_speed_kmh: 40.0 # Average rural/state highway speed
+  default_speed_meta:
+    status: "ASSUMPTION"
+    source: "NHAI / rural logistics transit observations"
+    last_verified: null
+
+financing:
+  annual_rate: 0.12 # 12% per annum capital cost
+  meta:
+    status: "ASSUMPTION"
+    source: "Standard Kisan Credit Card (KCC) / local informal interest rate baseline"
+    last_verified: null
+
+storage:
+  tomato_per_qtl_day: 2.0 # INR/qtl/day
+  tomato_storage_meta:
+    status: "ASSUMPTION"
+    source: "Local APMC crate yard holding charges"
+    last_verified: null
+  onion_per_qtl_day: 0.5 # INR/qtl/day in traditional chawl
+  onion_storage_meta:
+    status: "ASSUMPTION"
+    source: "Traditional chawl holding cost estimate"
+    last_verified: null
+  default_per_qtl_day: 1.0
+
+hamali_tolai:
+  default_per_qtl: 12.0 # INR/qtl (e.g. ₹240 for 20 quintals)
+  meta:
+    status: "ASSUMPTION"
+    source: "APMC market handling, unloading & weighment schedule"
+    last_verified: null
+
+commission_and_fees:
+  farmer_commission_pct: 0.0 # 0% commission charged to farmer
+  commission_meta:
+    status: "VERIFIED"
+    source: "Maharashtra APMC Regulation Act Amendment (Farmer commission prohibited)"
+    last_verified: "2024-01-01"
+  market_fee_pct: 0.01 # 1% cess/mandi development fee where applicable
+  fee_meta:
+    status: "ASSUMPTION"
+    source: "APMC market cess rules"
+    last_verified: null
+
+spoilage:
+  tomato:
+    holding:
+      days_0_2: 0.01 # 1.0% per day for days 0-2
+      days_3_5: 0.035 # 3.5% per day for days 3-5
+      days_6_plus: 0.07 # 7.0% per day for day 6+
+    holding_meta:
+      status: "ASSUMPTION"
+      source: "Post-harvest research priors for ambient tropical tomato storage"
+      last_verified: null
+    travel:
+      hourly_crate: 0.0015 # 0.15% per hour transit in crates
+      hourly_loose: 0.0040 # 0.40% per hour transit in loose bags
+      default_hourly: 0.0015
+    travel_meta:
+      status: "ASSUMPTION"
+      source: "Post-harvest handling and transit shrinkage trials"
+      last_verified: null
+  onion:
+    holding:
+      days_0_2: 0.001 # 0.10% per day for days 0-2
+      days_3_5: 0.0015 # 0.15% per day for days 3-5
+      days_6_plus: 0.0020 # 0.20% per day for day 6+
+    holding_meta:
+      status: "ASSUMPTION"
+      source: "ICAR-DOGR onion storage shrinkage priors"
+      last_verified: null
+    travel:
+      hourly_crate: 0.0005 # 0.05% per hour transit
+      hourly_loose: 0.0005
+      default_hourly: 0.0005
+    travel_meta:
+      status: "ASSUMPTION"
+      source: "Onion transit weight loss observations"
+      last_verified: null
+
+vehicle_types:
+  small_pickup:
+    name: "Small Pickup (e.g. Bolero Maxi Truck)"
+    payload_qtl: 15.0
+    rate_per_km: 10.0
+  medium_truck:
+    name: "Medium Truck (e.g. 407 / 6-wheeler)"
+    payload_qtl: 25.0
+    rate_per_km: 12.0
+  large_truck:
+    name: "Large Truck (e.g. 10-wheeler)"
+    payload_qtl: 50.0
+    rate_per_km: 16.0
+  default_type: "medium_truck"

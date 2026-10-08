@@ -1,0 +1,22 @@
+# KrishiNirnay — Routing and Logistics Configuration
+# Version: 1.0.0
+# Authority: SYRUS_PS02_MASTER.md Section 15 & SYRUS_PS02_DIVISION_2_DECISION_RISK_ENGINE.md Section 7
+route_config_version: "1.0.0"
+
+provider:
+  name: "OpenRouteService"
+  # Mandatory: Build against current api.heigit.org host, NOT deprecated api.openrouteservice.org
+  base_url: "https://api.heigit.org/ors/v2/directions/driving-car"
+  timeout_seconds: 5.0
+  max_retries: 1
+
+cache:
+  enabled: true
+  ttl_seconds: 86400 # 24 hours
+
+fallback:
+  road_factor: 1.3 # Haversine distance multiplier to approximate road distance
+  avg_speed_kmh: 40.0 # Average rural commercial transit speed
+
+go_block_policy:
+  weak_route_margin_buffer: 0.03 # 3% margin buffer; if Go gain < required_gain + buffer on estimate, block Go

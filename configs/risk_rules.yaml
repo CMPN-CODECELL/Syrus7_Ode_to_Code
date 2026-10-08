@@ -1,0 +1,97 @@
+# KrishiNirnay — Six-Risk Rules and Policy Configuration
+# Version: 1.0.0
+# Authority: SYRUS_PS02_MASTER.md & SYRUS_PS02_DIVISION_2_DECISION_RISK_ENGINE.md
+rules_version: "1.0.0"
+
+weights:
+  price_drop: 0.25
+  arrival_spike: 0.20
+  volatility: 0.15
+  stale: 0.15
+  forecast: 0.15
+  weather: 0.10
+
+score_thresholds:
+  green_max: 0.25 # R < 0.25 is GREEN
+  yellow_max: 0.55 # 0.25 <= R < 0.55 is YELLOW; R >= 0.55 is RED
+
+color_scores:
+  GREEN: 0.0
+  YELLOW: 0.5
+  RED: 1.0
+
+profiles:
+  Cautious:
+    quantile: "q20"
+    min_gain_pct: 0.05 # 5% minimum net gain
+    min_probability: 0.70 # 70% probability of beating baseline
+  Balanced:
+    quantile: "q35"
+    min_gain_pct: 0.03 # 3% minimum net gain
+    min_probability: 0.65 # 65% probability of beating baseline
+  Aggressive:
+    quantile: "q50"
+    min_gain_pct: 0.015 # 1.5% minimum net gain
+    min_probability: 0.55 # 55% probability of beating baseline
+
+default_profile: "Balanced"
+
+yellow_risk_modifiers:
+  gain_multiplier: 1.5 # required gain * 1.5
+  probability_increment: 0.05 # required probability + 5 percentage points
+
+flags:
+  price_drop:
+    yellow_chance: 0.55 # chance of drop >= 55%
+    yellow_q20_ratio: 0.97 # q20 <= 97% of today price
+    yellow_3d_change: -0.10 # 3-day change <= -10%
+    red_chance: 0.70 # chance of drop >= 70%
+    red_q20_ratio: 0.92 # q20 <= 92% of today price
+    red_3d_change: -0.15 # 3-day change <= -15%
+
+  arrival_spike:
+    prior_weeks_median: 8 # prior 8 weeks same-weekday median
+    mad_scale: 1.4826 # robust z-score scale factor
+    yellow_ratio: 1.5 # r >= 1.5
+    yellow_z: 2.5 # z >= 2.5
+    red_ratio: 2.0 # r >= 2.0
+    red_z: 3.5 # z >= 3.5
+
+  volatility:
+    window_days: 14
+    yellow_percentile: 0.75 # > 75th percentile of historical log return vol
+    yellow_spread: 0.50 # (max - min) / modal > 50%
+    red_percentile: 0.90 # > 90th percentile
+    red_spread: 1.00 # > 100%
+
+  stale_data:
+    fresh_max_sessions: 1 # 0-1 expected trading sessions: Fresh
+    yellow_sessions: 2 # 2 expected trading sessions: Yellow
+    red_min_sessions: 3 # 3+ expected trading sessions: Red (blocked)
+
+  forecast:
+    yellow_width: 0.20 # (q90 - q10) / q50 > 20%
+    yellow_mase_min: 0.8
+    yellow_mase_max: 1.0
+    yellow_coverage_min: 0.65
+    yellow_coverage_max: 0.75
+    red_width: 0.35 # (q90 - q10) / q50 > 35%
+    red_mase_min: 1.0
+    red_coverage_max: 0.65
+
+  weather:
+    yellow_temp: 35.0 # >= 35 C
+    yellow_rain_24h: 15.6 # >= 15.6 mm / 24h
+    red_temp: 40.0 # >= 40 C
+    red_temp_coastal: 37.0 # >= 37 C coastal
+    red_rain_24h: 64.5 # >= 64.5 mm / 24h
+
+overrides:
+  red_stale_to_red: true
+  red_forecast_to_red: true
+  two_reds_to_red: true
+  three_yellows_to_yellow: true
+
+hysteresis:
+  consecutive_improvements_required: 2
+  immediate_worsening: true

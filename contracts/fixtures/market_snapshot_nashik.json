@@ -1,0 +1,19 @@
+{
+  "market": "Nashik APMC",
+  "commodity": "Tomato",
+  "observation_date": "2026-10-09",
+  "modal_price_inr_per_qtl": 1800.0,
+  "min_price_inr_per_qtl": 1700.0,
+  "max_price_inr_per_qtl": 1900.0,
+  "arrivals": 45.0,
+  "arrivals_unit": "tonne",
+  "source": "data.gov.in",
+  "fetched_at": "2026-10-09T01:00:00+05:30",
+  "expected_trading_age_sessions": 1,
+  "coverage_pct": 0.95,
+  "is_suspicious_static": false,
+  "is_market_open": true,
+  "recent_daily_prices": [1780.0, 1800.0, 1810.0, 1790.0, 1800.0, 1820.0, 1800.0],
+  "prior_8w_same_weekday_arrivals": [42.0, 44.0, 46.0, 45.0, 43.0, 45.0, 47.0, 45.0],
+  "is_post_closure_catchup": false
+}
