@@ -1,0 +1,16 @@
+{
+  "name": "KrishiNirnay",
+  "short_name": "KrishiNirnay",
+  "description": "AI Market and Risk Intelligence for Agri Supply Chains",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

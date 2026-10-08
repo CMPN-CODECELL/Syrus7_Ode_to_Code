@@ -1,0 +1,52 @@
+# Risk Rules Configuration for KrishiNirnay
+# Version: 1.0.0
+
+weights:
+  price_drop: 0.25
+  arrival_spike: 0.20
+  volatility: 0.15
+  stale_data: 0.15
+  forecast_reliability: 0.15
+  weather: 0.10
+
+thresholds:
+  overall_green_max: 0.25
+  overall_yellow_max: 0.55
+
+risk_profiles:
+  CAUTIOUS:
+    quantile: "q20"
+    min_gain_pct: 0.05
+    min_prob_beat_baseline: 0.70
+  BALANCED:
+    quantile: "q35"
+    min_gain_pct: 0.03
+    min_prob_beat_baseline: 0.65
+  AGGRESSIVE:
+    quantile: "q50"
+    min_gain_pct: 0.015
+    min_prob_beat_baseline: 0.55
+
+yellow_adjustments:
+  gain_multiplier: 1.5
+  prob_additive: 0.05
+
+flag_definitions:
+  price_drop:
+    yellow: "chance of drop >= 55% OR q20 <= 97% of today's price OR 3-day change <= -10%"
+    red: "chance >= 70% OR q20 <= 92% OR 3-day change <= -15%"
+  arrival_spike:
+    yellow: "ratio >= 1.5 OR robust_z >= 2.5"
+    red: "ratio >= 2.0 OR robust_z >= 3.5"
+  volatility:
+    yellow: "volatility > 75th percentile OR spread > 50%"
+    red: "volatility > 90th percentile OR spread > 100%"
+  stale_data:
+    yellow: "age == 2 expected trading days"
+    red: "age >= 3 expected trading days"
+  forecast_reliability:
+    yellow: "width > 20% OR MASE 0.8-1.0 OR coverage 65-75%"
+    red: "width > 35% OR MASE > 1.0 OR coverage < 65% OR OOD"
+  weather:
+    yellow: "IMD Yellow OR temp >= 35C OR rain >= 15.6mm/24h"
+    red: "IMD Red OR temp >= 40C OR rain >= 64.5mm/24h"

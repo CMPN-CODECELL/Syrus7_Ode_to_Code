@@ -1,0 +1,188 @@
+{
+  "request_id": "req-golden-2026-fixture-001",
+  "engine_version": "1.0.0",
+  "data_snapshot_id": "data_gov_in_2026_q3_v1",
+  "rules_version": "rules_v1.0",
+  "forecast_model_version": "xgboost_direct_h7_v1",
+  "calibration_version": "conformal_residual_v1",
+  "cost_config_version": "cost_v1.0",
+  "weather_snapshot_id": "openmeteo_imd_v1",
+  "route_snapshot_id": "ors_heigit_v1",
+  "timestamp": "2026-10-09T06:00:00+05:30",
+  "commodity": "Tomato",
+  "lot_quantity_qtl": 20.0,
+  "risk_profile": "BALANCED",
+  "baseline": {
+    "market": "Nashik APMC",
+    "sale_day": "2026-10-09",
+    "modal_price": 1800.0,
+    "quantity_sold_qtl": 19.8,
+    "gross_revenue": 35640.0,
+    "net_total": 33960.0,
+    "cost_breakdown": {
+      "gross_revenue": 35640.0,
+      "transport": 1440.0,
+      "hamali_tolai": 240.0,
+      "commission_fees": 0.0,
+      "storage": 0.0,
+      "financing": 0.0,
+      "travel_loss_pct": 0.01,
+      "holding_loss_pct": 0.0,
+      "quality_factor": 1.0,
+      "quantity_initial_qtl": 20.0,
+      "quantity_sold_qtl": 19.8,
+      "final_net": 33960.0
+    }
+  },
+  "chosen": {
+    "action": "WAIT",
+    "market": "Nashik APMC",
+    "sale_day": "2026-10-11",
+    "wait_days": 2,
+    "modal_price_expected": 1950.0,
+    "net_total": 36055.0,
+    "gain_total": 2095.0,
+    "gain_pct": 0.0617,
+    "probability_beat_baseline": 0.624,
+    "reservation_price": 1842.0,
+    "cost_breakdown": {
+      "gross_revenue": 37838.0,
+      "transport": 1440.0,
+      "hamali_tolai": 240.0,
+      "commission_fees": 0.0,
+      "storage": 80.0,
+      "financing": 23.0,
+      "travel_loss_pct": 0.01,
+      "holding_loss_pct": 0.02,
+      "quality_factor": 1.0,
+      "quantity_initial_qtl": 20.0,
+      "quantity_sold_qtl": 19.404,
+      "final_net": 36055.0
+    }
+  },
+  "cautious_wait": {
+    "modal_price_q20": 1700.0,
+    "net_total": 31204.0,
+    "gain_total": -2756.0
+  },
+  "two_day_q_quantiles": {
+    "q20_price": 1760.0,
+    "q20_net": 33570.0,
+    "q35_price": 1830.0,
+    "q35_net": 34937.0,
+    "q50_price": 1900.0,
+    "q50_net": 36305.0
+  },
+  "three_mandi_sell_now": {
+    "home_a_nashik": 35172.0,
+    "mandi_b_pimpalgaon": 34554.0,
+    "mandi_c_lasalgaon": 33968.0
+  },
+  "forecast": {
+    "crop": "Tomato",
+    "mandi": "Nashik APMC",
+    "target_date": "2026-10-11",
+    "q10": 1640.0,
+    "q20": 1700.0,
+    "q35": 1830.0,
+    "q50": 1950.0,
+    "q90": 2180.0,
+    "low": 1640.0,
+    "expected": 1950.0,
+    "high": 2180.0,
+    "reliability": "HIGH",
+    "rolling_mase": 0.74,
+    "rolling_80_coverage": 0.82,
+    "training_end_date": "2026-10-07",
+    "out_of_range": false,
+    "top_drivers_up": ["Festive demand pickup", "Declining local arrivals"],
+    "top_drivers_down": ["Inter-state supply from Karnataka"],
+    "unit": "INR_PER_QUINTAL"
+  },
+  "risk": {
+    "overall": "YELLOW",
+    "score": 0.38,
+    "flags": [
+      {
+        "id": "price_drop",
+        "name": "Price Drop Risk",
+        "status": "GREEN",
+        "score": 0.0,
+        "reason": "Forecast expected price trends upward to ₹1,950/qtl with low probability of steep drop",
+        "evidence": "q20 at ₹1,700/qtl, probability of beating baseline is 62.4%"
+      },
+      {
+        "id": "arrival_spike",
+        "name": "Arrival Spike Risk",
+        "status": "GREEN",
+        "score": 0.0,
+        "reason": "Daily arrivals within normal 8-week median bounds (ratio 0.94)",
+        "evidence": "Observed 1,420 quintals vs median 1,510 quintals"
+      },
+      {
+        "id": "volatility",
+        "name": "Volatility Risk",
+        "status": "YELLOW",
+        "score": 0.5,
+        "reason": "14-day price spread is 54% due to monsoon transitions",
+        "evidence": "Min ₹1,300 to Max ₹2,000 against modal ₹1,800"
+      },
+      {
+        "id": "stale_data",
+        "name": "Data Freshness Risk",
+        "status": "GREEN",
+        "score": 0.0,
+        "reason": "Confirmed report from today's morning trading session (0 days old)",
+        "evidence": "Fetched today at 05:30 IST from data.gov.in"
+      },
+      {
+        "id": "forecast_reliability",
+        "name": "Forecast Reliability Risk",
+        "status": "GREEN",
+        "score": 0.0,
+        "reason": "Walk-forward MASE 0.74 (< 0.80) and 82% conformal interval coverage",
+        "evidence": "Training through 2026-10-07, within standard feature envelope"
+      },
+      {
+        "id": "weather",
+        "name": "Weather Risk",
+        "status": "YELLOW",
+        "score": 0.5,
+        "reason": "Open-Meteo predicts moderate rain (18mm) on Day 2 in Nashik district",
+        "evidence": "IMD Yellow alert for Nashik catchment area; holding loss factor increased to 2%"
+      }
+    ]
+  },
+  "warnings": [
+    "Weather Yellow alert: ensure tarp/covered transport for Day 2 travel."
+  ],
+  "assumptions": [
+    "Transport billed round trip at ₹12/km for 60 km (₹1,440)",
+    "Storage estimated at ₹2.0/qtl/day for 2 days",
+    "Financing estimated at 12% annual rate on capital tied up"
+  ],
+  "source_refs": [
+    "data.gov.in AGMARKNET daily feed",
+    "OpenRouteService routing api.heigit.org",
+    "Open-Meteo & IMD meteorological radar"
+  ],
+  "explanation": {
+    "verdict": "WAIT 2 DAYS",
+    "why": [
+      "Expected net realization is ₹36,055 compared to ₹33,960 today, giving an extra net gain of ₹2,095.",
+      "62.4% probability of beating today's baseline after all deductions for holding loss (2%), travel loss (1%), storage (₹80), and financing (₹23).",
+      "Do not sell below the reservation price of ₹1,842/qtl in future days."
+    ],
+    "key_drivers": [
+      "Forecast modal price rises from ₹1,800/qtl to ₹1,950/qtl",
+      "Arrival volumes are steady, preventing price crashes"
+    ],
+    "evidence": [
+      "Baseline Net: ₹33,960",
+      "Wait 2 Days Net: ₹36,055",
+      "Reservation Price: ₹1,842/qtl",
+      "Risk Score: 0.38 (Yellow)"
+    ],
+    "spoken_summary": "२ दिवस थांबा. अंदाजे निव्वळ नफा ३६,०५५ रुपये मिळेल, जो आजपेक्षा २,०९५ रुपये जास्त आहे. हवामानाचा यलो अलर्ट असल्याने मालाची काळजी घ्या."
+  }
+}

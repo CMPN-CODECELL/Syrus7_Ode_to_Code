@@ -1,0 +1,55 @@
+# Application Configuration for KrishiNirnay
+# Project: KrishiNirnay
+# Tagline: "Sahi Bhav Se, Samriddhi Ki Raah Pe."
+
+app_name: "KrishiNirnay"
+tagline: "Sahi Bhav Se, Samriddhi Ki Raah Pe."
+version: "1.0.0"
+
+models:
+  primary_llm: "gemini-2.5-flash" # or gemini-3.8-flash adapter
+  fallback_llm: "openai/gpt-oss-20b"
+  primary_asr: "groq-whisper-large-v3-turbo"
+  fallback_asr: "whisper-large-v3"
+  primary_tts: "gemini-3.8-flash-lite-tts"
+
+languages:
+  supported:
+    - code: "mr-IN"
+      name: "मराठी"
+    - code: "hi-IN"
+      name: "हिंदी"
+    - code: "en-IN"
+      name: "English"
+  default: "mr-IN"
+
+markets:
+  verified_mandis:
+    - id: "nashik_apmc"
+      name: "Nashik APMC"
+      district: "Nashik"
+      state: "Maharashtra"
+      coordinates: [19.9975, 73.7898]
+    - id: "pimpalgaon_apmc"
+      name: "Pimpalgaon Baswant APMC"
+      district: "Nashik"
+      state: "Maharashtra"
+      coordinates: [20.1714, 73.9856]
+    - id: "lasalgaon_apmc"
+      name: "Lasalgaon APMC"
+      district: "Nashik"
+      state: "Maharashtra"
+      coordinates: [20.1465, 74.2275]
+
+commodities:
+  - id: "tomato"
+    canonical_name: "Tomato"
+    local_names: ["टोमॅटो", "टमाटर"]
+  - id: "onion"
+    canonical_name: "Onion"
+    local_names: ["कांदा", "प्याज"]
+
+limits:
+  max_audio_size_bytes: 10485760 # 10 MB
+  max_request_body_bytes: 1048576 # 1 MB
+  rate_limit_per_minute: 60

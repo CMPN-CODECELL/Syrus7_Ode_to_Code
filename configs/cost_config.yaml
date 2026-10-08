@@ -1,0 +1,38 @@
+# Cost Configuration for KrishiNirnay
+# Version: 1.0.0
+# Currency: INR
+# Units: INR_PER_QUINTAL, qtl, km
+
+price_unit: INR_PER_QUINTAL
+quantity_unit: qtl
+
+transport:
+  rate_per_km: 12.0 # INR/km
+  round_trip_factor: 2.0
+  default_vehicle_payload_qtl: 25.0
+  road_factor: 1.25
+
+labour:
+  hamali_per_qtl: 12.0 # INR/qtl (e.g. 20 qtl = 240 INR)
+  tolai_per_qtl: 0.0
+
+market_fees:
+  commission_rate: 0.0 # 0% directly to farmer in regulated APMC
+  cess_rate: 0.0105 # 1.05% APMC cess where applicable
+
+financing:
+  annual_rate: 0.12 # 12% per year (ASSUMPTION)
+
+storage:
+  tomato_per_qtl_day: 2.0 # INR/qtl/day (ASSUMPTION)
+  onion_per_qtl_day: 1.5 # INR/qtl/day (ASSUMPTION)
+
+spoilage:
+  tomato:
+    travel_loss_per_100km: 0.01 # 1% per 100km / ~60km round trip
+    holding_loss_days_0_2: 0.02 # 2% total over 2 days
+    holding_loss_days_3_5: 0.035 # 3.5% per day for day 3-5
+  onion:
+    travel_loss_per_100km: 0.005
+    holding_loss_days_0_2: 0.005
+    holding_loss_days_3_5: 0.01
