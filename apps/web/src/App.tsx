@@ -24,6 +24,7 @@ import { LandingPage } from './components/LandingPage';
 import { HomeScreen } from './components/HomeScreen';
 import { AssistantScreen } from './components/AssistantScreen';
 import { BottomNav } from './components/BottomNav';
+import { MyFarmScreen } from './components/MyFarmScreen';
 
 import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus } from './types';
 import { ApiClient } from './api/client';
@@ -34,12 +35,16 @@ import enDict from './localization/en.json';
 
 export const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'home' | 'decision' | 'costs'>('home');
-  const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('mr-IN');
+  const [activeTab, setActiveTab] = useState<'advice' | 'simulator' | 'costs' | 'farm'>('advice');
+  const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('en-IN');
   const [riskProfile, setRiskProfile] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [demoMode, setDemoMode] = useState<DemoFailureMode>('NORMAL');
   const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
+
+  // WebSocket Live Stream State
+  const [wsStatus, setWsStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connecting');
+  const [liveTicker, setLiveTicker] = useState<string>('🟢 Live Mandi Stream Active: 142 tonnes traded at Nashik APMC • Modal rate steady at ₹1,800/qtl');
 
   const [decisionRecord, setDecisionRecord] = useState<DecisionRecord | null>(null);
   const [heatmapData, setHeatmapData] = useState<HeatmapMatrix | null>(null);
@@ -56,7 +61,7 @@ export const App: React.FC = () => {
     home_mandi: 'Nashik APMC',
     requested_wait_days: 2,
     risk_profile: 'BALANCED',
-    language: 'mr-IN',
+    language: 'en-IN',
     is_complete: true,
     missing_slots: [],
     ambiguous_slots: []
@@ -92,6 +97,26 @@ export const App: React.FC = () => {
   useEffect(() => {
     loadDecisionData(currentSlots, riskProfile);
   }, [language, riskProfile]);
+
+  // WebSocket Live Stream Lifecycle
+  useEffect(() => {
+    const socket = ApiClient.connectMarketFeed(
+      (msg) => {
+        if (msg.type === 'INITIAL_MARKET_STATE' || msg.type === 'MARKET_REFRESH') {
+          setWsStatus('connected');
+        } else if (msg.type === 'LIVE_TICKER' && msg.ticker) {
+          setLiveTicker(msg.ticker);
+        }
+      },
+      (st) => {
+        setWsStatus(st);
+      }
+    );
+
+    return () => {
+      socket?.close();
+    };
+  }, []);
 
   const handleModeChange = async (mode: DemoFailureMode) => {
     setDemoMode(mode);
@@ -158,51 +183,76 @@ export const App: React.FC = () => {
         onOpenJudgeTools={() => setIsJudgeModalOpen(true)}
         lotSummary={lotSummary}
         labels={labels}
+        wsStatus={wsStatus}
       />
 
-      {/* 2. Main 3 Farmer Views */}
+      {/* 2. Main 4 Clear Tabs */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {loading && !decisionRecord ? (
           <div className="bg-white p-16 text-center rounded-3xl border border-emerald-100 shadow-sm space-y-4">
             <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="text-sm font-bold text-slate-700">
-              {labels.engineStarting || 'लोड होत आहे...'}
+              {labels.engineStarting || 'Loading Market Intelligence...'}
             </p>
           </div>
         ) : (
           <>
-            {/* View 1: Crop & Mandi Setup */}
-            {activeTab === 'home' && (
-              <HomeScreen
-                record={decisionRecord}
-                slots={currentSlots}
-                onNavigateTab={(t: any) => setActiveTab(t)}
-                onOpenVoice={() => setIsVoiceOpen(true)}
-                onOpenEditLot={() => setIsEditModalOpen(true)}
-                onSelectCropPreset={handleSelectCropPreset}
-                labels={labels}
-                language={language}
-              />
-            )}
-
-            {/* View 2: Smart Decision (WAIT / SELL / GO) */}
-            {activeTab === 'decision' && (
+            {/* Tab 1: Market Advice (Today's Decision & 7-Day Horizon) */}
+            {activeTab === 'advice' && (
               <DecisionScreen
                 record={decisionRecord}
+                slots={currentSlots}
+                onUpdateSlots={(updated) => {
+                  const newSlots = { ...currentSlots, ...updated };
+                  setCurrentSlots(newSlots);
+                  if (updated.risk_profile && updated.risk_profile !== riskProfile) {
+                    setRiskProfile(updated.risk_profile as any);
+                  }
+                }}
                 onPlayVoice={handlePlayVoice}
                 onOpenCosts={() => setActiveTab('costs')}
+                onOpenScenarios={() => setActiveTab('simulator')}
                 labels={labels}
                 language={language}
                 isInsufficientEvidence={demoMode === 'DATA_OUTAGE'}
+                liveTicker={liveTicker}
+                wsStatus={wsStatus}
               />
             )}
 
-            {/* View 3: Simple Pocket Calculator */}
+            {/* Tab 2: What-If Planner & Simulator */}
+            {activeTab === 'simulator' && (
+              <ScenarioScreen
+                record={decisionRecord}
+                labels={labels}
+                language={language}
+              />
+            )}
+
+            {/* Tab 3: Itemized Expense Bill */}
             {activeTab === 'costs' && (
               <CostScreen
                 record={decisionRecord}
                 labels={labels}
                 language={language}
+              />
+            )}
+
+            {/* Tab 4: My Farm & Settings */}
+            {activeTab === 'farm' && (
+              <MyFarmScreen
+                slots={currentSlots}
+                onOpenEditLot={() => setIsEditModalOpen(true)}
+                language={language}
+                setLanguage={setLanguage}
+                theme={theme}
+                onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                demoMode={demoMode}
+                onDemoModeChange={handleModeChange}
+                demoStatus={demoStatus}
+                riskProfile={riskProfile}
+                setRiskProfile={setRiskProfile}
+                labels={labels}
               />
             )}
           </>

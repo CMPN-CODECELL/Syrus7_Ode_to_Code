@@ -231,10 +231,10 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, labels, language
         {showTechnicalDetails && (
           <div className="pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600 animate-in fade-in duration-200">
             <p>
-              <strong>Sequential Loss Cascade:</strong> Harvest Qty (20.0 qtl) \(\to\) after 2% holding loss (19.6 qtl) \(\to\) after 1% travel loss (19.404 qtl sold at mandi weighbridge). Zero double-spoilage deduction guaranteed.
+              <strong>Sequential Loss Cascade:</strong> Harvest Qty (20.0 qtl) → after 2% holding loss (19.6 qtl) → after 1% travel loss (19.404 qtl sold at weighbridge). Zero double-spoilage deduction guaranteed.
             </p>
             <p>
-              <strong>Transport Formula:</strong> Discrete trips = \(\lceil 20 / 25 \rceil = 1\) trip. Round trip 60 km \(\times\) rate basis + driver allowance.
+              <strong>Transport Formula:</strong> Discrete trips = ceil(20 / 25) = 1 trip. Round trip 60 km × rate basis + driver allowance.
             </p>
             <p>
               <strong>Mandi Bylaws:</strong> Hamali and APMC market cess verified against Agmarknet Maharashtra benchmarks.

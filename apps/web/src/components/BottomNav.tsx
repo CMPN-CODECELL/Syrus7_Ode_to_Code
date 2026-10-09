@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sprout, Scale, Receipt } from 'lucide-react';
+import { TrendingUp, Sliders, Receipt, Sprout } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: string;
@@ -15,20 +15,25 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   const navItems = [
     {
-      id: 'home',
-      label: language === 'mr-IN' ? 'माझे पीक' : language === 'hi-IN' ? 'मेरी फसल' : 'My Crop',
-      icon: Sprout
-    },
-    {
-      id: 'decision',
-      label: language === 'mr-IN' ? 'योग्य निर्णय' : language === 'hi-IN' ? 'सही निर्णय' : 'Smart Decision',
-      icon: Scale,
+      id: 'advice',
+      label: 'Advice',
+      icon: TrendingUp,
       isHighlight: true
     },
     {
+      id: 'simulator',
+      label: 'Planner',
+      icon: Sliders
+    },
+    {
       id: 'costs',
-      label: language === 'mr-IN' ? 'साधा हिशोब' : language === 'hi-IN' ? 'सीधा हिसाब' : 'Calculator',
+      label: 'Bill',
       icon: Receipt
+    },
+    {
+      id: 'farm',
+      label: 'My Farm',
+      icon: Sprout
     }
   ];
 

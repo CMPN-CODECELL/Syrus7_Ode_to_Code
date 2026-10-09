@@ -75,3 +75,36 @@ def test_dynamic_translate_endpoint():
     assert res_hi.status_code == 200
     assert res_hi.json()["translated_text"] == "पिंपलगांव बसवंत मंडी"
 
+def test_market_calendar_endpoint():
+    res = client.get("/api/market-calendar?crop=Tomato&mandi=Nashik%20APMC")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data["days"]) == 7
+    # Day 2 is Sunday holiday for Nashik APMC
+    day2 = data["days"][2]
+    assert day2["is_open"] is False
+    assert "Sunday" in day2["holiday_name"]
+    assert "Weekly Off" in day2["status_label"]
+    # Day 4 is Festival Amavasya holiday
+    day4 = data["days"][4]
+    assert day4["is_open"] is False
+    assert "Festival" in day4["holiday_name"]
+
+def test_weather_impact_endpoint():
+    res = client.get("/api/weather-impact?crop=Tomato&mandi=Nashik%20APMC")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["alert_level"] == "YELLOW"
+    assert data["rainfall_forecast_mm"] == 18.0
+    assert "harvest_disruption" in data
+    assert "storage_spoilage_risk" in data
+
+def test_websocket_market_feed():
+    with client.websocket_connect("/ws/market-feed") as ws:
+        msg = ws.receive_json()
+        assert msg["type"] == "INITIAL_MARKET_STATE"
+        assert len(msg["mandis"]) == 3
+        assert "weather" in msg
+        assert "closures" in msg
+
+

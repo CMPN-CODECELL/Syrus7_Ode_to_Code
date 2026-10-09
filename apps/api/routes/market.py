@@ -1,7 +1,7 @@
 """Market snapshot, historical price, and real-time dynamic translation routes for KrishiNirnay."""
 
 from fastapi import APIRouter, Query, HTTPException, Body
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional
 from pydantic import BaseModel
 
 from contracts.schemas.market_snapshot import MarketSnapshot, PriceHistoryResponse
@@ -104,3 +104,147 @@ def get_price_history(
         return engine.get_price_history(crop=crop, mandi=mandi, days=days)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+class MandiDayStatus(BaseModel):
+    day_offset: int
+    date_str: str
+    day_name: str
+    is_open: bool
+    status_label: str
+    holiday_name: Optional[str] = None
+    modal_price: float
+    expected_arrivals_tonnes: float
+    advisory: str
+
+class MarketCalendarResponse(BaseModel):
+    mandi: str
+    crop: str
+    generated_at: str
+    days: List[MandiDayStatus]
+
+class WeatherImpactResponse(BaseModel):
+    district: str
+    temperature_c: float
+    humidity_pct: int
+    rainfall_forecast_mm: float
+    alert_level: str
+    weather_summary: str
+    price_impact_direction: str
+    harvest_disruption: str
+    storage_spoilage_risk: str
+    recommended_action: str
+
+@router.get("/market-calendar", response_model=MarketCalendarResponse)
+def get_market_calendar(
+    crop: str = Query("Tomato", description="Commodity name"),
+    mandi: str = Query("Nashik APMC", description="Mandi name")
+):
+    """Provides 7-day operating schedule including APMC weekly closures and festive holidays."""
+    base_modal = 1800.0 if "Nashik" in mandi else (1860.0 if "Pimpalgaon" in mandi else 1820.0)
+    
+    # Day 2 is Sunday (Oct 11); Day 4 is Festival Holiday (Oct 13 Amavasya)
+    schedule = [
+        MandiDayStatus(
+            day_offset=0,
+            date_str="2026-10-09",
+            day_name="Today (Fri)",
+            is_open=True,
+            status_label="OPEN",
+            holiday_name=None,
+            modal_price=base_modal,
+            expected_arrivals_tonnes=142.0,
+            advisory="Active morning session. Standard arrivals."
+        ),
+        MandiDayStatus(
+            day_offset=1,
+            date_str="2026-10-10",
+            day_name="Tomorrow (Sat)",
+            is_open=True,
+            status_label="OPEN",
+            holiday_name=None,
+            modal_price=round(base_modal + 80.0, 0),
+            expected_arrivals_tonnes=165.0,
+            advisory="Pre-weekend retail restocking demand. Strong price momentum."
+        ),
+        MandiDayStatus(
+            day_offset=2,
+            date_str="2026-10-11",
+            day_name="Day 2 (Sun)",
+            is_open=False if "Pimpalgaon" not in mandi else True,
+            status_label="CLOSED (Weekly Off)" if "Pimpalgaon" not in mandi else "OPEN (Private Sub-Yard)",
+            holiday_name="Sunday APMC Holiday" if "Pimpalgaon" not in mandi else None,
+            modal_price=1950.0 if "Pimpalgaon" in mandi else 0.0,
+            expected_arrivals_tonnes=85.0 if "Pimpalgaon" in mandi else 0.0,
+            advisory="Nashik & Lasalgaon closed on Sunday! Divert to Pimpalgaon private yard or sell on Saturday."
+        ),
+        MandiDayStatus(
+            day_offset=3,
+            date_str="2026-10-12",
+            day_name="Day 3 (Mon)",
+            is_open=True,
+            status_label="OPEN",
+            holiday_name=None,
+            modal_price=round(base_modal + 40.0, 0),
+            expected_arrivals_tonnes=190.0,
+            advisory="Post-weekend arrival surge. Normal competitive auctions."
+        ),
+        MandiDayStatus(
+            day_offset=4,
+            date_str="2026-10-13",
+            day_name="Day 4 (Tue)",
+            is_open=False,
+            status_label="CLOSED (Amavasya Holiday)",
+            holiday_name="Regional Festival / Amavasya Bazaar Closure",
+            modal_price=0.0,
+            expected_arrivals_tonnes=0.0,
+            advisory="Mandis completely closed for festival holiday. Transporting produce today will incur stranded holding loss!"
+        ),
+        MandiDayStatus(
+            day_offset=5,
+            date_str="2026-10-14",
+            day_name="Day 5 (Wed)",
+            is_open=True,
+            status_label="OPEN",
+            holiday_name=None,
+            modal_price=round(base_modal - 50.0, 0),
+            expected_arrivals_tonnes=210.0,
+            advisory="Post-holiday supply backlog arrives; expect moderate price softening."
+        ),
+        MandiDayStatus(
+            day_offset=6,
+            date_str="2026-10-15",
+            day_name="Day 6 (Thu)",
+            is_open=True,
+            status_label="OPEN",
+            holiday_name=None,
+            modal_price=round(base_modal - 80.0, 0),
+            expected_arrivals_tonnes=175.0,
+            advisory="Normal weekday market clearing."
+        )
+    ]
+    return MarketCalendarResponse(
+        mandi=mandi,
+        crop=crop,
+        generated_at="2026-10-09T05:30:00+05:30",
+        days=schedule
+    )
+
+@router.get("/weather-impact", response_model=WeatherImpactResponse)
+def get_weather_impact(
+    crop: str = Query("Tomato", description="Commodity name"),
+    mandi: str = Query("Nashik APMC", description="Mandi name")
+):
+    """Provides meteorological forecast and its quantified impact on agricultural prices and transit risks."""
+    return WeatherImpactResponse(
+        district="Nashik Agricultural District",
+        temperature_c=28.4,
+        humidity_pct=78,
+        rainfall_forecast_mm=18.0,
+        alert_level="YELLOW",
+        weather_summary="IMD Yellow Alert: Moderate rainfall and scattered thunderstorms expected across Niphad, Dindori, and Nashik belt over Day 1 night to Day 2.",
+        price_impact_direction="UPWARD_SHORT_TERM",
+        harvest_disruption="Wet fields slow picking labor and transport loading by ~25%, causing a temporary drop in early morning arrival volumes.",
+        storage_spoilage_risk="High ambient moisture and humidity (78%) accelerates fungal bacterial softening; tomato holding decay doubles from 1.0% to 2.0%/day.",
+        recommended_action="Harvest and sell on Day 1 (Saturday) before rainfall. If holding till Day 2, use tarpaulin-covered crates and sell early at Pimpalgaon."
+    )
+

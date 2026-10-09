@@ -16,6 +16,7 @@ interface Props {
   onOpenJudgeTools?: () => void;
   lotSummary: string;
   labels: Record<string, string>;
+  wsStatus?: 'connected' | 'disconnected' | 'connecting';
 }
 
 export const Navbar: React.FC<Props> = ({
@@ -32,21 +33,26 @@ export const Navbar: React.FC<Props> = ({
   onOpenLanding,
   onOpenJudgeTools,
   lotSummary,
-  labels
+  labels,
+  wsStatus = 'connected'
 }) => {
-  // Simplified 3 Farmer Tabs
+  // Clear, intuitive tabs that any user understands at a glance
   const farmerTabs = [
     {
-      id: 'home',
-      label: language === 'mr-IN' ? '🌾 माझे पीक व बाजार' : language === 'hi-IN' ? '🌾 मेरी फसल व मंडी' : '🌾 My Crop & Mandi'
+      id: 'advice',
+      label: '📈 Market Advice'
     },
     {
-      id: 'decision',
-      label: language === 'mr-IN' ? '⚖️ योग्य निर्णय व भाव' : language === 'hi-IN' ? '⚖️ सही निर्णय व भाव' : '⚖️ Decision & Rates'
+      id: 'simulator',
+      label: '🧪 What-If Planner'
     },
     {
       id: 'costs',
-      label: language === 'mr-IN' ? '💰 साधा हिशोब (पावती)' : language === 'hi-IN' ? '💰 सीधा हिसाब (रसीद)' : '💰 Pocket Calculator'
+      label: '💰 Expense Bill'
+    },
+    {
+      id: 'farm',
+      label: '🌾 My Farm'
     }
   ];
 
@@ -86,8 +92,14 @@ export const Navbar: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Controls: Language Selector + Judge Tools Button */}
+          {/* Controls: Live Feed + Language Selector + Judge Tools Button */}
           <div className="flex items-center gap-2">
+            {/* Live WebSocket Status Pill */}
+            <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 text-[11px] font-bold text-emerald-900 shadow-2xs">
+              <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : wsStatus === 'connecting' ? 'bg-amber-500 animate-ping' : 'bg-red-400'}`}></span>
+              <span className="hidden sm:inline font-mono">{wsStatus === 'connected' ? 'Live Stream' : 'Connecting...'}</span>
+            </div>
+
             {/* Language Selector (मराठी | हिंदी | EN) */}
             <div className="flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs">
               <button

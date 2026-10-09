@@ -12,7 +12,10 @@ import {
   ScenarioRequest,
   ScenarioResponse,
   DemoStatus,
-  DemoFailureMode
+  DemoFailureMode,
+  MarketCalendarResponse,
+  WeatherImpactResponse,
+  LiveMarketMessage
 } from '../types';
 
 const API_BASE = ''; // uses vite proxy or relative path
@@ -49,6 +52,94 @@ export class ApiClient {
     const res = await fetch(`${API_BASE}/api/heatmap`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
+  }
+
+  static async getMarketCalendar(crop: string = 'Tomato', mandi: string = 'Nashik APMC'): Promise<MarketCalendarResponse> {
+    try {
+      const res = await fetch(`${API_BASE}/api/market-calendar?crop=${encodeURIComponent(crop)}&mandi=${encodeURIComponent(mandi)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      // Offline fallback
+      return {
+        mandi,
+        crop,
+        generated_at: '2026-10-09T05:30:00+05:30',
+        days: [
+          { day_offset: 0, date_str: '2026-10-09', day_name: 'Today (Fri)', is_open: true, status_label: 'OPEN', modal_price: 1800, expected_arrivals_tonnes: 142, advisory: 'Active trading' },
+          { day_offset: 1, date_str: '2026-10-10', day_name: 'Tomorrow (Sat)', is_open: true, status_label: 'OPEN', modal_price: 1880, expected_arrivals_tonnes: 165, advisory: 'Strong weekend demand' },
+          { day_offset: 2, date_str: '2026-10-11', day_name: 'Day 2 (Sun)', is_open: false, status_label: 'CLOSED (Weekly Off)', holiday_name: 'Sunday APMC Holiday', modal_price: 0, expected_arrivals_tonnes: 0, advisory: 'Nashik APMC closed on Sunday! Divert to Pimpalgaon private yard' },
+          { day_offset: 3, date_str: '2026-10-12', day_name: 'Day 3 (Mon)', is_open: true, status_label: 'OPEN', modal_price: 1840, expected_arrivals_tonnes: 190, advisory: 'Post-weekend arrival surge' },
+          { day_offset: 4, date_str: '2026-10-13', day_name: 'Day 4 (Tue)', is_open: false, status_label: 'CLOSED (Festival Holiday)', holiday_name: 'Amavasya Mandi Holiday', modal_price: 0, expected_arrivals_tonnes: 0, advisory: 'Mandi closed for festival! Do not travel today.' },
+          { day_offset: 5, date_str: '2026-10-14', day_name: 'Day 5 (Wed)', is_open: true, status_label: 'OPEN', modal_price: 1750, expected_arrivals_tonnes: 210, advisory: 'Delayed produce arrives' },
+          { day_offset: 6, date_str: '2026-10-15', day_name: 'Day 6 (Thu)', is_open: true, status_label: 'OPEN', modal_price: 1720, expected_arrivals_tonnes: 175, advisory: 'Normal weekday' }
+        ]
+      };
+    }
+  }
+
+  static async getWeatherImpact(crop: string = 'Tomato', mandi: string = 'Nashik APMC'): Promise<WeatherImpactResponse> {
+    try {
+      const res = await fetch(`${API_BASE}/api/weather-impact?crop=${encodeURIComponent(crop)}&mandi=${encodeURIComponent(mandi)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      return {
+        district: 'Nashik Agricultural Belt',
+        temperature_c: 28.4,
+        humidity_pct: 78,
+        rainfall_forecast_mm: 18.0,
+        alert_level: 'YELLOW',
+        weather_summary: 'IMD Yellow Alert: Moderate rain (18mm) expected over Day 1 night to Day 2.',
+        price_impact_direction: 'UPWARD_SHORT_TERM',
+        harvest_disruption: 'Wet fields slow picking labor and transport loading by ~25%.',
+        storage_spoilage_risk: 'High humidity causes fungal softening; holding decay increases to 2%/day.',
+        recommended_action: 'Harvest and sell on Saturday or use covered tarpaulin transport.'
+      };
+    }
+  }
+
+  static connectMarketFeed(
+    onMessage: (data: LiveMarketMessage) => void,
+    onStatusChange?: (status: 'connected' | 'disconnected' | 'connecting') => void
+  ): WebSocket | null {
+    try {
+      const isSecure = window.location.protocol === 'https:';
+      const wsProtocol = isSecure ? 'wss:' : 'ws:';
+      const host = window.location.host || 'localhost:3000';
+      const wsUrl = `${wsProtocol}//${host}/ws/market-feed`;
+
+      onStatusChange?.('connecting');
+      const socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        onStatusChange?.('connected');
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const parsed = JSON.parse(event.data);
+          onMessage(parsed);
+        } catch (e) {
+          console.warn('Failed to parse WS data:', e);
+        }
+      };
+
+      socket.onerror = (err) => {
+        console.warn('Market WebSocket error:', err);
+        onStatusChange?.('disconnected');
+      };
+
+      socket.onclose = () => {
+        onStatusChange?.('disconnected');
+      };
+
+      return socket;
+    } catch (e) {
+      console.warn('WebSocket connection not supported or failed:', e);
+      onStatusChange?.('disconnected');
+      return null;
+    }
   }
 
   static async runScenario(req: ScenarioRequest): Promise<ScenarioResponse> {

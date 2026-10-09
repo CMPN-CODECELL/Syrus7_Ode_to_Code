@@ -258,3 +258,65 @@ export interface DemoStatus {
   market_api_healthy: boolean;
   weather_api_healthy: boolean;
 }
+
+export interface MandiDayStatus {
+  day_offset: number;
+  date_str: string;
+  day_name: string;
+  is_open: boolean;
+  status_label: string;
+  holiday_name?: string | null;
+  modal_price: number;
+  expected_arrivals_tonnes: number;
+  advisory: string;
+}
+
+export interface MarketCalendarResponse {
+  mandi: string;
+  crop: string;
+  generated_at: string;
+  days: MandiDayStatus[];
+}
+
+export interface WeatherImpactResponse {
+  district: string;
+  temperature_c: number;
+  humidity_pct: number;
+  rainfall_forecast_mm: number;
+  alert_level: string;
+  weather_summary: string;
+  price_impact_direction: string;
+  harvest_disruption: string;
+  storage_spoilage_risk: string;
+  recommended_action: string;
+}
+
+export interface LiveMarketMessage {
+  type: string;
+  client_id?: string;
+  timestamp?: string;
+  mandis?: Array<{
+    name: string;
+    commodity: string;
+    modal_price: number;
+    min_price: number;
+    max_price: number;
+    arrivals_tonnes: number;
+    status: string;
+    weather_alert?: string;
+  }>;
+  weather?: {
+    district: string;
+    temp_c: number;
+    rain_mm: number;
+    summary: string;
+    impact: string;
+  };
+  closures?: Array<{
+    day_offset: number;
+    mandi: string;
+    reason: string;
+  }>;
+  ticker?: string;
+}
+
