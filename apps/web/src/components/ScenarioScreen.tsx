@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sliders, RefreshCw, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Sliders, RefreshCw, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, Zap } from 'lucide-react';
 import { DecisionRecord, ScenarioResponse } from '../types';
 import { ApiClient } from '../api/client';
 
@@ -27,6 +27,31 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
         price_delta_pct: priceDeltaPct,
         transport_delta_pct: transportDeltaPct,
         arrival_multiplier: arrivalMultiplier,
+        risk_profile: record.risk_profile
+      });
+      setScenarioResult(res);
+    } catch (e) {
+      console.error('Scenario simulation failed:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const triggerCustomScenario = async (pDelta: number, tDelta: number, aMult: number) => {
+    if (!record) return;
+    setPriceDeltaPct(pDelta);
+    setTransportDeltaPct(tDelta);
+    setArrivalMultiplier(aMult);
+    setLoading(true);
+    try {
+      const res = await ApiClient.runScenario({
+        base_request_id: record.request_id,
+        commodity: record.commodity,
+        quantity_qtl: record.lot_quantity_qtl,
+        home_mandi: record.chosen.market,
+        price_delta_pct: pDelta,
+        transport_delta_pct: tDelta,
+        arrival_multiplier: aMult,
         risk_profile: record.risk_profile
       });
       setScenarioResult(res);
@@ -67,6 +92,52 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>{loading ? 'Simulating Engine...' : 'Rerun Backend Scenario'}</span>
         </button>
+      </div>
+
+      {/* 1-Click Stress Test Presets */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+          <span className="flex items-center gap-1.5">
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span>एक-क्लिक ताण चाचणी (1-Click Stress Test Presets):</span>
+          </span>
+          <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
+            झटपट परिणाम पाहण्यासाठी क्लिक करा
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <button
+            onClick={() => triggerCustomScenario(0, 0.20, 1.0)}
+            className="p-3 rounded-2xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 text-left transition shadow-xs text-xs"
+          >
+            <span className="font-extrabold text-amber-900 block text-[11px]">🚛 +20% वाहतूक वाढ</span>
+            <span className="text-[10px] text-slate-600 font-medium">इंधन दरवाढ प्रभाव</span>
+          </button>
+
+          <button
+            onClick={() => triggerCustomScenario(-0.10, 0, 1.0)}
+            className="p-3 rounded-2xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-left transition shadow-xs text-xs"
+          >
+            <span className="font-extrabold text-rose-900 block text-[11px]">📉 -10% भाव घसरण</span>
+            <span className="text-[10px] text-slate-600 font-medium">अपेक्षित भाव पडल्यास</span>
+          </button>
+
+          <button
+            onClick={() => triggerCustomScenario(0, 0, 2.0)}
+            className="p-3 rounded-2xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-left transition shadow-xs text-xs"
+          >
+            <span className="font-extrabold text-blue-900 block text-[11px]">🌾 2.0x दुप्पट आवक</span>
+            <span className="text-[10px] text-slate-600 font-medium">बाजारात प्रचंड माल आल्यास</span>
+          </button>
+
+          <button
+            onClick={() => triggerCustomScenario(0, 0, 1.0)}
+            className="p-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-left transition shadow-xs text-xs"
+          >
+            <span className="font-extrabold text-emerald-900 block text-[11px]">🔄 मूळ स्थिती (Reset)</span>
+            <span className="text-[10px] text-slate-600 font-medium">सामान्य बाजार परिस्थिती</span>
+          </button>
+        </div>
       </div>
 
       {/* Interactive Controls Sliders */}

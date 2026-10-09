@@ -9,7 +9,8 @@ import {
   AlertTriangle,
   Sparkles,
   Info,
-  DollarSign
+  DollarSign,
+  CheckCircle2
 } from 'lucide-react';
 import { DecisionRecord } from '../types';
 import { FreshnessBadge } from './FreshnessBadge';
@@ -71,6 +72,80 @@ export const DecisionScreen: React.FC<Props> = ({
 
   return (
     <div className="space-y-6">
+      {/* 0. Beginner-Friendly 3-Step Farmer Summary Bar */}
+      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-emerald-200 shadow-sm">
+        <div className="flex items-center justify-between mb-3 border-b border-emerald-100 pb-2">
+          <span className="text-xs font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>३-पायरी निर्णय मार्गदर्शक • 3-Step Farmer Action Guide</span>
+          </span>
+          <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">
+            सोप्या ३ गोष्टी लक्षात ठेवा (Quick 3 Takeaways)
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Step 1: Decision */}
+          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              १
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
+                पायरी १: काय करावे? (Action)
+              </span>
+              <p className="text-sm font-black text-emerald-950 mt-0.5">
+                {isWait ? `थांबा ${chosen.wait_days} दिवस (Wait ${chosen.wait_days} Days)` : isGo ? `जा ${chosen.market} (Go to ${chosen.market})` : `आजच विका (${baseline.market})`}
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                {chosen.market} येथे विक्री करा
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2: In-Hand Money */}
+          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              २
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
+                पायरी २: हातात निव्वळ नफा (Net In-Hand)
+              </span>
+              <p className="text-sm font-black text-emerald-950 mt-0.5">
+                ₹{chosen.net_total.toLocaleString('en-IN')}
+                {chosen.gain_total > 0 && (
+                  <span className="text-xs font-black text-emerald-700 ml-1.5">
+                    (+₹{chosen.gain_total.toLocaleString('en-IN')} वाढ)
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                वाहतूक, हमाली, नासाडी सर्व वजा करून
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Reservation Price */}
+          <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              ३
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 block">
+                पायरी ३: किमान आरक्षण भाव (Min Price)
+              </span>
+              <p className="text-sm font-black text-amber-950 mt-0.5">
+                ₹{chosen.reservation_price.toLocaleString('en-IN')} / क्विंटल
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                यापेक्षा कमी भावात अजिबात विकू नका
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 1. Primary Action & Net Card */}
       <div className={`p-6 sm:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden ${actionBg}`}>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
