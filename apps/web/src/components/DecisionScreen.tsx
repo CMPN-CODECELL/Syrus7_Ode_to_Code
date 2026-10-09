@@ -9,7 +9,8 @@ import {
   AlertTriangle,
   Sparkles,
   Info,
-  DollarSign
+  DollarSign,
+  CheckCircle2
 } from 'lucide-react';
 import { DecisionRecord } from '../types';
 import { FreshnessBadge } from './FreshnessBadge';
@@ -71,6 +72,84 @@ export const DecisionScreen: React.FC<Props> = ({
 
   return (
     <div className="space-y-6">
+      {/* 0. Beginner-Friendly 3-Step Farmer Summary Bar */}
+      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-emerald-200 shadow-sm">
+        <div className="flex items-center justify-between mb-3 border-b border-emerald-100 pb-2">
+          <span className="text-xs font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{labels.stepGuideTitle || '3-Step Farmer Action Guide'}</span>
+          </span>
+          <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">
+            {labels.stepGuideSubtitle || '3 Simple Rules to Remember'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Step 1: Decision */}
+          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              1
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
+                {labels.step1Title || 'Step 1: Recommended Action'}
+              </span>
+              <p className="text-sm font-black text-emerald-950 mt-0.5">
+                {isWait
+                  ? (labels.step1Wait ? labels.step1Wait.replace('{days}', String(chosen.wait_days)) : `Wait ${chosen.wait_days} Days`)
+                  : isGo
+                  ? (labels.step1Go ? labels.step1Go.replace('{mandi}', chosen.market) : `Go to ${chosen.market}`)
+                  : (labels.step1SellNow ? labels.step1SellNow.replace('{mandi}', baseline.market) : `Sell Today (${baseline.market})`)}
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                {labels.step1Sub ? labels.step1Sub.replace('{mandi}', chosen.market) : `Sell produce at ${chosen.market}`}
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2: In-Hand Money */}
+          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              2
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
+                {labels.step2Title || 'Step 2: Net In-Hand Realization'}
+              </span>
+              <p className="text-sm font-black text-emerald-950 mt-0.5">
+                ₹{chosen.net_total.toLocaleString('en-IN')}
+                {chosen.gain_total > 0 && (
+                  <span className="text-xs font-black text-emerald-700 ml-1.5">
+                    ({labels.step2Gain ? labels.step2Gain.replace('{amount}', chosen.gain_total.toLocaleString('en-IN')) : `+₹${chosen.gain_total.toLocaleString('en-IN')}`})
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                {labels.step2Sub || 'After deducting freight, labor, spoilage & mandi fees'}
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Reservation Price */}
+          <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
+              3
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 block">
+                {labels.step3Title || 'Step 3: Minimum Reservation Price'}
+              </span>
+              <p className="text-sm font-black text-amber-950 mt-0.5">
+                ₹{chosen.reservation_price.toLocaleString('en-IN')} {labels.step3Unit || '/ qtl'}
+              </p>
+              <p className="text-[11px] text-slate-600 font-medium">
+                {labels.step3Sub || 'Strictly do not accept any bid below this price'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 1. Primary Action & Net Card */}
       <div className={`p-6 sm:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden ${actionBg}`}>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -90,7 +169,7 @@ export const DecisionScreen: React.FC<Props> = ({
             title="Read out spoken summary"
           >
             <Volume2 className="w-4 h-4 text-emerald-700 animate-pulse" />
-            <span>{labels.listen || 'Listen (बोला/ऐका)'}</span>
+            <span>{labels.listen || 'Listen'}</span>
           </button>
         </div>
 
@@ -100,7 +179,7 @@ export const DecisionScreen: React.FC<Props> = ({
               {actionTitle}
             </h1>
             <p className="text-emerald-100 text-sm font-semibold">
-              {chosen.market} • {lot_quantity_qtl} qtl {commodity}
+              {chosen.market} • {lot_quantity_qtl} {labels.quantity || 'qtl'} {commodity}
             </p>
           </div>
 
@@ -117,8 +196,8 @@ export const DecisionScreen: React.FC<Props> = ({
               )}
             </div>
             <div className="text-xs text-emerald-100 mt-1 flex items-center justify-between font-medium">
-              <span>Sell Now Baseline: ₹{baseline.net_total.toLocaleString('en-IN')}</span>
-              <span className="font-bold">{Math.round(chosen.probability_beat_baseline * 100)}% Win Prob</span>
+              <span>{labels.sellNowBaseline || 'Sell Now Baseline:'} ₹{baseline.net_total.toLocaleString('en-IN')}</span>
+              <span className="font-bold">{Math.round(chosen.probability_beat_baseline * 100)}% {labels.winProbability || 'Win Prob'}</span>
             </div>
           </div>
         </div>
@@ -134,10 +213,10 @@ export const DecisionScreen: React.FC<Props> = ({
           </div>
           <div className="text-2xl font-black text-slate-900">
             ₹{chosen.reservation_price.toLocaleString('en-IN')}
-            <span className="text-xs font-medium text-slate-500"> /qtl</span>
+            <span className="text-xs font-medium text-slate-500"> {labels.step3Unit || '/qtl'}</span>
           </div>
           <p className="text-[11px] text-slate-600 font-medium">
-            Do NOT accept any bid below this threshold to preserve baseline net profit.
+            {labels.reservationSub || 'Do NOT accept any bid below this threshold to preserve baseline net profit.'}
           </p>
         </div>
 
@@ -179,14 +258,14 @@ export const DecisionScreen: React.FC<Props> = ({
         {/* Avoided Loss & Spoilage Factor */}
         <div className="bg-white p-5 rounded-3xl space-y-2 border-l-4 border-l-blue-600 border border-emerald-100 shadow-sm hover:shadow-md transition">
           <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span>Deductions Accounted</span>
+            <span>{labels.costs || 'Cost Deductions'}</span>
             <Info className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-black text-slate-900">
             ₹{(chosen.cost_breakdown.transport + chosen.cost_breakdown.hamali_tolai + chosen.cost_breakdown.storage + chosen.cost_breakdown.financing).toLocaleString('en-IN')}
           </div>
           <p className="text-[11px] text-slate-600 font-medium">
-            Transport, storage, labor & sequential holding/travel loss factored.
+            {labels.step2Sub || 'Transport, storage, labor & sequential holding/travel loss factored.'}
           </p>
         </div>
       </div>
@@ -202,7 +281,7 @@ export const DecisionScreen: React.FC<Props> = ({
             onClick={onOpenScenarios}
             className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
           >
-            <span>Stress Test This Decision</span>
+            <span>{labels.scenarios || 'What-If Simulator'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

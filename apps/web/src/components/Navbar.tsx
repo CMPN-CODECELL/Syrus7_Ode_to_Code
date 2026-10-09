@@ -33,6 +33,7 @@ export const Navbar: React.FC<Props> = ({
   labels
 }) => {
   const tabs = [
+    { id: 'home', label: labels.home || 'Home' },
     { id: 'decision', label: labels.decision || 'Decision' },
     { id: 'heatmap', label: labels.heatmap || '3×7 Heatmap' },
     { id: 'forecast', label: labels.forecast || 'Forecast' },
@@ -40,6 +41,8 @@ export const Navbar: React.FC<Props> = ({
     { id: 'costs', label: labels.costs || 'Costs' },
     { id: 'risk', label: labels.risk || 'Risk' },
     { id: 'scenarios', label: labels.scenarios || 'What-If' },
+    { id: 'assistant', label: labels.assistant || 'Krishi Mitra' },
+    { id: 'profile', label: labels.profile || 'My Farm' },
   ];
 
   return (
