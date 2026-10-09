@@ -45,16 +45,16 @@ export const FarmerInputsModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-lg bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+      <div className="w-full max-w-lg bg-white border border-emerald-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-emerald-100 pb-4">
           <div className="flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-agri-400" />
-            <h3 className="text-lg font-bold text-slate-100">Farmer Lot & Selling Parameters</h3>
+            <Sprout className="w-5 h-5 text-emerald-600" />
+            <h3 className="text-lg font-black text-slate-900">Farmer Lot & Selling Parameters</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -64,13 +64,13 @@ export const FarmerInputsModal: React.FC<Props> = ({
           {/* Commodity & Quantity */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-semibold flex items-center gap-1">
+              <label className="text-slate-800 font-bold flex items-center gap-1">
                 <span>Commodity (पीक)</span>
               </label>
               <select
                 value={commodity}
                 onChange={(e) => setCommodity(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-100 focus:border-agri-500 focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
               >
                 <option value="Tomato">Tomato (टोमॅटो)</option>
                 <option value="Onion">Onion (कांदा)</option>
@@ -78,7 +78,7 @@ export const FarmerInputsModal: React.FC<Props> = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-semibold flex items-center gap-1">
+              <label className="text-slate-800 font-bold flex items-center gap-1">
                 <span>Quantity & Unit</span>
               </label>
               <div className="flex gap-2">
@@ -88,12 +88,12 @@ export const FarmerInputsModal: React.FC<Props> = ({
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
-                  className="w-2/3 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-100 focus:border-agri-500 focus:outline-none"
+                  className="w-2/3 bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 font-bold focus:border-emerald-600 focus:bg-white focus:outline-none"
                 />
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-1/3 bg-slate-900 border border-slate-800 rounded-xl px-2 py-2.5 text-slate-100 focus:border-agri-500 focus:outline-none"
+                  className="w-1/3 bg-slate-50 border border-slate-200 rounded-2xl px-2 py-2.5 text-slate-900 font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
                 >
                   <option value="qtl">Quintal</option>
                   <option value="tonne">Tonne</option>
@@ -105,8 +105,8 @@ export const FarmerInputsModal: React.FC<Props> = ({
 
           {/* Bag Weight if bag selected */}
           {unit === 'bag' && (
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-1">
-              <label className="text-amber-300 font-semibold text-xs">
+            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-1">
+              <label className="text-amber-900 font-bold text-xs">
                 Bag Weight (kg per bag) — Required Invariant
               </label>
               <input
@@ -115,7 +115,7 @@ export const FarmerInputsModal: React.FC<Props> = ({
                 max="100"
                 value={bagWeightKg}
                 onChange={(e) => setBagWeightKg(parseFloat(e.target.value) || 50)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs"
+                className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs"
                 placeholder="e.g. 50 kg"
               />
             </div>
@@ -124,14 +124,14 @@ export const FarmerInputsModal: React.FC<Props> = ({
           {/* Mandi & Wait Days */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-semibold flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-agri-400" />
+              <label className="text-slate-800 font-bold flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Home Mandi (स्थानिक बाजार)</span>
               </label>
               <select
                 value={homeMandi}
                 onChange={(e) => setHomeMandi(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-100 focus:border-agri-500 focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
               >
                 <option value="Nashik APMC">Nashik APMC (Home Baseline)</option>
                 <option value="Pimpalgaon Baswant APMC">Pimpalgaon Baswant APMC</option>
@@ -140,14 +140,14 @@ export const FarmerInputsModal: React.FC<Props> = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-semibold flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-teal-400" />
+              <label className="text-slate-800 font-bold flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-teal-600" />
                 <span>Wait Horizon</span>
               </label>
               <select
                 value={waitDays}
                 onChange={(e) => setWaitDays(parseInt(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-100 focus:border-agri-500 focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 font-semibold focus:border-emerald-600 focus:bg-white focus:outline-none"
               >
                 <option value={1}>1 Day (+1d)</option>
                 <option value={2}>2 Days (+2d Recommended)</option>
@@ -159,8 +159,8 @@ export const FarmerInputsModal: React.FC<Props> = ({
 
           {/* Risk Profile */}
           <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1">
-              <Shield className="w-3.5 h-3.5 text-amber-400" />
+            <label className="text-slate-800 font-bold flex items-center gap-1">
+              <Shield className="w-3.5 h-3.5 text-amber-600" />
               <span>Farmer Risk Appetite</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -169,10 +169,10 @@ export const FarmerInputsModal: React.FC<Props> = ({
                   key={prof}
                   type="button"
                   onClick={() => setRiskProfile(prof)}
-                  className={`py-2 px-3 rounded-xl border text-xs font-bold transition ${
+                  className={`py-2 px-3 rounded-2xl border text-xs font-bold transition ${
                     riskProfile === prof
-                      ? 'bg-agri-600 text-white border-agri-500 shadow-md shadow-agri-600/30'
-                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-850'
+                      ? 'bg-emerald-700 text-white border-emerald-700 shadow-md shadow-emerald-700/20'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   {prof === 'CAUTIOUS' ? 'Cautious (q20)' : prof === 'BALANCED' ? 'Balanced (q35)' : 'Aggressive (q50)'}
@@ -181,17 +181,17 @@ export const FarmerInputsModal: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-slate-800">
+          <div className="pt-4 flex justify-end gap-3 border-t border-emerald-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition text-xs font-semibold"
+              className="px-4 py-2.5 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition text-xs font-bold"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-agri-600 hover:bg-agri-500 text-white font-bold transition text-xs shadow-lg shadow-agri-600/30"
+              className="px-5 py-2.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black transition text-xs shadow-md shadow-emerald-700/25"
             >
               Update & Recalculate Decision
             </button>
