@@ -1,0 +1,46 @@
+{
+  "project": "KrishiNirnay",
+  "source": "AGMARKNET",
+  "source_file": "data/raw/agmarknet_maharashtra_tomato_onion_2024-07_to_2026-09.csv",
+  "input_file": "data/clean/agmarknet_maharashtra_prices_exact_dedup.csv",
+  "output_file": "data/clean/krishinirnay_daily_model_series.csv",
+  "created_at": "2026-10-09T10:01:23+05:30",
+  "date_range": {
+    "start": "2024-07-01",
+    "end": "2026-09-30"
+  },
+  "commodities": [
+    "Tomato",
+    "Onion"
+  ],
+  "markets_in_this_training_batch": [
+    "APMC Nasik",
+    "APMC Pimpalgaon Baswant",
+    "APMC Sangamner"
+  ],
+  "units": {
+    "prices": "INR per quintal",
+    "arrivals": "quintals",
+    "conversion": "1 metric tonne = 10 quintals"
+  },
+  "aggregation_policy": {
+    "daily_key": [
+      "Date",
+      "Market",
+      "Commodity"
+    ],
+    "modal_price": "Arrival-weighted average of variety modal prices. This is a derived proxy, not an official consolidated modal price.",
+    "minimum_price": "Minimum of the variety minimum prices",
+    "maximum_price": "Maximum of the variety maximum prices",
+    "arrivals": "Use the source-reported daily total once, converted from metric tonnes to quintals. Do not sum the repeated daily total across variety rows."
+  },
+  "quality_notes": {
+    "exact_duplicate_rows_in_original_download": 17,
+    "daily_groups_rejected": 0,
+    "daily_groups_where_variety_arrival_sum_does_not_match_source_total": 1,
+    "known_arrival_exception": "Pimpalgaon Baswant Onion on 2025-01-25 has a source total that differs from the remaining variety row after exact duplicate removal. The source-reported daily total is retained and the discrepancy is recorded in daily_series_group_audit.csv.",
+    "unresolved_conflicting_groups_outside_selected_markets": "Manmad conflicts were not included in this selected training batch.",
+    "raw_source_unchanged": true
+  },
+  "rejected_groups": []
+}

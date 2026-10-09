@@ -1,0 +1,97 @@
+{
+  "project": "KrishiNirnay",
+  "model_status": "candidate_not_promoted",
+  "input_file": "data/clean/krishinirnay_daily_model_series.csv",
+  "forecast_horizons_days": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "cutoff_date": "2026-04-22",
+  "target": "Daily observed modal-price proxy, including the documented arrival-weighted variety aggregation for multi-variety days.",
+  "evaluation": "Chronological walk-forward evaluation. Model fitted using training targets before cutoff; test origins start at cutoff. Scores use exact source-observed target dates only.",
+  "features": [
+    "price_current",
+    "price_lag_1",
+    "price_lag_2",
+    "price_lag_3",
+    "price_lag_7",
+    "price_lag_14",
+    "price_lag_28",
+    "price_mean_3",
+    "price_mean_7",
+    "price_mean_14",
+    "price_mean_28",
+    "price_std_7",
+    "arrivals_current",
+    "arrivals_lag_1",
+    "arrivals_lag_2",
+    "arrivals_lag_7",
+    "arrivals_mean_7",
+    "target_day_of_week",
+    "target_month",
+    "target_day_of_year_sin",
+    "target_day_of_year_cos"
+  ],
+  "categorical_features": [
+    "Market",
+    "Commodity"
+  ],
+  "horizon_training_summary": [
+    {
+      "horizon_days": 1,
+      "training_rows": 2292,
+      "test_rows": 594,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 2,
+      "training_rows": 2195,
+      "test_rows": 569,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 3,
+      "training_rows": 2191,
+      "test_rows": 549,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 4,
+      "training_rows": 2173,
+      "test_rows": 550,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 5,
+      "training_rows": 2163,
+      "test_rows": 559,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 6,
+      "training_rows": 2202,
+      "test_rows": 573,
+      "negative_predictions_clipped": 0
+    },
+    {
+      "horizon_days": 7,
+      "training_rows": 2452,
+      "test_rows": 648,
+      "negative_predictions_clipped": 0
+    }
+  ],
+  "winner_counts": {
+    "Last-observed": 29,
+    "Moving-average-7": 9,
+    "XGBoost": 4
+  },
+  "xgboost_wins": 4,
+  "series_horizon_comparisons": 42,
+  "metrics_file": "reports/forecast/xgboost_walk_forward_comparison.csv",
+  "predictions_file": "reports/forecast/xgboost_walk_forward_predictions.csv"
+}
