@@ -86,11 +86,11 @@
     }
   ],
   "winner_counts": {
-    "Last-observed": 29,
+    "Last-observed": 30,
     "Moving-average-7": 9,
-    "XGBoost": 4
+    "XGBoost": 3
   },
-  "xgboost_wins": 4,
+  "xgboost_wins": 3,
   "series_horizon_comparisons": 42,
   "metrics_file": "reports/forecast/xgboost_walk_forward_comparison.csv",
   "predictions_file": "reports/forecast/xgboost_walk_forward_predictions.csv"
