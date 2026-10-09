@@ -154,7 +154,14 @@ export const App: React.FC = () => {
   const lotSummary = `${currentSlots.quantity || 20} ${currentSlots.quantity_unit || 'qtl'} ${currentSlots.commodity || 'Tomato'} • ${currentSlots.home_mandi || 'Nashik APMC'}`;
 
   if (showLanding) {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+    return (
+      <LandingPage
+        onGetStarted={() => setShowLanding(false)}
+        language={language}
+        setLanguage={setLanguage}
+        labels={labels}
+      />
+    );
   }
 
   return (

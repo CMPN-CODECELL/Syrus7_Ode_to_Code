@@ -11,11 +11,17 @@ import { VoiceAssistantScreen } from './src/screens/VoiceAssistantScreen';
 import { DecisionRecord, HeatmapMatrix } from './src/types';
 import { MobileApiClient } from './src/api/client';
 
+import mrDict from './src/localization/mr.json';
+import hiDict from './src/localization/hi.json';
+import enDict from './src/localization/en.json';
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('decision');
-  const [language, setLanguage] = useState<'mr-IN' | 'hi-IN'>('mr-IN');
+  const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('mr-IN');
   const [record, setRecord] = useState<DecisionRecord | null>(null);
   const [heatmap, setHeatmap] = useState<HeatmapMatrix | null>(null);
+
+  const labels = language === 'mr-IN' ? mrDict : language === 'hi-IN' ? hiDict : enDict;
 
   useEffect(() => {
     MobileApiClient.assist({
@@ -33,13 +39,13 @@ export default function App() {
   }, [language]);
 
   const tabs = [
-    { id: 'decision', label: 'निर्णय' },
-    { id: 'heatmap', label: '३×७ तक्ता' },
-    { id: 'forecast', label: 'अंदाज' },
-    { id: 'costs', label: 'खर्च' },
-    { id: 'risk', label: 'जोखीम' },
-    { id: 'scenarios', label: 'सिम्युलेटर' },
-    { id: 'voice', label: 'सहाय्यक' },
+    { id: 'decision', label: labels.decision || 'Decision' },
+    { id: 'heatmap', label: labels.heatmap || 'Heatmap' },
+    { id: 'forecast', label: labels.forecast || 'Forecast' },
+    { id: 'costs', label: labels.costs || 'Costs' },
+    { id: 'risk', label: labels.risk || 'Risk' },
+    { id: 'scenarios', label: labels.scenarios || 'What-If' },
+    { id: 'voice', label: labels.assistant || 'Assistant' },
   ];
 
   return (
@@ -53,12 +59,26 @@ export default function App() {
           <Text style={styles.brandTagline}>Sahi Bhav Se, Samriddhi Ki Raah Pe.</Text>
         </View>
 
-        <TouchableOpacity
-          onPress={() => setLanguage(language === 'mr-IN' ? 'hi-IN' : 'mr-IN')}
-          style={styles.langBtn}
-        >
-          <Text style={styles.langText}>{language === 'mr-IN' ? 'मराठी' : 'हिंदी'}</Text>
-        </TouchableOpacity>
+        <View style={styles.langContainer}>
+          <TouchableOpacity
+            onPress={() => setLanguage('mr-IN')}
+            style={[styles.langBtn, language === 'mr-IN' && styles.langBtnActive]}
+          >
+            <Text style={[styles.langText, language === 'mr-IN' && styles.langTextActive]}>मराठी</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setLanguage('hi-IN')}
+            style={[styles.langBtn, language === 'hi-IN' && styles.langBtnActive]}
+          >
+            <Text style={[styles.langText, language === 'hi-IN' && styles.langTextActive]}>हिंदी</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setLanguage('en-IN')}
+            style={[styles.langBtn, language === 'en-IN' && styles.langBtnActive]}
+          >
+            <Text style={[styles.langText, language === 'en-IN' && styles.langTextActive]}>EN</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Main Screen Body */}
@@ -115,15 +135,25 @@ const styles = StyleSheet.create({
   },
   brandTitle: { color: '#4ade80', fontSize: 18, fontWeight: '900' },
   brandTagline: { color: '#64748b', fontSize: 10, fontWeight: '500' },
-  langBtn: {
+  langContainer: {
+    flexDirection: 'row',
+    gap: 4,
     backgroundColor: '#0f172a',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    padding: 2,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#1e293b',
   },
-  langText: { color: '#cbd5e1', fontSize: 11, fontWeight: '700' },
+  langBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  langBtnActive: {
+    backgroundColor: '#16a34a',
+  },
+  langText: { color: '#94a3b8', fontSize: 10, fontWeight: '700' },
+  langTextActive: { color: '#ffffff' },
   body: { flex: 1 },
   tabBar: {
     flexDirection: 'row',

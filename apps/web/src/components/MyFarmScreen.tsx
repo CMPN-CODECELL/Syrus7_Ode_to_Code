@@ -58,7 +58,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-black text-slate-900 font-serif">
-                  {language === 'mr-IN' ? 'शेतकरी मित्र' : language === 'hi-IN' ? 'किसान भाई' : 'Kisan Friend'}
+                  {labels.kisanName || 'Kisan Friend'}
                 </h1>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
@@ -66,7 +66,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                {language === 'mr-IN' ? 'नाशिक विभाग • महाराष्ट्र' : language === 'hi-IN' ? 'नासिक संभाग • महाराष्ट्र' : 'Nashik Division • Maharashtra'}
+                {labels.locationTag || 'Nashik Division • Maharashtra'}
               </p>
             </div>
           </div>
@@ -84,28 +84,28 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-              {language === 'mr-IN' ? 'एकूण जमीन' : language === 'hi-IN' ? 'कुल भूमि' : 'Total Land'}
+              {labels.totalLand || 'Total Land'}
             </span>
-            <span className="text-lg font-black text-slate-900 font-serif">5 Acres</span>
+            <span className="text-lg font-black text-slate-900 font-serif">{labels.landVal || '5 Acres'}</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-              {language === 'mr-IN' ? 'चालू पीक' : language === 'hi-IN' ? 'वर्तमान फसल' : 'Active Crop'}
+              {labels.activeCrop || 'Active Crop'}
             </span>
             <span className="text-lg font-black text-emerald-700 font-serif">{slots.commodity}</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-              {language === 'mr-IN' ? 'लॉट प्रमाण' : language === 'hi-IN' ? 'लॉट मात्रा' : 'Lot Quantity'}
+              {labels.quantity || 'Lot Quantity'}
             </span>
             <span className="text-lg font-black text-slate-900 font-serif">{slots.quantity} {slots.quantity_unit}</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-              {language === 'mr-IN' ? 'गृह बाजार' : language === 'hi-IN' ? 'गृह मंडी' : 'Home Mandi'}
+              {labels.homeMandi || 'Home Mandi'}
             </span>
             <span className="text-lg font-black text-slate-900 font-serif truncate block">{slots.home_mandi}</span>
           </div>
@@ -116,7 +116,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
       <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm space-y-5">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Settings className="w-5 h-5 text-emerald-700" />
-          <span>{language === 'mr-IN' ? 'ॲप सेटिंग्ज व पसंती' : language === 'hi-IN' ? 'ऐप सेटिंग्स व प्राथमिकताएं' : 'App Settings & Preferences'}</span>
+          <span>{labels.appSettings || 'App Settings & Preferences'}</span>
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -124,7 +124,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
               <Globe className="w-4 h-4 text-emerald-700" />
-              <span>{language === 'mr-IN' ? 'भाषा निवडा' : language === 'hi-IN' ? 'भाषा चुनें' : 'Select Language'}</span>
+              <span>{labels.langVoicePref || 'Language & Voice Preference'}</span>
             </span>
             <div className="grid grid-cols-3 gap-1.5">
               <button
@@ -158,7 +158,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
               {theme === 'dark' ? <Moon className="w-4 h-4 text-amber-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
-              <span>{language === 'mr-IN' ? 'स्क्रीन कॉन्ट्रास्ट' : language === 'hi-IN' ? 'स्क्रीन कंट्रास्ट' : 'Screen Contrast'}</span>
+              <span>{labels.appearanceTheme || 'Appearance & Contrast'}</span>
             </span>
             <div className="grid grid-cols-2 gap-1.5">
               <button
@@ -197,7 +197,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
                     riskProfile === prof ? 'bg-emerald-700 text-white shadow-xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  {prof === 'CAUTIOUS' ? 'q20' : prof === 'BALANCED' ? 'q35' : 'q50'}
+                  {prof === 'CAUTIOUS' ? (labels.cautious || 'q20') : prof === 'BALANCED' ? (labels.balanced || 'q35') : (labels.aggressive || 'q50')}
                 </button>
               ))}
             </div>
@@ -211,7 +211,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
             <h2 className="text-base font-black text-slate-900">
-              Judge Evaluation Mode Switcher
+              {labels.demoToolsTitle || 'Judge Evaluation Mode Switcher'}
             </h2>
           </div>
           <span className="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">
@@ -219,7 +219,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
           </span>
         </div>
         <p className="text-xs text-slate-500 font-medium">
-          Simulate real-world API outages and witness KrishiNirnay’s graceful fallback & circuit breakers:
+          {labels.demoToolsSub || 'Simulate real-world API outages and witness KrishiNirnay’s graceful fallback & circuit breakers:'}
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -233,7 +233,7 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
                   : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              {mode.replace('_', ' ')}
+              {mode === 'NORMAL' ? (labels.normalMode || 'Normal') : mode === 'DATA_OUTAGE' ? (labels.dataOutageMode || 'Data Outage') : mode === 'STALE_DATA' ? (labels.staleDataMode || 'Stale Data') : mode === 'WEATHER_OUTAGE' ? (labels.weatherOutageMode || 'Weather Outage') : (labels.llmOutageMode || 'LLM Outage')}
             </button>
           ))}
         </div>

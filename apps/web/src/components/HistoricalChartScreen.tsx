@@ -53,10 +53,10 @@ export const HistoricalChartScreen: React.FC<Props> = ({ commodity, mandi, label
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
             <History className="w-6 h-6 text-emerald-600" />
-            <span>{days}-Day Historical Modal Trend & Arrivals ({mandi})</span>
+            <span>{labels.historyTitle ? labels.historyTitle.replace('{days}', String(days)).replace('{mandi}', mandi) : `${days}-Day Historical Modal Trend & Arrivals (${mandi})`}</span>
           </h2>
           <p className="text-xs text-slate-600 font-medium mt-1">
-            Confirmed daily market observations from {history.source}.
+            {labels.historySubtitle ? labels.historySubtitle.replace('{source}', history.source) : `Confirmed daily market observations from ${history.source}.`}
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export const HistoricalChartScreen: React.FC<Props> = ({ commodity, mandi, label
                   days === d ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {d} Days
+                {d} {labels.days || 'Days'}
               </button>
             ))}
           </div>
@@ -85,19 +85,19 @@ export const HistoricalChartScreen: React.FC<Props> = ({ commodity, mandi, label
       {selectedPoint && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 text-xs">
           <div>
-            <span className="text-slate-500 block text-[11px] font-semibold">Observation Date</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">{labels.obsDate || 'Observation Date'}</span>
             <span className="text-sm font-bold text-slate-900">{selectedPoint.date}</span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[11px] font-semibold">Modal Price</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">{labels.modalPrice || 'Modal Price'}</span>
             <span className="text-sm font-black text-emerald-800">₹{selectedPoint.modal_price} /qtl</span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[11px] font-semibold">Min – Max Range</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">{labels.minMaxRange || 'Min – Max Range'}</span>
             <span className="text-sm font-bold text-slate-800">₹{selectedPoint.min_price} – ₹{selectedPoint.max_price}</span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[11px] font-semibold">Arrivals Volume</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">{labels.arrivalVolume || 'Arrivals Volume'}</span>
             <span className="text-sm font-black text-blue-700">{selectedPoint.arrivals} tonnes</span>
           </div>
         </div>
@@ -109,15 +109,15 @@ export const HistoricalChartScreen: React.FC<Props> = ({ commodity, mandi, label
           <div className="flex items-center gap-4 text-[11px] font-bold">
             <span className="flex items-center gap-1.5">
               <span className="w-3.5 h-1 bg-emerald-600 rounded"></span>
-              Modal Price (₹/qtl)
+              {labels.modalPrice || 'Modal Price'} (₹/qtl)
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-2 bg-emerald-200 border border-emerald-400 rounded-sm"></span>
-              Min–Max Spread
+              {labels.minMaxRange || 'Min–Max Spread'}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 bg-blue-500 rounded-sm"></span>
-              Arrivals (Tonnes)
+              {labels.arrivalVolume || 'Arrivals'} (Tonnes)
             </span>
           </div>
           <span className="text-[11px] text-slate-500 font-medium">Hover / tap points to inspect</span>

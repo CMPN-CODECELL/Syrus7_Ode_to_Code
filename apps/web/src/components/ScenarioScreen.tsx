@@ -135,7 +135,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             className="p-3 rounded-2xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-left transition shadow-xs text-xs"
           >
             <span className="font-extrabold text-blue-900 block text-[11px]">
-              🌾 2.0x {labels.heatwave || '2x Inflow Glut'}
+              🌾 2.0x {labels.mandiGlut || '2x Inflow Glut'}
             </span>
             <span className="text-[10px] text-slate-600 font-medium">
               {labels.spoilage || 'Excess supply shock'}
@@ -147,7 +147,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             className="p-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-left transition shadow-xs text-xs"
           >
             <span className="font-extrabold text-emerald-900 block text-[11px]">
-              🔄 {labels.demoMode || 'Baseline Reset'}
+              🔄 {labels.resetBaseline || labels.demoMode || 'Baseline Reset'}
             </span>
             <span className="text-[10px] text-slate-600 font-medium">
               {labels.balanced || 'Normal Market Baseline'}
@@ -161,7 +161,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
         {/* Price Delta Slider */}
         <div className="space-y-2 bg-white p-4 rounded-2xl border border-emerald-100 shadow-xs">
           <div className="flex justify-between font-bold">
-            <span className="text-slate-800">Future Mandi Price Delta</span>
+            <span className="text-slate-800">{labels.priceDelta || 'Future Mandi Price Delta'}</span>
             <span className={priceDeltaPct < 0 ? 'text-rose-700 font-black' : 'text-emerald-700 font-black'}>
               {priceDeltaPct > 0 ? `+${(priceDeltaPct * 100).toFixed(0)}%` : `${(priceDeltaPct * 100).toFixed(0)}%`}
             </span>
@@ -176,16 +176,16 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             className="w-full accent-emerald-600 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500 font-medium">
-            <span>Crash (-30%)</span>
-            <span>Default (-10%)</span>
-            <span>Surge (+30%)</span>
+            <span>{labels.crash || 'Crash (-30%)'}</span>
+            <span>-10%</span>
+            <span>{labels.surge || 'Surge (+30%)'}</span>
           </div>
         </div>
 
         {/* Transport Surge Slider */}
         <div className="space-y-2 bg-white p-4 rounded-2xl border border-emerald-100 shadow-xs">
           <div className="flex justify-between font-bold">
-            <span className="text-slate-800">Transport & Diesel Cost Delta</span>
+            <span className="text-slate-800">{labels.transportDelta || 'Transport & Diesel Cost Delta'}</span>
             <span className="text-amber-700 font-black">
               {transportDeltaPct > 0 ? `+${(transportDeltaPct * 100).toFixed(0)}%` : `${(transportDeltaPct * 100).toFixed(0)}%`}
             </span>
@@ -200,16 +200,16 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             className="w-full accent-emerald-600 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500 font-medium">
-            <span>Cheaper (-10%)</span>
-            <span>Surge (+20%)</span>
-            <span>Crisis (+50%)</span>
+            <span>{labels.cheaper || 'Cheaper (-10%)'}</span>
+            <span>+20%</span>
+            <span>{labels.crisis || 'Crisis (+50%)'}</span>
           </div>
         </div>
 
         {/* Arrival Volume Multiplier Slider */}
         <div className="space-y-2 bg-white p-4 rounded-2xl border border-emerald-100 shadow-xs">
           <div className="flex justify-between font-bold">
-            <span className="text-slate-800">Arrivals Surge Multiplier</span>
+            <span className="text-slate-800">{labels.arrivalsMult || 'Arrivals Surge Multiplier'}</span>
             <span className={arrivalMultiplier > 1.5 ? 'text-rose-700 font-black' : 'text-slate-900 font-black'}>
               {arrivalMultiplier.toFixed(1)}x
             </span>
@@ -224,9 +224,9 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             className="w-full accent-emerald-600 cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500 font-medium">
-            <span>Low (0.5x)</span>
-            <span>Normal (1.0x)</span>
-            <span>Surge Glut (2.0x+)</span>
+            <span>{labels.low || 'Low (0.5x)'}</span>
+            <span>{labels.normal || 'Normal (1.0x)'}</span>
+            <span>{labels.glut || 'Surge Glut (2.0x+)'}</span>
           </div>
         </div>
       </div>
@@ -240,7 +240,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <span className="font-black text-sm block mb-0.5 text-amber-900">
-                  Decision Recommendation Flips!
+                  {labels.recommendationFlips || 'Decision Recommendation Flips!'}
                 </span>
                 <p className="font-medium">{scenarioResult.summary}</p>
               </div>
@@ -249,7 +249,9 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
               <div>
-                <span className="font-black block text-emerald-900">Recommendation Resilient</span>
+                <span className="font-black block text-emerald-900">
+                  {labels.recommendationResilient || 'Recommendation Resilient'}
+                </span>
                 <p className="font-medium">{scenarioResult.summary}</p>
               </div>
             </div>
@@ -260,10 +262,10 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels }) => {
             <table className="w-full text-left text-xs sm:text-sm divide-y divide-emerald-100">
               <thead>
                 <tr className="text-emerald-950 font-black uppercase text-[11px] tracking-wider bg-emerald-50/80">
-                  <th className="py-3 px-4">Metric</th>
-                  <th className="py-3 px-4">Baseline Recommendation</th>
-                  <th className="py-3 px-4 text-emerald-800 font-black">Stressed Scenario</th>
-                  <th className="py-3 px-4 text-right">Net Impact</th>
+                  <th className="py-3 px-4">{labels.comparisonMetric || 'Metric'}</th>
+                  <th className="py-3 px-4">{labels.baselineRec || 'Baseline Recommendation'}</th>
+                  <th className="py-3 px-4 text-emerald-800 font-black">{labels.stressedRec || 'Stressed Scenario'}</th>
+                  <th className="py-3 px-4 text-right">{labels.netImpact || 'Net Impact'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white font-medium">

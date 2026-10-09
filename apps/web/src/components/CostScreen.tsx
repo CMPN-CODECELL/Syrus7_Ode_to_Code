@@ -24,16 +24,16 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
             <Receipt className="w-6 h-6 text-emerald-600" />
-            <span>Canonical Logistics & Cost Breakdown</span>
+            <span>{labels.costTitle || 'Canonical Logistics & Cost Breakdown'}</span>
           </h2>
           <p className="text-xs text-slate-600 font-medium mt-1">
-            Reconciles gross produce revenue to final net realization. Invariant: zero double-spoilage deductions.
+            {labels.costSubtitle || 'Reconciles gross produce revenue to final net realization. Invariant: zero double-spoilage deductions.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-            cost_config_v1.0
+            {labels.costConfigVersion || 'cost_config_v1.0'}
           </span>
         </div>
       </div>
@@ -42,25 +42,37 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
       <div className="bg-emerald-50/50 p-5 rounded-3xl border border-emerald-200 space-y-3">
         <h3 className="text-xs font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
           <Scale className="w-4 h-4 text-emerald-700" />
-          <span>Sequential Perishability Loss Cascade</span>
+          <span>{labels.lossWaterfallTitle || 'Sequential Perishability Loss Cascade'}</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 shadow-xs">
-            <span className="text-slate-500 block text-[11px] font-semibold">1. Harvest Lot Quantity</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">
+              {labels.harvestQty || '1. Harvest Lot Quantity'}
+            </span>
             <span className="text-base font-black text-slate-900">{initialQty} qtl</span>
-            <span className="text-[10px] text-slate-500 block font-medium">Initial weight at farmgate</span>
+            <span className="text-[10px] text-slate-500 block font-medium">
+              {labels.harvestQtySub || 'Initial weight at farmgate'}
+            </span>
           </div>
           <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 shadow-xs">
-            <span className="text-slate-500 block text-[11px] font-semibold">2. After Holding Loss ({holdingLoss.toFixed(1)}%)</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">
+              {labels.afterHoldingLoss ? labels.afterHoldingLoss.replace('{pct}', holdingLoss.toFixed(1)) : `2. After Holding Loss (${holdingLoss.toFixed(1)}%)`}
+            </span>
             <span className="text-base font-black text-amber-700">
               {(initialQty * (1 - cb.holding_loss_pct)).toFixed(3)} qtl
             </span>
-            <span className="text-[10px] text-slate-500 block font-medium">2-day respiration & moisture loss</span>
+            <span className="text-[10px] text-slate-500 block font-medium">
+              {labels.holdingLossSub ? labels.holdingLossSub.replace('{days}', String(record.chosen.wait_days)) : '2-day respiration & moisture loss'}
+            </span>
           </div>
           <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 shadow-xs">
-            <span className="text-slate-500 block text-[11px] font-semibold">3. Final Saleable Weight ({travelLoss.toFixed(1)}% transit)</span>
+            <span className="text-slate-500 block text-[11px] font-semibold">
+              {labels.finalWeight ? labels.finalWeight.replace('{pct}', travelLoss.toFixed(1)) : `3. Final Saleable Weight (${travelLoss.toFixed(1)}% transit)`}
+            </span>
             <span className="text-base font-black text-emerald-800">{soldQty} qtl</span>
-            <span className="text-[10px] text-slate-500 block font-medium">Net weighed at mandi weighbridge</span>
+            <span className="text-[10px] text-slate-500 block font-medium">
+              {labels.finalWeightSub || 'Net weighed at mandi weighbridge'}
+            </span>
           </div>
         </div>
       </div>
@@ -70,23 +82,25 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
         <table className="w-full text-left text-xs sm:text-sm divide-y divide-emerald-100">
           <thead>
             <tr className="text-emerald-950 font-black uppercase text-[11px] tracking-wider bg-emerald-50/80">
-              <th className="py-3 px-4">Cost Component</th>
-              <th className="py-3 px-4">Formula / Basis</th>
-              <th className="py-3 px-4 text-center">Provenance</th>
-              <th className="py-3 px-4 text-right">Amount (₹)</th>
+              <th className="py-3 px-4">{labels.costComponent || 'Cost Component'}</th>
+              <th className="py-3 px-4">{labels.formulaBasis || 'Formula / Basis'}</th>
+              <th className="py-3 px-4 text-center">{labels.provenance || 'Provenance'}</th>
+              <th className="py-3 px-4 text-right">{labels.amount || 'Amount (₹)'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white font-medium">
             <tr className="bg-emerald-50/40 text-emerald-950 font-bold">
               <td className="py-3.5 px-4 flex items-center gap-2">
                 <Box className="w-4 h-4 text-emerald-700" />
-                Gross Realized Revenue
+                {labels.grossRevenue || 'Gross Realized Revenue'}
               </td>
               <td className="py-3.5 px-4 font-mono text-xs text-slate-700">
                 {soldQty} qtl × ₹{record.chosen.modal_price_expected}/qtl
               </td>
               <td className="py-3.5 px-4 text-center">
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Deterministic</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  {labels.deterministicProvenance || 'Deterministic'}
+                </span>
               </td>
               <td className="py-3.5 px-4 text-right text-base font-black text-emerald-900">
                 ₹{cb.gross_revenue.toLocaleString('en-IN')}
@@ -96,13 +110,15 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
             <tr className="hover:bg-slate-50">
               <td className="py-3 px-4 flex items-center gap-2 text-slate-800 font-semibold">
                 <Truck className="w-4 h-4 text-blue-600" />
-                Transport & Freight
+                {labels.transportFreight || labels.transport || 'Transport & Freight'}
               </td>
               <td className="py-3 px-4 text-slate-600 font-mono text-xs">
                 ₹12/km × 60 km × 2.0 (round-trip) × 1 trip
               </td>
               <td className="py-3 px-4 text-center">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">Verified Rate</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                  {labels.verifiedRate || 'Verified Rate'}
+                </span>
               </td>
               <td className="py-3 px-4 text-right text-rose-700 font-mono font-bold">
                 -₹{cb.transport.toLocaleString('en-IN')}
@@ -110,10 +126,14 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
             </tr>
 
             <tr className="hover:bg-slate-50">
-              <td className="py-3 px-4 text-slate-800 font-semibold">Hamali / Weighment (Tolai)</td>
+              <td className="py-3 px-4 text-slate-800 font-semibold">
+                {labels.hamaliTolai || labels.hamali || 'Hamali / Weighment (Tolai)'}
+              </td>
               <td className="py-3 px-4 text-slate-600 font-mono text-xs">₹12.0/qtl × {initialQty} qtl</td>
               <td className="py-3 px-4 text-center">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">APMC By-law</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                  {labels.apmcBylaw || 'APMC By-law'}
+                </span>
               </td>
               <td className="py-3 px-4 text-right text-rose-700 font-mono font-bold">
                 -₹{cb.hamali_tolai.toLocaleString('en-IN')}
@@ -121,10 +141,14 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
             </tr>
 
             <tr className="hover:bg-slate-50">
-              <td className="py-3 px-4 text-slate-800 font-semibold">Holding Storage Cost</td>
+              <td className="py-3 px-4 text-slate-800 font-semibold">
+                {labels.holdingStorage || labels.storage || 'Holding Storage Cost'}
+              </td>
               <td className="py-3 px-4 text-slate-600 font-mono text-xs">₹2.0/qtl/day × {initialQty} qtl × {record.chosen.wait_days} days</td>
               <td className="py-3 px-4 text-center">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">Assumption</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                  {labels.assumptionProvenance || 'Assumption'}
+                </span>
               </td>
               <td className="py-3 px-4 text-right text-rose-700 font-mono font-bold">
                 -₹{cb.storage.toLocaleString('en-IN')}
@@ -132,10 +156,14 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
             </tr>
 
             <tr className="hover:bg-slate-50">
-              <td className="py-3 px-4 text-slate-800 font-semibold">Capital Financing Cost (Opportunity)</td>
+              <td className="py-3 px-4 text-slate-800 font-semibold">
+                {labels.financingCost || labels.financing || 'Capital Financing Cost (Opportunity)'}
+              </td>
               <td className="py-3 px-4 text-slate-600 font-mono text-xs">12% annual rate on capital tied up × {record.chosen.wait_days}d / 365</td>
               <td className="py-3 px-4 text-center">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">Assumption</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                  {labels.assumptionProvenance || 'Assumption'}
+                </span>
               </td>
               <td className="py-3 px-4 text-right text-rose-700 font-mono font-bold">
                 -₹{cb.financing.toLocaleString('en-IN')}
@@ -143,8 +171,8 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
             </tr>
 
             <tr className="bg-slate-50 text-slate-900 font-black border-t-2 border-slate-200">
-              <td className="py-3.5 px-4">Total Deductions</td>
-              <td className="py-3.5 px-4 text-slate-600 text-xs font-medium">Freight + Labor + Storage + Financing</td>
+              <td className="py-3.5 px-4">{labels.totalDeductions || 'Total Deductions'}</td>
+              <td className="py-3.5 px-4 text-slate-600 text-xs font-medium">{labels.step2Sub || 'Freight + Labor + Storage + Financing'}</td>
               <td className="py-3.5 px-4 text-center"></td>
               <td className="py-3.5 px-4 text-right text-rose-700 text-base font-mono">
                 -₹{totalDeductions.toLocaleString('en-IN')}
@@ -153,14 +181,14 @@ export const CostScreen: React.FC<Props> = ({ record, labels }) => {
 
             <tr className="bg-emerald-700 text-white font-extrabold text-base border-t-2 border-emerald-800">
               <td className="py-4 px-4 text-white font-black">
-                Final Net Realization (In Hand)
+                {labels.finalNetRealization || labels.netRealization || 'Final Net Realization (In Hand)'}
               </td>
               <td className="py-4 px-4 text-emerald-100 text-xs font-semibold">
-                Gross Revenue − Total Deductions
+                {labels.finalNetSub || 'Gross Revenue − Total Deductions'}
               </td>
               <td className="py-4 px-4 text-center">
                 <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-white/20 text-white border border-white/40">
-                  Authority Net
+                  {labels.authorityNet || 'Authority Net'}
                 </span>
               </td>
               <td className="py-4 px-4 text-right text-white text-xl font-black">

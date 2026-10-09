@@ -49,45 +49,45 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     {
       name: 'Tomato',
       label: language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato',
-      variety: language === 'mr-IN' ? 'भाजीपाला पीक' : language === 'hi-IN' ? 'सब्जी फसल' : 'Vegetable Crop',
+      variety: labels.vegCrop || 'Vegetable Crop',
       mandi: 'Nashik APMC',
       defaultQty: 20,
       active: (slots.commodity || '').toLowerCase().includes('tomato'),
       image: '🍅',
-      tag: language === 'mr-IN' ? 'सक्रिय लॉट' : language === 'hi-IN' ? 'सक्रिय लॉट' : 'Active Lot',
+      tag: labels.activeLot || 'Active Lot',
       tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-300'
     },
     {
       name: 'Onion',
       label: language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion',
-      variety: language === 'mr-IN' ? 'रब्बी कांदा' : language === 'hi-IN' ? 'रबी प्याज' : 'Rabi Red',
+      variety: labels.rabiCrop || 'Rabi Red',
       mandi: 'Lasalgaon APMC',
       defaultQty: 30,
       active: (slots.commodity || '').toLowerCase().includes('onion'),
       image: '🧅',
-      tag: language === 'mr-IN' ? 'आशियातील सर्वात मोठी मंडी' : language === 'hi-IN' ? 'एशिया की सबसे बड़ी मंडी' : 'Asia’s Largest Mandi',
+      tag: labels.asiaLargest || 'Asia’s Largest Mandi',
       tagColor: 'bg-amber-100 text-amber-800 border-amber-300'
     },
     {
       name: 'Wheat',
       label: language === 'mr-IN' ? 'गहू' : language === 'hi-IN' ? 'गेहूं' : 'Wheat',
-      variety: language === 'mr-IN' ? 'शरबती धान्य' : language === 'hi-IN' ? 'शरबती अनाज' : 'Sharbati Grain',
+      variety: labels.sharbatiGrain || 'Sharbati Grain',
       mandi: 'Daund Mandi',
       defaultQty: 25,
       active: (slots.commodity || '').toLowerCase().includes('wheat'),
       image: '🌾',
-      tag: language === 'mr-IN' ? 'दीर्घ साठवणूक' : language === 'hi-IN' ? 'दीर्घ भंडारण' : 'Long Storage',
+      tag: labels.longStorage || 'Long Storage',
       tagColor: 'bg-blue-100 text-blue-800 border-blue-300'
     },
     {
       name: 'Soybean',
       label: language === 'mr-IN' ? 'सोयाबीन' : language === 'hi-IN' ? 'सोयाबीन' : 'Soybean',
-      variety: language === 'mr-IN' ? 'पिवळे सोयाबीन' : language === 'hi-IN' ? 'पीला सोयाबीन' : 'Yellow Grade-A',
+      variety: labels.oilseedCrop || 'Yellow Grade-A',
       mandi: 'Latur APMC',
       defaultQty: 15,
       active: (slots.commodity || '').toLowerCase().includes('soybean'),
       image: '🌱',
-      tag: language === 'mr-IN' ? 'तेलबिया दर' : language === 'hi-IN' ? 'तिलहन भाव' : 'Oilseed Benchmark',
+      tag: labels.oilseedBench || 'Oilseed Benchmark',
       tagColor: 'bg-purple-100 text-purple-800 border-purple-300'
     }
   ];

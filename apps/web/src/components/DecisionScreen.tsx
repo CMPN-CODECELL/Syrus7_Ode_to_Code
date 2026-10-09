@@ -231,8 +231,8 @@ export const DecisionScreen: React.FC<Props> = ({
             <span className="text-xs font-medium text-slate-500"> (q50)</span>
           </div>
           <div className="text-[11px] text-slate-600 font-semibold flex items-center justify-between">
-            <span>Low (q10): ₹{forecast.low}</span>
-            <span>High (q90): ₹{forecast.high}</span>
+            <span>q10: ₹{forecast.low}</span>
+            <span>q90: ₹{forecast.high}</span>
           </div>
         </div>
 
@@ -251,7 +251,7 @@ export const DecisionScreen: React.FC<Props> = ({
             <span className="text-xs font-mono font-bold text-slate-500">({risk.score.toFixed(2)})</span>
           </div>
           <p className="text-[11px] text-slate-600 font-medium">
-            {risk.flags.filter(f => f.status !== 'GREEN').length} elevated risk factor(s) monitored.
+            {risk.flags.filter(f => f.status !== 'GREEN').length} {labels.factorsMonitored || 'elevated risk factor(s) monitored.'}
           </p>
         </div>
 
@@ -281,7 +281,7 @@ export const DecisionScreen: React.FC<Props> = ({
             onClick={onOpenScenarios}
             className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
           >
-            <span>{labels.scenarios || 'What-If Simulator'}</span>
+            <span>{labels.stressTestBtn || labels.scenarios || 'Stress Test This Decision'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -289,7 +289,9 @@ export const DecisionScreen: React.FC<Props> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {explanation.why.map((reason, idx) => (
             <div key={idx} className="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100 text-xs text-slate-800 space-y-1.5 shadow-xs">
-              <span className="font-extrabold text-emerald-800 uppercase tracking-wider text-[10px] block">Fact #{idx + 1}</span>
+              <span className="font-extrabold text-emerald-800 uppercase tracking-wider text-[10px] block">
+                {labels.factPrefix || 'Fact #'}{idx + 1}
+              </span>
               <p className="leading-relaxed font-medium">{reason}</p>
             </div>
           ))}

@@ -3,9 +3,17 @@ import { Sprout, ArrowRight, Play, CheckCircle2 } from 'lucide-react';
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  language?: 'mr-IN' | 'hi-IN' | 'en-IN';
+  setLanguage?: (lang: 'mr-IN' | 'hi-IN' | 'en-IN') => void;
+  labels?: Record<string, string>;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onGetStarted,
+  language = 'mr-IN',
+  setLanguage,
+  labels = {}
+}) => {
   // Animation duration is 3.84 seconds for the GIF
   const [animationFinished, setAnimationFinished] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -27,6 +35,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const skipText = labels.skipIntro || (language === 'mr-IN' ? 'पुढे जा (Skip)' : language === 'hi-IN' ? 'आगे बढ़ें (Skip)' : 'Skip Intro');
+  const initText = labels.appInitializing || (language === 'mr-IN' ? 'कृषिनिर्णय सुरू होत आहे...' : language === 'hi-IN' ? 'कृषिनिर्णय प्रारंभ हो रहा है...' : 'Initializing KrishiNirnay...');
+  const getStartedText = labels.getStarted || (language === 'mr-IN' ? 'सुरू करा • Get Started' : language === 'hi-IN' ? 'शुरू करें • Get Started' : 'Get Started');
+  const subtitleText = labels.heroSubtitle || (language === 'mr-IN'
+    ? 'केवळ बाजार भाव नव्हे, तर वाहतूक खर्च व नासाडी वजा करून शेतकऱ्याचा खरा निव्वळ नफा ठरवणारे तंत्रज्ञान.'
+    : language === 'hi-IN'
+    ? 'केवल मंडी भाव ही नहीं, बल्कि ढुलाई खर्च और उपज खराबी घटाकर किसान का असली शुद्ध मुनाफा तय करने वाली तकनीक।'
+    : 'Not just market prices, but factoring transport costs and spoilage to determine a farmer’s true net realization.');
 
   return (
     <div 
@@ -50,18 +67,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* Subtle vignette overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/60 pointer-events-none" />
 
-      {/* Top Brand Pill & Skip Option while video is playing */}
-      {!animationFinished && (
-        <div className="absolute top-6 right-6 z-30">
+      {/* Top Bar: Language Switcher (Left) & Skip Option (Right) */}
+      <div className="absolute top-6 left-6 right-6 z-30 flex items-center justify-between">
+        {setLanguage && (
+          <div className="flex items-center bg-black/60 backdrop-blur-md rounded-2xl p-1 border border-white/20 text-xs">
+            <button
+              onClick={() => setLanguage('mr-IN')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition ${
+                language === 'mr-IN' ? 'bg-emerald-600 text-white shadow-sm' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              मराठी
+            </button>
+            <button
+              onClick={() => setLanguage('hi-IN')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition ${
+                language === 'hi-IN' ? 'bg-emerald-600 text-white shadow-sm' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              हिंदी
+            </button>
+            <button
+              onClick={() => setLanguage('en-IN')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition ${
+                language === 'en-IN' ? 'bg-emerald-600 text-white shadow-sm' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              English
+            </button>
+          </div>
+        )}
+
+        {!animationFinished && (
           <button
             onClick={() => setAnimationFinished(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white/90 text-xs font-semibold backdrop-blur-md border border-white/20 transition transform active:scale-95"
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white/90 text-xs font-semibold backdrop-blur-md border border-white/20 transition transform active:scale-95"
           >
-            <span>Skip Intro (पुढे जा)</span>
+            <span>{skipText}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Progress bar during initial single video playback */}
       {!animationFinished && (
@@ -72,8 +118,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[11px] text-white/70 font-medium tracking-wide">
-            कृषिनिर्णय सुरू होत आहे...
+          <p className="text-[11px] text-white/80 font-medium tracking-wide">
+            {initText}
           </p>
         </div>
       )}
@@ -96,7 +142,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 “Sahi Bhav Se, Samriddhi Ki Raah Pe.”
               </p>
               <p className="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed max-w-sm mx-auto">
-                केवळ बाजार भाव नव्हे, तर वाहतूक खर्च व नासाडी वजा करून शेतकऱ्याचा <strong>खरा निव्वळ नफा</strong> ठरवणारे तंत्रज्ञान.
+                {subtitleText}
               </p>
             </div>
 
@@ -104,15 +150,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-emerald-100 font-medium">
               <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                टोमॅटो आणि कांदा
+                {labels.tagProduce || (language === 'mr-IN' ? 'टोमॅटो आणि कांदा' : language === 'hi-IN' ? 'टमाटर और प्याज' : 'Tomato & Onion')}
               </span>
               <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                ३ बाजार समित्या
+                {labels.tagMandis || (language === 'mr-IN' ? '३ बाजार समित्या' : language === 'hi-IN' ? '3 प्रमुख मंडियां' : '3 Verified APMCs')}
               </span>
               <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                मराठी / हिंदी आवाज
+                {labels.tagVoice || (language === 'mr-IN' ? 'मराठी / हिंदी आवाज' : language === 'hi-IN' ? 'मराठी / हिंदी आवाज' : 'Voice Guidance')}
               </span>
             </div>
 
@@ -123,7 +169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg sm:text-xl shadow-xl shadow-emerald-500/40 transition-all duration-300 transform hover:scale-[1.02] active:scale-95"
                 aria-label="Get Started with KrishiNirnay"
               >
-                <span>सुरू करा • Get Started</span>
+                <span>{getStartedText}</span>
                 <ArrowRight className="w-5 h-5 text-slate-950 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </div>
