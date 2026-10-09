@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KrishiNirnayRiskSchema",
+  "description": "Six-risk engine result schema",
+  "type": "object",
+  "required": [
+    "overall",
+    "score",
+    "flags",
+    "overrides_applied"
+  ],
+  "properties": {
+    "overall": { "type": "string", "enum": ["GREEN", "YELLOW", "RED"] },
+    "score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "score", "weight", "reason"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "price_drop",
+              "arrival_spike",
+              "volatility",
+              "stale_data",
+              "forecast_reliability",
+              "weather"
+            ]
+          },
+          "status": { "type": "string", "enum": ["GREEN", "YELLOW", "RED"] },
+          "score": { "type": "number", "enum": [0.0, 0.5, 1.0] },
+          "weight": { "type": "number" },
+          "reason": { "type": "string" },
+          "metrics": { "type": "object" }
+        }
+      }
+    },
+    "overrides_applied": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

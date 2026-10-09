@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KrishiNirnayScenarioSchema",
+  "description": "Scenario engine request and response contracts",
+  "type": "object",
+  "required": [
+    "baseline_record",
+    "scenario_record",
+    "difference"
+  ],
+  "properties": {
+    "baseline_record": { "$ref": "decision_record.schema.json" },
+    "scenario_record": { "$ref": "decision_record.schema.json" },
+    "difference": {
+      "type": "object",
+      "required": [
+        "net_delta",
+        "risk_changed",
+        "action_changed",
+        "baseline_action",
+        "scenario_action",
+        "baseline_risk",
+        "scenario_risk",
+        "main_reason"
+      ],
+      "properties": {
+        "net_delta": { "type": "number" },
+        "risk_changed": { "type": "boolean" },
+        "action_changed": { "type": "boolean" },
+        "baseline_action": { "type": "string" },
+        "scenario_action": { "type": "string" },
+        "baseline_risk": { "type": "string" },
+        "scenario_risk": { "type": "string" },
+        "main_reason": { "type": "string" }
+      }
+    },
+    "break_even_changed": { "type": "boolean" }
+  }
+}

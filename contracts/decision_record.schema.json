@@ -1,131 +1,363 @@
 {
   "$defs": {
-    "BaselineOutcome": {
+    "AssumptionRecord": {
+      "description": "Explicit inspection metadata for an economic or physical parameter.",
+      "properties": {
+        "param": {
+          "title": "Param",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value"
+        },
+        "status": {
+          "enum": [
+            "VERIFIED",
+            "ASSUMPTION"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source"
+        },
+        "last_verified": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Verified"
+        }
+      },
+      "required": [
+        "param",
+        "value",
+        "status"
+      ],
+      "title": "AssumptionRecord",
+      "type": "object"
+    },
+    "BaselineRecord": {
+      "description": "The baseline action: sell at home mandi today.",
       "properties": {
         "market": {
-          "description": "Home baseline mandi name",
           "title": "Market",
           "type": "string"
         },
         "sale_day": {
-          "description": "Sale date (YYYY-MM-DD)",
           "title": "Sale Day",
           "type": "string"
         },
-        "modal_price": {
-          "description": "Observed modal price in INR/qtl",
-          "title": "Modal Price",
-          "type": "number"
-        },
-        "quantity_sold_qtl": {
-          "description": "Net sold quantity in qtl",
-          "title": "Quantity Sold Qtl",
-          "type": "number"
-        },
-        "gross_revenue": {
-          "description": "Gross revenue in INR",
-          "title": "Gross Revenue",
-          "type": "number"
-        },
         "net_total": {
-          "description": "Net baseline realization in INR",
           "title": "Net Total",
           "type": "number"
         },
+        "gross_revenue": {
+          "title": "Gross Revenue",
+          "type": "number"
+        },
+        "quantity_sold_qtl": {
+          "title": "Quantity Sold Qtl",
+          "type": "number"
+        },
+        "price_inr_per_qtl": {
+          "title": "Price Inr Per Qtl",
+          "type": "number"
+        },
+        "modal_price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modal Price"
+        },
+        "costs": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Costs",
+          "type": "object"
+        },
         "cost_breakdown": {
-          "$ref": "#/$defs/CostBreakdown"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CostBreakdown"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
         "market",
         "sale_day",
-        "modal_price",
-        "quantity_sold_qtl",
-        "gross_revenue",
         "net_total",
-        "cost_breakdown"
+        "gross_revenue",
+        "quantity_sold_qtl",
+        "price_inr_per_qtl",
+        "costs"
       ],
-      "title": "BaselineOutcome",
+      "title": "BaselineRecord",
       "type": "object"
     },
-    "ChosenOutcome": {
+    "CandidateEvaluation": {
+      "description": "Evaluated option across mandi x day horizon for the 3x7 heatmap.",
+      "properties": {
+        "market": {
+          "title": "Market",
+          "type": "string"
+        },
+        "sale_day": {
+          "title": "Sale Day",
+          "type": "string"
+        },
+        "holding_days": {
+          "title": "Holding Days",
+          "type": "integer"
+        },
+        "price_inr_per_qtl": {
+          "title": "Price Inr Per Qtl",
+          "type": "number"
+        },
+        "quantile_used": {
+          "title": "Quantile Used",
+          "type": "string"
+        },
+        "net_total": {
+          "title": "Net Total",
+          "type": "number"
+        },
+        "gain_pct": {
+          "title": "Gain Pct",
+          "type": "number"
+        },
+        "probability_beat_baseline": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Probability Beat Baseline"
+        },
+        "reservation_price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reservation Price"
+        },
+        "is_open": {
+          "title": "Is Open",
+          "type": "boolean"
+        },
+        "is_feasible": {
+          "title": "Is Feasible",
+          "type": "boolean"
+        },
+        "is_safe": {
+          "title": "Is Safe",
+          "type": "boolean"
+        },
+        "disqualification_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Disqualification Reason"
+        },
+        "costs": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Costs",
+          "type": "object"
+        },
+        "breakdown": {
+          "title": "Breakdown",
+          "type": "object"
+        }
+      },
+      "required": [
+        "market",
+        "sale_day",
+        "holding_days",
+        "price_inr_per_qtl",
+        "quantile_used",
+        "net_total",
+        "gain_pct",
+        "is_open",
+        "is_feasible",
+        "is_safe",
+        "costs",
+        "breakdown"
+      ],
+      "title": "CandidateEvaluation",
+      "type": "object"
+    },
+    "ChosenRecord": {
+      "description": "The winning recommendation that passed all safety and economic gates.",
       "properties": {
         "action": {
-          "description": "Recommended action",
           "enum": [
             "SELL_NOW",
             "WAIT",
-            "GO"
+            "GO",
+            "INSUFFICIENT_EVIDENCE"
           ],
           "title": "Action",
           "type": "string"
         },
         "market": {
-          "description": "Selected mandi name",
           "title": "Market",
           "type": "string"
         },
         "sale_day": {
-          "description": "Recommended sale date (YYYY-MM-DD)",
           "title": "Sale Day",
           "type": "string"
         },
-        "wait_days": {
-          "default": 0,
-          "description": "Number of days to wait from today",
-          "title": "Wait Days",
-          "type": "integer"
-        },
-        "modal_price_expected": {
-          "description": "Expected/forecasted modal price in INR/qtl",
-          "title": "Modal Price Expected",
-          "type": "number"
-        },
         "net_total": {
-          "description": "Risk-adjusted net realization in INR",
           "title": "Net Total",
           "type": "number"
         },
         "gain_total": {
-          "description": "Net gain over baseline in INR",
           "title": "Gain Total",
           "type": "number"
         },
         "gain_pct": {
-          "description": "Net gain percentage over baseline",
           "title": "Gain Pct",
           "type": "number"
         },
         "probability_beat_baseline": {
-          "description": "Probability of beating baseline net (0.0 to 1.0)",
-          "title": "Probability Beat Baseline",
-          "type": "number"
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Probability Beat Baseline"
         },
         "reservation_price": {
-          "description": "Break-even / reservation price per quintal in INR/qtl",
-          "title": "Reservation Price",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reservation Price"
+        },
+        "required_gain_pct": {
+          "title": "Required Gain Pct",
           "type": "number"
         },
+        "quantity_sold_qtl": {
+          "title": "Quantity Sold Qtl",
+          "type": "number"
+        },
+        "holding_days": {
+          "title": "Holding Days",
+          "type": "integer"
+        },
+        "wait_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wait Days"
+        },
+        "modal_price_expected": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modal Price Expected"
+        },
+        "costs": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Costs",
+          "type": "object"
+        },
         "cost_breakdown": {
-          "$ref": "#/$defs/CostBreakdown"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CostBreakdown"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
         "action",
         "market",
         "sale_day",
-        "modal_price_expected",
         "net_total",
         "gain_total",
         "gain_pct",
-        "probability_beat_baseline",
-        "reservation_price",
-        "cost_breakdown"
+        "required_gain_pct",
+        "quantity_sold_qtl",
+        "holding_days",
+        "costs"
       ],
-      "title": "ChosenOutcome",
+      "title": "ChosenRecord",
       "type": "object"
     },
     "CostBreakdown": {
+      "description": "Detailed logistics and perishability cost breakdown.",
       "properties": {
         "gross_revenue": {
           "description": "Gross revenue before deductions (INR)",
@@ -206,229 +438,9 @@
       "type": "object"
     },
     "ExplanationPayload": {
+      "description": "Immutable deterministic explanation evidence.",
       "properties": {
         "verdict": {
-          "title": "Verdict",
-          "type": "string"
-        },
-        "why": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Why",
-          "type": "array"
-        },
-        "key_drivers": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Key Drivers",
-          "type": "array"
-        },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Evidence",
-          "type": "array"
-        },
-        "spoken_summary": {
-          "description": "Short 3-part spoken text: verdict, net amount, main risk",
-          "title": "Spoken Summary",
-          "type": "string"
-        }
-      },
-      "required": [
-        "verdict",
-        "spoken_summary"
-      ],
-      "title": "ExplanationPayload",
-      "type": "object"
-    },
-    "ForecastPayload": {
-      "properties": {
-        "crop": {
-          "title": "Crop",
-          "type": "string"
-        },
-        "mandi": {
-          "title": "Mandi",
-          "type": "string"
-        },
-        "target_date": {
-          "title": "Target Date",
-          "type": "string"
-        },
-        "q10": {
-          "title": "Q10",
-          "type": "number"
-        },
-        "q20": {
-          "title": "Q20",
-          "type": "number"
-        },
-        "q35": {
-          "title": "Q35",
-          "type": "number"
-        },
-        "q50": {
-          "title": "Q50",
-          "type": "number"
-        },
-        "q90": {
-          "title": "Q90",
-          "type": "number"
-        },
-        "low": {
-          "title": "Low",
-          "type": "number"
-        },
-        "expected": {
-          "title": "Expected",
-          "type": "number"
-        },
-        "high": {
-          "title": "High",
-          "type": "number"
-        },
-        "reliability": {
-          "enum": [
-            "HIGH",
-            "MEDIUM",
-            "LOW"
-          ],
-          "title": "Reliability",
-          "type": "string"
-        },
-        "rolling_mase": {
-          "title": "Rolling Mase",
-          "type": "number"
-        },
-        "rolling_80_coverage": {
-          "title": "Rolling 80 Coverage",
-          "type": "number"
-        },
-        "training_end_date": {
-          "title": "Training End Date",
-          "type": "string"
-        },
-        "out_of_range": {
-          "default": false,
-          "title": "Out Of Range",
-          "type": "boolean"
-        },
-        "top_drivers_up": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Top Drivers Up",
-          "type": "array"
-        },
-        "top_drivers_down": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Top Drivers Down",
-          "type": "array"
-        },
-        "unit": {
-          "default": "INR_PER_QUINTAL",
-          "title": "Unit",
-          "type": "string"
-        }
-      },
-      "required": [
-        "crop",
-        "mandi",
-        "target_date",
-        "q10",
-        "q20",
-        "q35",
-        "q50",
-        "q90",
-        "low",
-        "expected",
-        "high",
-        "reliability",
-        "rolling_mase",
-        "rolling_80_coverage",
-        "training_end_date"
-      ],
-      "title": "ForecastPayload",
-      "type": "object"
-    },
-    "RiskFlag": {
-      "properties": {
-        "id": {
-          "description": "Flag identifier, e.g. price_drop, weather",
-          "title": "Id",
-          "type": "string"
-        },
-        "name": {
-          "description": "Human readable flag title",
-          "title": "Name",
-          "type": "string"
-        },
-        "status": {
-          "enum": [
-            "GREEN",
-            "YELLOW",
-            "RED"
-          ],
-          "title": "Status",
-          "type": "string"
-        },
-        "score": {
-          "description": "0.0 for Green, 0.5 for Yellow, 1.0 for Red",
-          "title": "Score",
-          "type": "number"
-        },
-        "reason": {
-          "description": "Explanation of flag state",
-          "title": "Reason",
-          "type": "string"
-        },
-        "evidence": {
-          "description": "Underlying metric or data evidence",
-          "title": "Evidence",
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "status",
-        "score",
-        "reason",
-        "evidence"
-      ],
-      "title": "RiskFlag",
-      "type": "object"
-    },
-    "RiskPayload": {
-      "properties": {
-        "overall": {
-          "enum": [
-            "GREEN",
-            "YELLOW",
-            "RED"
-          ],
-          "title": "Overall",
-          "type": "string"
-        },
-        "score": {
-          "description": "Weighted composite risk score [0, 1]",
-          "title": "Score",
-          "type": "number"
-        },
-        "flags": {
-          "items": {
-            "$ref": "#/$defs/RiskFlag"
-          },
-          "title": "Flags",
-          "type": "array"
-        },
-        "safety_override": {
           "anyOf": [
             {
               "type": "string"
@@ -438,98 +450,293 @@
             }
           ],
           "default": null,
-          "title": "Safety Override"
+          "description": "Concise headline verdict",
+          "title": "Verdict"
+        },
+        "why": {
+          "description": "High-level bulleted rationale for the farmer",
+          "items": {
+            "type": "string"
+          },
+          "title": "Why",
+          "type": "array"
+        },
+        "key_drivers": {
+          "description": "Top quantitative drivers that determined the outcome",
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Drivers",
+          "type": "array"
+        },
+        "evidence": {
+          "description": "Strict machine-readable evidence dictionary",
+          "title": "Evidence",
+          "type": "object"
+        },
+        "spoken_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Short 3-part spoken text: verdict, net amount, main risk",
+          "title": "Spoken Summary"
+        }
+      },
+      "required": [
+        "why",
+        "key_drivers",
+        "evidence"
+      ],
+      "title": "ExplanationPayload",
+      "type": "object"
+    },
+    "RiskAssessment": {
+      "description": "Complete six-risk assessment output with overrides and explanations.",
+      "properties": {
+        "overall": {
+          "description": "Overall risk status: 'GREEN', 'YELLOW', or 'RED'",
+          "title": "Overall",
+          "type": "string"
+        },
+        "score": {
+          "description": "Weighted composite risk score R in [0.0, 1.0]",
+          "title": "Score",
+          "type": "number"
+        },
+        "raw_score": {
+          "description": "Score before safety overrides",
+          "title": "Raw Score",
+          "type": "number"
+        },
+        "flags": {
+          "description": "The six individual risk flags",
+          "items": {
+            "$ref": "#/$defs/RiskFlag"
+          },
+          "title": "Flags",
+          "type": "array"
+        },
+        "overrides_applied": {
+          "description": "List of safety overrides triggered",
+          "items": {
+            "type": "string"
+          },
+          "title": "Overrides Applied",
+          "type": "array"
+        },
+        "is_wait_blocked_by_risk": {
+          "default": false,
+          "description": "True if risk policies strictly block Wait",
+          "title": "Is Wait Blocked By Risk",
+          "type": "boolean"
+        },
+        "is_go_blocked_by_risk": {
+          "default": false,
+          "description": "True if risk policies strictly block Go",
+          "title": "Is Go Blocked By Risk",
+          "type": "boolean"
+        },
+        "blocking_reasons": {
+          "description": "Detailed blocking explanations",
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocking Reasons",
+          "type": "array"
         }
       },
       "required": [
         "overall",
         "score",
+        "raw_score",
         "flags"
       ],
-      "title": "RiskPayload",
+      "title": "RiskAssessment",
+      "type": "object"
+    },
+    "RiskFlag": {
+      "description": "Individual evaluated risk flag.",
+      "properties": {
+        "name": {
+          "description": "Flag name: price_drop, arrival_spike, volatility, stale_data, forecast_reliability, weather",
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "description": "'GREEN', 'YELLOW', or 'RED'",
+          "title": "Status",
+          "type": "string"
+        },
+        "score": {
+          "description": "0.0 for Green, 0.5 for Yellow, 1.0 for Red",
+          "title": "Score",
+          "type": "number"
+        },
+        "weight": {
+          "description": "Configured weight in overall score",
+          "title": "Weight",
+          "type": "number"
+        },
+        "reason": {
+          "description": "Deterministic reason for flag classification",
+          "title": "Reason",
+          "type": "string"
+        },
+        "metrics": {
+          "description": "Underlying quantitative metrics",
+          "title": "Metrics",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "status",
+        "score",
+        "weight",
+        "reason"
+      ],
+      "title": "RiskFlag",
+      "type": "object"
+    },
+    "SourceRefRecord": {
+      "description": "Audit reference to upstream data sources.",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "ref": {
+          "title": "Ref",
+          "type": "string"
+        },
+        "fetched_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fetched At"
+        }
+      },
+      "required": [
+        "type",
+        "source",
+        "ref"
+      ],
+      "title": "SourceRefRecord",
       "type": "object"
     }
   },
+  "description": "Immutable DecisionRecord: Single Source of Truth for KrishiNirnay.",
   "properties": {
     "request_id": {
+      "description": "Unique request UUID",
       "title": "Request Id",
       "type": "string"
     },
     "engine_version": {
       "default": "1.0.0",
+      "description": "Decision engine software version",
       "title": "Engine Version",
       "type": "string"
     },
     "data_snapshot_id": {
-      "default": "snapshot_v1_live",
+      "description": "ID/Hash of market data snapshot",
       "title": "Data Snapshot Id",
       "type": "string"
     },
     "rules_version": {
-      "default": "rules_v1.0",
+      "default": "1.0.0",
+      "description": "Version of risk and gate rules",
       "title": "Rules Version",
       "type": "string"
     },
     "forecast_model_version": {
-      "default": "xgboost_direct_h7_v1",
+      "default": "1.0.0",
+      "description": "Version of predictive model",
       "title": "Forecast Model Version",
       "type": "string"
     },
     "calibration_version": {
-      "default": "conformal_residual_v1",
+      "default": "1.0.0",
+      "description": "Version of conformal calibration",
       "title": "Calibration Version",
       "type": "string"
     },
     "cost_config_version": {
-      "default": "cost_v1.0",
+      "default": "1.0.0",
+      "description": "Version of cost configuration file",
       "title": "Cost Config Version",
       "type": "string"
     },
     "weather_snapshot_id": {
-      "default": "weather_openmeteo_v1",
+      "default": "weather-snap-v1",
+      "description": "ID of weather context snapshot",
       "title": "Weather Snapshot Id",
       "type": "string"
     },
     "route_snapshot_id": {
-      "default": "route_ors_v1",
+      "default": "route-snap-v1",
+      "description": "ID of routing context snapshot",
       "title": "Route Snapshot Id",
       "type": "string"
     },
     "timestamp": {
+      "description": "ISO-8601 generation timestamp",
       "title": "Timestamp",
       "type": "string"
     },
     "commodity": {
+      "default": "Tomato",
+      "description": "Commodity name",
       "title": "Commodity",
       "type": "string"
     },
     "lot_quantity_qtl": {
+      "default": 20.0,
+      "description": "Lot quantity in quintals",
       "title": "Lot Quantity Qtl",
       "type": "number"
     },
     "risk_profile": {
       "default": "BALANCED",
-      "enum": [
-        "CAUTIOUS",
-        "BALANCED",
-        "AGGRESSIVE"
-      ],
+      "description": "Risk profile",
       "title": "Risk Profile",
       "type": "string"
     },
     "baseline": {
-      "$ref": "#/$defs/BaselineOutcome"
+      "$ref": "#/$defs/BaselineRecord",
+      "description": "Home mandi sell-today baseline"
     },
     "chosen": {
-      "$ref": "#/$defs/ChosenOutcome"
+      "$ref": "#/$defs/ChosenRecord",
+      "description": "Selected policy recommendation"
     },
     "forecast": {
-      "$ref": "#/$defs/ForecastPayload"
+      "description": "Forecast summary",
+      "title": "Forecast",
+      "type": "object"
     },
     "risk": {
-      "$ref": "#/$defs/RiskPayload"
+      "$ref": "#/$defs/RiskAssessment",
+      "description": "Six-risk assessment"
     },
     "warnings": {
+      "description": "Operational and quality warnings",
       "items": {
         "type": "string"
       },
@@ -537,31 +744,46 @@
       "type": "array"
     },
     "assumptions": {
+      "description": "Inspectable parameter assumptions",
       "items": {
-        "type": "string"
+        "$ref": "#/$defs/AssumptionRecord"
       },
       "title": "Assumptions",
       "type": "array"
     },
     "source_refs": {
+      "description": "Data provenance references",
       "items": {
-        "type": "string"
+        "$ref": "#/$defs/SourceRefRecord"
       },
       "title": "Source Refs",
       "type": "array"
     },
     "explanation": {
-      "$ref": "#/$defs/ExplanationPayload"
+      "$ref": "#/$defs/ExplanationPayload",
+      "description": "Deterministic explanation and Why cards"
+    },
+    "candidates": {
+      "description": "All evaluated candidate cells (3x7 grid)",
+      "items": {
+        "$ref": "#/$defs/CandidateEvaluation"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "hysteresis_applied": {
+      "default": false,
+      "description": "True if recommendation flip was suppressed by hysteresis",
+      "title": "Hysteresis Applied",
+      "type": "boolean"
     }
   },
   "required": [
     "request_id",
+    "data_snapshot_id",
     "timestamp",
-    "commodity",
-    "lot_quantity_qtl",
     "baseline",
     "chosen",
-    "forecast",
     "risk",
     "explanation"
   ],

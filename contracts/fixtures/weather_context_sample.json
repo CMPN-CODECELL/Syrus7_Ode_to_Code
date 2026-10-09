@@ -1,0 +1,14 @@
+{
+  "location_name": "Nashik APMC",
+  "latitude": 19.9975,
+  "longitude": 73.7898,
+  "temperature_max_c": 32.5,
+  "rainfall_mm_24h": 0.0,
+  "imd_warning_color": "NONE",
+  "is_coastal": false,
+  "is_available": true,
+  "source": "open_meteo_imd",
+  "notes": [
+    "Typical clear conditions across Nashik district catchment"
+  ]
+}

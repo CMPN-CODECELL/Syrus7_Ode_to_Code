@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KrishiNirnayDecisionRequest",
+  "description": "Decision request contract for KrishiNirnay",
+  "type": "object",
+  "required": [
+    "commodity",
+    "quantity",
+    "quantity_unit",
+    "home_mandi",
+    "observation_date"
+  ],
+  "properties": {
+    "request_id": { "type": "string" },
+    "commodity": { "type": "string" },
+    "quantity": { "type": "number", "minimum": 0.01 },
+    "quantity_unit": { "type": "string", "enum": ["qtl", "kg", "tonne", "bags"] },
+    "bag_weight_kg": { "type": ["number", "null"] },
+    "home_mandi": { "type": "string" },
+    "home_coords": {
+      "type": ["array", "null"],
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "alternative_mandis": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "mandi_coords": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "number" },
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "observation_date": { "type": "string", "format": "date" },
+    "horizon_days": { "type": "integer", "minimum": 1, "maximum": 7, "default": 7 },
+    "risk_profile": { "type": "string", "enum": ["Cautious", "Balanced", "Aggressive"], "default": "Balanced" },
+    "vehicle_type": { "type": ["string", "null"] },
+    "vehicle_payload_qtl": { "type": ["number", "null"] },
+    "shared_transport": { "type": "boolean", "default": false },
+    "farmer_load_share": { "type": "number", "minimum": 0.01, "maximum": 1.0, "default": 1.0 },
+    "storage_available": { "type": "boolean", "default": false },
+    "packaging_type": { "type": "string", "enum": ["crates", "loose_bags"], "default": "crates" },
+    "quality_factor": { "type": "number", "minimum": 0.1, "maximum": 1.0, "default": 1.0 },
+    "prior_action": { "type": ["string", "null"], "enum": ["SELL_NOW", "WAIT", "GO", null] },
+    "prior_risk": { "type": ["string", "null"], "enum": ["GREEN", "YELLOW", "RED", null] }
+  }
+}

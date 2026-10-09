@@ -1,0 +1,53 @@
+[
+  {
+    "target_date": "2026-10-10",
+    "holding_days": 1,
+    "q10": 1780.0,
+    "q20": 1820.0,
+    "q35": 1860.0,
+    "q50": 1900.0,
+    "q90": 2000.0,
+    "low": 1780.0,
+    "expected": 1900.0,
+    "high": 2000.0,
+    "reliability": "HIGH",
+    "rolling_mase": 0.45,
+    "rolling_80_coverage": 0.81,
+    "training_end_date": "2026-10-08",
+    "out_of_range": false
+  },
+  {
+    "target_date": "2026-10-11",
+    "holding_days": 2,
+    "q10": 1760.0,
+    "q20": 1830.0,
+    "q35": 1880.0,
+    "q50": 1950.0,
+    "q90": 2080.0,
+    "low": 1760.0,
+    "expected": 1950.0,
+    "high": 2080.0,
+    "reliability": "HIGH",
+    "rolling_mase": 0.48,
+    "rolling_80_coverage": 0.80,
+    "training_end_date": "2026-10-08",
+    "out_of_range": false
+  },
+  {
+    "target_date": "2026-10-12",
+    "holding_days": 3,
+    "q10": 1740.0,
+    "q20": 1810.0,
+    "q35": 1870.0,
+    "q50": 1940.0,
+    "q90": 2100.0,
+    "low": 1740.0,
+    "expected": 1940.0,
+    "high": 2100.0,
+    "reliability": "HIGH",
+    "rolling_mase": 0.52,
+    "rolling_80_coverage": 0.79,
+    "training_end_date": "2026-10-08",
+    "out_of_range": false
+  }
+]
