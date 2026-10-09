@@ -32,6 +32,10 @@ import { ScenarioScreen } from './components/ScenarioScreen';
 import { VoiceAssistantDrawer } from './components/VoiceAssistantDrawer';
 import { FarmerInputsModal } from './components/FarmerInputsModal';
 import { LandingPage } from './components/LandingPage';
+import { HomeScreen } from './components/HomeScreen';
+import { MyFarmScreen } from './components/MyFarmScreen';
+import { AssistantScreen } from './components/AssistantScreen';
+import { BottomNav } from './components/BottomNav';
 
 import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus } from './types';
 import { ApiClient } from './api/client';
@@ -42,7 +46,7 @@ import enDict from './localization/en.json';
 
 export const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<string>('decision');
+  const [activeTab, setActiveTab] = useState<string>('home');
   const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('mr-IN');
   const [riskProfile, setRiskProfile] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -136,6 +140,17 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleSelectCropPreset = (commodity: string, mandi: string, qty: number) => {
+    const updated: SlotSchema = {
+      ...currentSlots,
+      commodity,
+      home_mandi: mandi,
+      quantity: qty
+    };
+    setCurrentSlots(updated);
+    loadDecisionData(updated, riskProfile);
+  };
+
   const lotSummary = `${currentSlots.quantity || 20} ${currentSlots.quantity_unit || 'qtl'} ${currentSlots.commodity || 'Tomato'} • ${currentSlots.home_mandi || 'Nashik APMC'}`;
 
   if (showLanding) {
@@ -143,7 +158,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4F7F4] text-slate-900 pb-20 md:pb-6">
+    <div className="min-h-screen flex flex-col bg-[#F4F7F4] text-slate-900 pb-24 md:pb-8">
       {/* 1. Judge Demo Failure Mode Switcher Bar */}
       <DemoSwitchBar
         currentMode={demoMode}
@@ -161,7 +176,7 @@ export const App: React.FC = () => {
         setRiskProfile={setRiskProfile}
         theme={theme}
         onToggleTheme={handleToggleTheme}
-        onOpenVoice={() => setIsVoiceOpen(true)}
+        onOpenVoice={() => setActiveTab('assistant')}
         onOpenEditLot={() => setIsEditModalOpen(true)}
         onOpenLanding={() => setShowLanding(true)}
         lotSummary={lotSummary}
@@ -171,84 +186,101 @@ export const App: React.FC = () => {
       {/* 3. Main Body Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
-        {/* 1. Compact, Unified Farmer Status & Weather Banner */}
-        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-emerald-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
-          {/* Left: Farmer Profile & Lot Summary */}
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shadow-xs flex-shrink-0">
-              <User className="w-5 h-5" />
+        {/* Compact Status Banner for secondary screens */}
+        {activeTab !== 'home' && activeTab !== 'assistant' && activeTab !== 'profile' && (
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-emerald-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            {/* Left: Farmer Profile & Lot Summary */}
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shadow-xs flex-shrink-0">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    {labels.goodMorning || 'Good Morning, Kisan Friend! 🌾'}
+                  </h2>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                    {labels.verifiedFarmer || 'Verified'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition shadow-xs"
+                    title="Click to edit crop lot, quantity, or mandi"
+                  >
+                    <Sprout className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>{lotSummary}</span>
+                    <Edit3 className="w-3 h-3 text-emerald-600 ml-0.5" />
+                  </button>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
-                  {language === 'mr-IN' ? 'नमस्कार, शेतकरी मित्र! 🌾' : language === 'hi-IN' ? 'नमस्ते, किसान भाई! 🌾' : 'Welcome, Kisan Friend! 🌾'}
-                </h2>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  <ShieldCheck className="w-3 h-3 text-emerald-700" />
-                  Verified
+
+            {/* Right: Weather & Mandi Status Pills + Intro Video + Voice Trigger */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs">
+              {/* Weather Pill */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-950 font-bold shadow-2xs">
+                <Sun className="w-4 h-4 text-amber-500 animate-spin-slow" />
+                <span>28°C • {labels.sunnyClear || 'Clear Sky'}</span>
+              </div>
+
+              {/* Mandi & Freshness Pill */}
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 font-bold shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{currentSlots.home_mandi || 'Nashik'} {labels.activeTrading || 'Active'}</span>
+                <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                  {labels.verified || '100% Verified'}
                 </span>
               </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <button
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition shadow-xs"
-                  title="Click to edit crop lot, quantity, or mandi"
-                >
-                  <Sprout className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>{lotSummary}</span>
-                  <Edit3 className="w-3 h-3 text-emerald-600 ml-0.5" />
-                </button>
-              </div>
+
+              {/* Watch Intro Video Button */}
+              <button
+                onClick={() => setShowLanding(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold text-xs transition shadow-2xs"
+                title="Watch Intro Video / Landing Page"
+              >
+                <span>🎬</span>
+                <span className="hidden sm:inline">{labels.introVideo || 'Intro'}</span>
+              </button>
+
+              {/* Voice Assistant Call-to-Action */}
+              <button
+                onClick={() => setActiveTab('assistant')}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/25 transition active:scale-95"
+                title="Open Voice Assistant"
+              >
+                <Mic className="w-4 h-4 text-white" />
+                <span>{labels.speak || 'Speak'}</span>
+              </button>
             </div>
           </div>
-
-          {/* Right: Weather & Mandi Status Pills + Intro Video + Voice Trigger */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs">
-            {/* Weather Pill */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-950 font-bold shadow-2xs">
-              <Sun className="w-4 h-4 text-amber-500 animate-spin-slow" />
-              <span>28°C • Clear Sky</span>
-            </div>
-
-            {/* Mandi & Freshness Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 font-bold shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{currentSlots.home_mandi || 'Nashik'} Active</span>
-              <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-1.5 py-0.5 rounded-md">100% Verified</span>
-            </div>
-
-            {/* Watch Intro Video Button */}
-            <button
-              onClick={() => setShowLanding(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold text-xs transition shadow-2xs"
-              title="Watch Intro Video / Landing Page"
-            >
-              <span>🎬</span>
-              <span className="hidden sm:inline">{language === 'mr-IN' ? 'व्हिडिओ' : language === 'hi-IN' ? 'वीडियो' : 'Intro'}</span>
-            </button>
-
-            {/* Voice Assistant Call-to-Action */}
-            <button
-              onClick={() => setIsVoiceOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/25 transition active:scale-95"
-              title="Open Voice Assistant"
-            >
-              <Mic className="w-4 h-4 text-white" />
-              <span>{labels.speak || 'बोला (Speak)'}</span>
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* Dynamic Screen View */}
         {loading && !decisionRecord ? (
           <div className="bg-white p-16 text-center rounded-3xl border border-emerald-100 shadow-sm space-y-4">
             <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="text-sm font-bold text-slate-700">
-              कृषिनिर्णय इंजिन सुरू होत आहे...
+              {language === 'mr-IN' ? 'कृषिनिर्णय इंजिन सुरू होत आहे...' : language === 'hi-IN' ? 'कृषिनिर्णय इंजन प्रारंभ हो रहा है...' : 'Initializing KrishiNirnay Engine...'}
             </p>
           </div>
         ) : (
           <>
+            {activeTab === 'home' && (
+              <HomeScreen
+                record={decisionRecord}
+                slots={currentSlots}
+                onNavigateTab={setActiveTab}
+                onOpenVoice={() => setActiveTab('assistant')}
+                onOpenEditLot={() => setIsEditModalOpen(true)}
+                onSelectCropPreset={handleSelectCropPreset}
+                labels={labels}
+                language={language}
+              />
+            )}
+
             {activeTab === 'decision' && (
               <DecisionScreen
                 record={decisionRecord}
@@ -304,6 +336,31 @@ export const App: React.FC = () => {
                 labels={labels}
               />
             )}
+
+            {activeTab === 'assistant' && (
+              <AssistantScreen
+                language={language}
+                labels={labels}
+                onPlayVoice={handlePlayVoice}
+              />
+            )}
+
+            {activeTab === 'profile' && (
+              <MyFarmScreen
+                slots={currentSlots}
+                onOpenEditLot={() => setIsEditModalOpen(true)}
+                language={language}
+                setLanguage={setLanguage}
+                theme={theme}
+                onToggleTheme={handleToggleTheme}
+                demoMode={demoMode}
+                onDemoModeChange={handleModeChange}
+                demoStatus={demoStatus}
+                riskProfile={riskProfile}
+                setRiskProfile={setRiskProfile}
+                labels={labels}
+              />
+            )}
           </>
         )}
       </main>
@@ -325,60 +382,13 @@ export const App: React.FC = () => {
         </div>
       </footer>
 
-      {/* 5. Mobile Phone Responsive Bottom Navigation Bar (AgriCare Style) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-emerald-100 shadow-xl py-1.5 px-3 flex items-center justify-around">
-        <button
-          onClick={() => setActiveTab('decision')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            activeTab === 'decision' ? 'text-emerald-700 font-black' : 'text-slate-500'
-          }`}
-        >
-          <Home className="w-5 h-5 mb-0.5" />
-          <span>निर्णय</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('heatmap')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            activeTab === 'heatmap' ? 'text-emerald-700 font-black' : 'text-slate-500'
-          }`}
-        >
-          <Calendar className="w-5 h-5 mb-0.5" />
-          <span>तक्ता</span>
-        </button>
-
-        {/* Central Raised Floating Mic for Instant Voice Assistance */}
-        <button
-          onClick={() => setIsVoiceOpen(true)}
-          className="flex flex-col items-center -mt-5"
-          title="Voice Assistant"
-        >
-          <div className="w-12 h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center shadow-lg shadow-emerald-700/40 border-4 border-white active:scale-90 transition">
-            <Mic className="w-5 h-5" />
-          </div>
-          <span className="text-[10px] font-bold text-emerald-800 mt-0.5">बोला</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('scenarios')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            activeTab === 'scenarios' ? 'text-emerald-700 font-black' : 'text-slate-500'
-          }`}
-        >
-          <Sliders className="w-5 h-5 mb-0.5" />
-          <span>काय होईल?</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab(activeTab === 'costs' ? 'risk' : 'costs')}
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            activeTab === 'costs' || activeTab === 'risk' ? 'text-emerald-700 font-black' : 'text-slate-500'
-          }`}
-        >
-          <Receipt className="w-5 h-5 mb-0.5" />
-          <span>खर्च/जोखीम</span>
-        </button>
-      </nav>
+      {/* 5. Modern Bottom Navigation Bar (AgriCare Mockup Style) */}
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        labels={labels}
+        language={language}
+      />
 
       {/* 6. Drawers and Modals */}
       <VoiceAssistantDrawer
