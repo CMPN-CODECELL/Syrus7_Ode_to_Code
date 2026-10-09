@@ -56,3 +56,22 @@ def test_scenario_endpoint():
     data = res.json()
     assert "comparison_table" in data
     assert data["action_flipped"] is True
+
+def test_dynamic_translate_endpoint():
+    res = client.post("/api/translate", json={
+        "text": ["Nashik APMC", "Tomato", "WAIT"],
+        "target_lang": "mr-IN"
+    })
+    assert res.status_code == 200
+    data = res.json()
+    assert data["target_lang"] == "mr-IN"
+    assert data["translated_text"] == ["नाशिक बाजार समिती", "टोमॅटो", "थांबा"]
+
+    # Test single phrase to Hindi
+    res_hi = client.post("/api/translate", json={
+        "text": "Pimpalgaon Baswant APMC",
+        "target_lang": "hi-IN"
+    })
+    assert res_hi.status_code == 200
+    assert res_hi.json()["translated_text"] == "पिंपलगांव बसवंत मंडी"
+

@@ -77,6 +77,21 @@ export class ApiClient {
     return await res.json();
   }
 
+  static async translate(text: string | string[], target_lang: string = 'mr-IN'): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/api/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, target_lang })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return data.translated_text;
+    } catch (e) {
+      return text;
+    }
+  }
+
   static async transcribeAudio(audioBase64?: string, language: string = 'mr-IN', simulatedText?: string): Promise<any> {
     const res = await fetch(`${API_BASE}/api/voice/transcribe`, {
       method: 'POST',

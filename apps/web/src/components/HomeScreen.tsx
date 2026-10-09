@@ -36,10 +36,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   
   // Locations with nearby mandis
   const locationOptions = [
-    { id: 'Nashik', name: language === 'mr-IN' ? 'नाशिक (Nashik)' : language === 'hi-IN' ? 'नासिक (Nashik)' : 'Nashik', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] },
-    { id: 'Niphad', name: language === 'mr-IN' ? 'निफाड (Niphad)' : language === 'hi-IN' ? 'निफाड़ (Niphad)' : 'Niphad', mandis: ['Pimpalgaon Baswant APMC', 'Lasalgaon APMC', 'Nashik APMC'] },
-    { id: 'Lasalgaon', name: language === 'mr-IN' ? 'लासलगाव (Lasalgaon)' : language === 'hi-IN' ? 'लासलगांव (Lasalgaon)' : 'Lasalgaon', mandis: ['Lasalgaon APMC', 'Pimpalgaon Baswant APMC', 'Nashik APMC'] },
-    { id: 'Pune', name: language === 'mr-IN' ? 'पुणे (Pune)' : language === 'hi-IN' ? 'पुणे (Pune)' : 'Pune', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] }
+    { id: 'Nashik', name: language === 'mr-IN' ? 'नाशिक' : language === 'hi-IN' ? 'नासिक' : 'Nashik', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] },
+    { id: 'Niphad', name: language === 'mr-IN' ? 'निफाड' : language === 'hi-IN' ? 'निफाड़' : 'Niphad', mandis: ['Pimpalgaon Baswant APMC', 'Lasalgaon APMC', 'Nashik APMC'] },
+    { id: 'Lasalgaon', name: language === 'mr-IN' ? 'लासलगाव' : language === 'hi-IN' ? 'लासलगांव' : 'Lasalgaon', mandis: ['Lasalgaon APMC', 'Pimpalgaon Baswant APMC', 'Nashik APMC'] },
+    { id: 'Pune', name: language === 'mr-IN' ? 'पुणे' : language === 'hi-IN' ? 'पुणे' : 'Pune', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] }
   ];
 
   // 2. Crop Selection State
@@ -130,20 +130,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     {
       id: 'Nashik APMC',
-      name: language === 'mr-IN' ? 'नाशिक बाजार समिती (Nashik APMC)' : language === 'hi-IN' ? 'नासिक मंडी (Nashik APMC)' : 'Nashik APMC',
-      dist: '१२ किमी (12 km)',
+      name: language === 'mr-IN' ? 'नाशिक बाजार समिती' : language === 'hi-IN' ? 'नासिक मंडी' : 'Nashik APMC',
+      dist: language === 'mr-IN' ? '१२ किमी (जवळ)' : language === 'hi-IN' ? '12 किमी (पास)' : '12 km (Near)',
       recommended: false
     },
     {
       id: 'Pimpalgaon Baswant APMC',
-      name: language === 'mr-IN' ? 'पिंपळगाव बसवंत बाजार (Pimpalgaon)' : language === 'hi-IN' ? 'पिंपलगांव मंडी (Pimpalgaon)' : 'Pimpalgaon Baswant APMC',
-      dist: '२८ किमी (28 km)',
+      name: language === 'mr-IN' ? 'पिंपळगाव बसवंत बाजार' : language === 'hi-IN' ? 'पिंपलगांव मंडी' : 'Pimpalgaon Baswant APMC',
+      dist: language === 'mr-IN' ? '२८ किमी' : language === 'hi-IN' ? '28 किमी' : '28 km',
       recommended: false
     },
     {
       id: 'Lasalgaon APMC',
-      name: language === 'mr-IN' ? 'लासलगाव बाजार समिती (Lasalgaon)' : language === 'hi-IN' ? 'लासलगांव मंडी (Lasalgaon)' : 'Lasalgaon APMC',
-      dist: '५२ किमी (52 km)',
+      name: language === 'mr-IN' ? 'लासलगाव बाजार समिती' : language === 'hi-IN' ? 'लासलगांव मंडी' : 'Lasalgaon APMC',
+      dist: language === 'mr-IN' ? '५२ किमी (दूर)' : language === 'hi-IN' ? '52 किमी (दूर)' : '52 km (Far)',
       recommended: false
     }
   ];
@@ -315,7 +315,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 onClick={() => setQuantity((prev) => prev + num)}
                 className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-emerald-100 border border-slate-200 hover:border-emerald-300 text-slate-800 text-xs font-black transition"
               >
-                +{num} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विं' : 'qtl') : (language === 'mr-IN' ? 'पोती' : 'bags')}
+                +{num} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विं' : language === 'hi-IN' ? 'क्विं' : 'qtl') : (language === 'mr-IN' ? 'पोती' : language === 'hi-IN' ? 'बोरी' : 'bags')}
               </button>
             ))}
             <button
@@ -436,7 +436,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 {language === 'mr-IN' ? 'आजचा व अंदाजित भाव (तुमच्या मालासाठी)' : language === 'hi-IN' ? 'आज का व अनुमानित भाव' : 'Estimated Revenue for your produce'}
               </span>
               <h3 className="text-lg font-black font-serif">
-                {quantity} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विंटल' : 'qtl') : (language === 'mr-IN' ? 'पोती' : 'bags')} {activeCropObj.name}
+                {quantity} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl') : (language === 'mr-IN' ? 'पोती' : language === 'hi-IN' ? 'बोरी' : 'bags')} {activeCropObj.name}
               </h3>
             </div>
           </div>

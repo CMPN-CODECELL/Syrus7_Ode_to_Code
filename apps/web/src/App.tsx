@@ -192,6 +192,7 @@ export const App: React.FC = () => {
                 onPlayVoice={handlePlayVoice}
                 onOpenCosts={() => setActiveTab('costs')}
                 labels={labels}
+                language={language}
                 isInsufficientEvidence={demoMode === 'DATA_OUTAGE'}
               />
             )}
@@ -201,6 +202,7 @@ export const App: React.FC = () => {
               <CostScreen
                 record={decisionRecord}
                 labels={labels}
+                language={language}
               />
             )}
           </>

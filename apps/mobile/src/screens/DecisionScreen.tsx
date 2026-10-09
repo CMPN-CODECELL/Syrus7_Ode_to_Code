@@ -37,14 +37,20 @@ export const DecisionScreen: React.FC<Props> = ({ record, onNavigateTab, languag
         </View>
 
         <Text style={styles.heroTitle}>
-          {chosen.action === 'WAIT' ? `WAIT ${chosen.wait_days} DAYS` : (chosen.action === 'GO' ? `GO TO ${chosen.market}` : 'SELL NOW')}
+          {chosen.action === 'WAIT'
+            ? (language === 'mr-IN' ? `${chosen.wait_days} दिवस थांबा` : language === 'hi-IN' ? `${chosen.wait_days} दिन रुकें` : `WAIT ${chosen.wait_days} DAYS`)
+            : (chosen.action === 'GO'
+            ? (language === 'mr-IN' ? `${chosen.market} येथे जा` : language === 'hi-IN' ? `${chosen.market} जाएं` : `GO TO ${chosen.market}`)
+            : (language === 'mr-IN' ? 'आजच विका' : language === 'hi-IN' ? 'आज ही बेचें' : 'SELL NOW'))}
         </Text>
         <Text style={styles.heroSubtitle}>
-          {chosen.market} • {lot_quantity_qtl} qtl {commodity}
+          {chosen.market} • {lot_quantity_qtl} {language === 'en-IN' ? 'qtl' : 'क्विंटल'} {commodity}
         </Text>
 
         <View style={styles.netBox}>
-          <Text style={styles.netLabel}>EXPECTED NET REALIZATION</Text>
+          <Text style={styles.netLabel}>
+            {language === 'mr-IN' ? 'हातात मिळणारा निव्वळ नफा' : language === 'hi-IN' ? 'हाथ में मिलने वाला शुद्ध लाभ' : 'EXPECTED NET REALIZATION'}
+          </Text>
           <View style={styles.netRow}>
             <Text style={styles.netValue}>₹{chosen.net_total.toLocaleString('en-IN')}</Text>
             {chosen.gain_total > 0 && (
@@ -52,50 +58,72 @@ export const DecisionScreen: React.FC<Props> = ({ record, onNavigateTab, languag
             )}
           </View>
           <Text style={styles.baselineNote}>
-            Sell Now Baseline: ₹{baseline.net_total.toLocaleString('en-IN')} • {Math.round(chosen.probability_beat_baseline * 100)}% Win Odds
+            {language === 'mr-IN'
+              ? `आजचा आधार भाव: ₹${baseline.net_total.toLocaleString('en-IN')} • ${Math.round(chosen.probability_beat_baseline * 100)}% खात्री`
+              : language === 'hi-IN'
+              ? `आज का आधार भाव: ₹${baseline.net_total.toLocaleString('en-IN')} • ${Math.round(chosen.probability_beat_baseline * 100)}% संभावना`
+              : `Sell Now Baseline: ₹${baseline.net_total.toLocaleString('en-IN')} • ${Math.round(chosen.probability_beat_baseline * 100)}% Win Odds`}
           </Text>
         </View>
 
         {/* Speak Button */}
         <TouchableOpacity style={styles.speakButton} onPress={handleSpeak} activeOpacity={0.8}>
-          <Text style={styles.speakButtonText}>🔊 ऐका / Listen Summary</Text>
+          <Text style={styles.speakButtonText}>
+            {language === 'mr-IN' ? '🔊 ऐका (बोलून दाखवा)' : language === 'hi-IN' ? '🔊 सुनें (बोलकर बताएं)' : '🔊 Listen Voice Summary'}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* 2. Key Deterministic Decision Gates */}
       <View style={styles.grid2x2}>
         <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>RESERVATION PRICE</Text>
+          <Text style={styles.metricLabel}>
+            {language === 'mr-IN' ? 'किमान आरक्षण भाव' : language === 'hi-IN' ? 'न्यूनतम आरक्षण भाव' : 'RESERVATION PRICE'}
+          </Text>
           <Text style={styles.metricVal}>₹{chosen.reservation_price.toLocaleString('en-IN')}/qtl</Text>
-          <Text style={styles.metricHint}>Do not accept below this bid</Text>
+          <Text style={styles.metricHint}>
+            {language === 'mr-IN' ? 'यापेक्षा कमी बोली घेऊ नका' : language === 'hi-IN' ? 'इससे कम बोली न लें' : 'Do not accept below this bid'}
+          </Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>FORECAST (q50)</Text>
+          <Text style={styles.metricLabel}>
+            {language === 'mr-IN' ? 'अंदाजित भाव (q50)' : language === 'hi-IN' ? 'अनुमानित भाव (q50)' : 'FORECAST (q50)'}
+          </Text>
           <Text style={styles.metricVal}>₹{forecast.expected.toLocaleString('en-IN')}</Text>
           <Text style={styles.metricHint}>Band: ₹{forecast.low} – ₹{forecast.high}</Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>RISK LEVEL</Text>
+          <Text style={styles.metricLabel}>
+            {language === 'mr-IN' ? 'जोखीम पातळी' : language === 'hi-IN' ? 'जोखिम स्तर' : 'RISK LEVEL'}
+          </Text>
           <Text style={[styles.metricVal, { color: risk.overall === 'GREEN' ? '#4ade80' : '#facc15' }]}>
             {risk.overall} ({risk.score.toFixed(2)})
           </Text>
-          <Text style={styles.metricHint}>6 flags deterministic composite</Text>
+          <Text style={styles.metricHint}>
+            {language === 'mr-IN' ? '६ निकष आधारित जोखीम' : language === 'hi-IN' ? '6 संकेतकों पर आधारित' : '6 flags deterministic composite'}
+          </Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>NET DEDUCTIONS</Text>
+          <Text style={styles.metricLabel}>
+            {language === 'mr-IN' ? 'एकूण वजावट' : language === 'hi-IN' ? 'कुल कटौती' : 'NET DEDUCTIONS'}
+          </Text>
           <Text style={styles.metricVal}>
             ₹{(chosen.cost_breakdown.transport + chosen.cost_breakdown.hamali_tolai + chosen.cost_breakdown.storage + chosen.cost_breakdown.financing).toLocaleString('en-IN')}
           </Text>
-          <Text style={styles.metricHint}>Freight, labor, loss & storage</Text>
+          <Text style={styles.metricHint}>
+            {language === 'mr-IN' ? 'भाडे, हमाली व घट' : language === 'hi-IN' ? 'भाड़ा, हमाली व खराबी' : 'Freight, labor, loss & storage'}
+          </Text>
         </View>
       </View>
 
       {/* 3. Evidence Reasons */}
       <View style={styles.reasonsCard}>
-        <Text style={styles.reasonsTitle}>Fact Evidence Cards (Why?)</Text>
+        <Text style={styles.reasonsTitle}>
+          {language === 'mr-IN' ? 'निर्णयाची महत्त्वाची कारणे (Why?)' : language === 'hi-IN' ? 'निर्णय के प्रमुख कारण (Why?)' : 'Fact Evidence Cards (Why?)'}
+        </Text>
         {explanation.why.map((reason, idx) => (
           <View key={idx} style={styles.reasonRow}>
             <Text style={styles.reasonIdx}>#{idx + 1}</Text>
