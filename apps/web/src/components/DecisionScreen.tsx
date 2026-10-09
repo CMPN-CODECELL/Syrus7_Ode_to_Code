@@ -1,301 +1,255 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  TrendingUp,
-  Clock,
+  Sprout,
+  Volume2,
   ArrowRight,
   ShieldAlert,
-  ShieldCheck,
-  Volume2,
+  CheckCircle2,
+  Calendar,
   AlertTriangle,
-  Sparkles,
-  Info,
+  Receipt,
+  Truck,
   DollarSign,
-  CheckCircle2
+  TrendingUp,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { DecisionRecord } from '../types';
-import { FreshnessBadge } from './FreshnessBadge';
 
-interface Props {
+interface DecisionScreenProps {
   record: DecisionRecord | null;
   onPlayVoice: (text: string) => void;
-  onOpenScenarios: () => void;
+  onOpenScenarios?: () => void;
+  onOpenCosts?: () => void;
   labels: Record<string, string>;
   isInsufficientEvidence?: boolean;
 }
 
-export const DecisionScreen: React.FC<Props> = ({
+export const DecisionScreen: React.FC<DecisionScreenProps> = ({
   record,
   onPlayVoice,
   onOpenScenarios,
+  onOpenCosts,
   labels,
-  isInsufficientEvidence = false
+  isInsufficientEvidence
 }) => {
-  if (isInsufficientEvidence || !record) {
+  const [selectedMandiPreview, setSelectedMandiPreview] = useState<string>('Nashik APMC');
+
+  if (!record) {
     return (
-      <div className="bg-white p-8 rounded-3xl border border-amber-300 text-center max-w-2xl mx-auto my-8 space-y-4 shadow-md">
-        <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
-          <AlertTriangle className="w-8 h-8" />
-        </div>
-        <h2 className="text-xl font-extrabold text-slate-900">
-          {labels.insufficientEvidence || 'Insufficient Market Evidence'}
-        </h2>
-        <p className="text-sm text-slate-700 font-medium">
-          नवीनतम बाजार भाव किंवा हवामान माहिती पुरेशी ताजी नसल्यामुळे थांबण्याचा (Wait) किंवा दुसऱ्या बाजारात जाण्याचा (Go) सल्ला देणे आर्थिकदृष्ट्या धोकादायक ठरू शकते.
+      <div className="bg-white p-12 text-center rounded-3xl border border-emerald-100 shadow-sm space-y-4 max-w-xl mx-auto">
+        <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p className="text-sm font-bold text-slate-700">
+          {labels.engineStarting || 'Calculating your optimal market decision...'}
         </p>
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-left text-slate-800 space-y-2">
-          <p className="font-bold text-slate-900">सुरक्षित उपाय (Safe Recommendations):</p>
-          <ul className="list-disc list-inside space-y-1 text-slate-700">
-            <li>स्थानिक खात्रीशीर बाजार समितीत (Nashik APMC) आजच विक्रीचा विचार करा.</li>
-            <li>पुढील ट्रेडिंग सत्रात नवीन अधिकृत आवक व भाव जाहीर होण्याची प्रतीक्षा करा.</li>
-          </ul>
-        </div>
       </div>
     );
   }
 
-  const { chosen, baseline, forecast, risk, explanation, lot_quantity_qtl, commodity } = record;
+  const { chosen, baseline, explanation, lot_quantity_qtl, commodity } = record;
   const isWait = chosen.action === 'WAIT';
   const isGo = chosen.action === 'GO';
-  const isSellNow = chosen.action === 'SELL_NOW';
+  const isSellNow = chosen.action === 'SELL_NOW' || (!isWait && !isGo);
 
-  const actionBg = isWait
-    ? 'bg-gradient-to-r from-emerald-800 via-emerald-700 to-green-700'
-    : isGo
-    ? 'bg-gradient-to-r from-blue-700 via-indigo-700 to-teal-700'
-    : 'bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700';
-
-  const actionTitle = isWait
-    ? `${labels.waitDays || 'Wait'} ${chosen.wait_days} ${labels.days || 'Days'}`
-    : isGo
-    ? `${labels.goToMandi || 'Go to'} ${chosen.market}`
-    : `${labels.sellNow || 'Sell Now'} (${baseline.market})`;
+  // Audio text
+  const spokenText = explanation.spoken_summary || (
+    isWait
+      ? `${chosen.wait_days} दिवस थांबा. अंदाजे निव्वळ नफा ${chosen.net_total.toLocaleString('en-IN')} रुपये मिळेल, जो आजपेक्षा ${chosen.gain_total.toLocaleString('en-IN')} रुपये जास्त आहे. स्थानिक बाजारात ${chosen.reservation_price} रुपयांपेक्षा कमी भावात माल विकू नका.`
+      : `आजच ${baseline.market} येथे माल विका. अंदाजे निव्वळ रक्कम ${baseline.net_total.toLocaleString('en-IN')} रुपये मिळेल.`
+  );
 
   return (
-    <div className="space-y-6">
-      {/* 0. Beginner-Friendly 3-Step Farmer Summary Bar */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-emerald-200 shadow-sm">
-        <div className="flex items-center justify-between mb-3 border-b border-emerald-100 pb-2">
-          <span className="text-xs font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>{labels.stepGuideTitle || '3-Step Farmer Action Guide'}</span>
+    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+      {/* 1. Insufficient Evidence / Outage Warning Banner if active */}
+      {isInsufficientEvidence && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+          <p className="text-xs font-bold">
+            {labels.insufficientEvidence || 'Market data is currently unavailable. Showing safe fallback baseline.'}
+          </p>
+        </div>
+      )}
+
+      {/* 2. THE GIANT TRAFFIC-LIGHT DECISION BANNER (अत्यंत सोपा, स्पष्ट निर्णय) */}
+      <div className={`rounded-3xl p-6 sm:p-8 text-white shadow-xl transition-all ${
+        isWait
+          ? 'bg-gradient-to-br from-emerald-800 via-emerald-700 to-green-700'
+          : isGo
+          ? 'bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-700'
+          : 'bg-gradient-to-br from-amber-700 via-amber-600 to-yellow-600'
+      }`}>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider text-white">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+            {isWait ? '🟢 योग्य निर्णय: थांबा' : isGo ? '🔵 योग्य निर्णय: दुसऱ्या बाजारात जा' : '🟡 योग्य निर्णय: आजच विका'}
           </span>
-          <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">
-            {labels.stepGuideSubtitle || '3 Simple Rules to Remember'}
-          </span>
+
+          {/* Large Listen Button (मोठे ऐका बटण) */}
+          <button
+            onClick={() => onPlayVoice(spokenText)}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-xs backdrop-blur-md border border-white/30 transition transform active:scale-95 shadow-xs"
+            title="Listen in local language"
+          >
+            <Volume2 className="w-4 h-4 text-emerald-200 animate-pulse" />
+            <span>{labels.listen || 'ऐका (Listen)'}</span>
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Step 1: Decision */}
-          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
-              1
+        {/* Hero Title: Exactly what to do */}
+        <div className="space-y-2 mb-6">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight font-serif text-white">
+            {isWait
+              ? `${chosen.wait_days} दिवस थांबा (${chosen.market})`
+              : isGo
+              ? `${chosen.market} येथे माल विका`
+              : `आजच ${baseline.market} येथे विका`}
+          </h1>
+          <p className="text-sm sm:text-base text-emerald-100 font-medium">
+            {lot_quantity_qtl} क्विंटल {commodity} • {chosen.market}
+          </p>
+        </div>
+
+        {/* 3 Large Golden Numbers */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-4 border-t border-white/20">
+          {/* Card 1: Expected In-Hand Cash */}
+          <div className="bg-black/20 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-200 block">
+              हातात मिळणारा निव्वळ नफा
+            </span>
+            <div className="text-2xl sm:text-3xl font-black text-white mt-1">
+              ₹{chosen.net_total.toLocaleString('en-IN')}
             </div>
+            <span className="text-[11px] text-emerald-200 font-semibold block mt-1">
+              सर्व खर्च व नासाडी वजा करून
+            </span>
+          </div>
+
+          {/* Card 2: Extra Gain vs Today */}
+          <div className="bg-black/20 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-200 block">
+              आज विकण्यापेक्षा जादा फायदा
+            </span>
+            <div className="text-2xl sm:text-3xl font-black text-green-300 mt-1">
+              {chosen.gain_total > 0 ? `+₹${chosen.gain_total.toLocaleString('en-IN')}` : '₹० आधार भाव'}
+            </div>
+            <span className="text-[11px] text-emerald-200 font-semibold block mt-1">
+              आज विकल्यास: ₹{baseline.net_total.toLocaleString('en-IN')}
+            </span>
+          </div>
+
+          {/* Card 3: Minimum Reservation Price (कमी भाव घेऊ नका) */}
+          <div className="bg-black/20 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-200 block">
+              किमान आरक्षण भाव (यापेक्षा कमी नको)
+            </span>
+            <div className="text-2xl sm:text-3xl font-black text-amber-300 mt-1">
+              ₹{chosen.reservation_price.toLocaleString('en-IN')}
+            </div>
+            <span className="text-[11px] text-amber-200 font-semibold block mt-1">
+              प्रति क्विंटल किमान बोली
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Plain Farmer Rationale (का थांबावे? सोप्या भाषेत कारणे) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
+        <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <span>हा निर्णय का योग्य आहे? (महत्त्वाची कारणे)</span>
+        </h2>
+
+        <div className="space-y-3 text-xs sm:text-sm text-slate-700">
+          <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+            <span className="text-xl">📈</span>
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
-                {labels.step1Title || 'Step 1: Recommended Action'}
+              <strong className="text-emerald-950 font-black block">भाव वाढण्याची दाट शक्यता</strong>
+              <span>
+                {chosen.market} मध्ये २ दिवसांनंतर आवक संतुलित राहून भाव ₹{chosen.reservation_price} पेक्षा जास्त मिळण्याची {Math.round(chosen.probability_beat_baseline * 100)}% शक्यता आहे.
               </span>
-              <p className="text-sm font-black text-emerald-950 mt-0.5">
-                {isWait
-                  ? (labels.step1Wait ? labels.step1Wait.replace('{days}', String(chosen.wait_days)) : `Wait ${chosen.wait_days} Days`)
-                  : isGo
-                  ? (labels.step1Go ? labels.step1Go.replace('{mandi}', chosen.market) : `Go to ${chosen.market}`)
-                  : (labels.step1SellNow ? labels.step1SellNow.replace('{mandi}', baseline.market) : `Sell Today (${baseline.market})`)}
-              </p>
-              <p className="text-[11px] text-slate-600 font-medium">
-                {labels.step1Sub ? labels.step1Sub.replace('{mandi}', chosen.market) : `Sell produce at ${chosen.market}`}
-              </p>
             </div>
           </div>
 
-          {/* Step 2: In-Hand Money */}
-          <div className="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
-              2
-            </div>
+          <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200">
+            <span className="text-xl">🚚</span>
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
-                {labels.step2Title || 'Step 2: Net In-Hand Realization'}
+              <strong className="text-blue-950 font-black block">खर्च व वजन घट वजा जाता नफा</strong>
+              <span>
+                गाडी भाडे (₹{Math.round(chosen.cost_breakdown.transport).toLocaleString('en-IN')}), हमाली (₹{Math.round(chosen.cost_breakdown.hamali_tolai).toLocaleString('en-IN')}) आणि २% साठवणूक घट वजा जाता तुम्हाला +₹{chosen.gain_total.toLocaleString('en-IN')} जास्त मिळतील.
               </span>
-              <p className="text-sm font-black text-emerald-950 mt-0.5">
-                ₹{chosen.net_total.toLocaleString('en-IN')}
-                {chosen.gain_total > 0 && (
-                  <span className="text-xs font-black text-emerald-700 ml-1.5">
-                    ({labels.step2Gain ? labels.step2Gain.replace('{amount}', chosen.gain_total.toLocaleString('en-IN')) : `+₹${chosen.gain_total.toLocaleString('en-IN')}`})
-                  </span>
-                )}
-              </p>
-              <p className="text-[11px] text-slate-600 font-medium">
-                {labels.step2Sub || 'After deducting freight, labor, spoilage & mandi fees'}
-              </p>
             </div>
           </div>
 
-          {/* Step 3: Reservation Price */}
-          <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-xs">
-              3
-            </div>
+          <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200">
+            <span className="text-xl">🛑</span>
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 block">
-                {labels.step3Title || 'Step 3: Minimum Reservation Price'}
+              <strong className="text-amber-950 font-black block">गावातील व्यापाऱ्यासाठी इशारा</strong>
+              <span>
+                स्थानिक गावात कोणी व्यापारी माल मागत असेल तर ₹{chosen.reservation_price} / क्विंटल पेक्षा कमी भावाने अजिबात विकू नका!
               </span>
-              <p className="text-sm font-black text-amber-950 mt-0.5">
-                ₹{chosen.reservation_price.toLocaleString('en-IN')} {labels.step3Unit || '/ qtl'}
-              </p>
-              <p className="text-[11px] text-slate-600 font-medium">
-                {labels.step3Sub || 'Strictly do not accept any bid below this price'}
-              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 1. Primary Action & Net Card */}
-      <div className={`p-6 sm:p-8 rounded-3xl text-white shadow-xl relative overflow-hidden ${actionBg}`}>
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4 relative z-10">
-          <div className="flex items-center gap-2">
-            <span className="px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
-              {chosen.action}
-            </span>
-            <FreshnessBadge freshness={record.risk.flags.find(f => f.id === 'stale_data')?.status === 'RED' ? 'STALE_RED' : 'FRESH'} />
-          </div>
-
-          {/* Read-Aloud Voice Button */}
-          <button
-            onClick={() => onPlayVoice(explanation.spoken_summary)}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white text-emerald-900 hover:bg-emerald-50 text-xs font-bold transition shadow-md active:scale-95"
-            title="Read out spoken summary"
-          >
-            <Volume2 className="w-4 h-4 text-emerald-700 animate-pulse" />
-            <span>{labels.listen || 'Listen'}</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end relative z-10">
+      {/* 4. Mandi Rates & Prediction Comparison for YOUR Quantity (आजचा भाव vs अंदाजित भाव) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2 drop-shadow-sm">
-              {actionTitle}
-            </h1>
-            <p className="text-emerald-100 text-sm font-semibold">
-              {chosen.market} • {lot_quantity_qtl} {labels.quantity || 'qtl'} {commodity}
+            <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <span>आजचा भाव vs २ दिवसांनंतरचा अंदाजित भाव</span>
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              तुमच्या {lot_quantity_qtl} क्विंटल {commodity} मालासाठी प्रत्यक्ष बाजार भाव तुलना
             </p>
           </div>
+        </div>
 
-          <div className="bg-black/25 backdrop-blur-md p-5 rounded-2xl border border-white/30 flex flex-col justify-center shadow-inner">
-            <div className="text-xs uppercase tracking-wider font-bold text-emerald-100 mb-1">
-              {labels.expectedNet || 'Expected Net Realization'}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Today's Price Box */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-slate-700 uppercase">आजचा चालू भाव (Today)</span>
+              <span className="text-xs font-bold text-slate-500">{baseline.market}</span>
             </div>
-            <div className="text-3xl sm:text-4xl font-black tracking-tight text-white flex items-baseline gap-2">
-              <span>₹{chosen.net_total.toLocaleString('en-IN')}</span>
-              {chosen.gain_total > 0 && (
-                <span className="text-sm font-black text-emerald-200">
-                  (+₹{chosen.gain_total.toLocaleString('en-IN')})
-                </span>
-              )}
+            <div>
+              <span className="text-2xl font-black text-slate-900">₹{baseline.modal_price.toLocaleString('en-IN')}</span>
+              <span className="text-xs font-bold text-slate-500 ml-1">/ क्विंटल</span>
             </div>
-            <div className="text-xs text-emerald-100 mt-1 flex items-center justify-between font-medium">
-              <span>{labels.sellNowBaseline || 'Sell Now Baseline:'} ₹{baseline.net_total.toLocaleString('en-IN')}</span>
-              <span className="font-bold">{Math.round(chosen.probability_beat_baseline * 100)}% {labels.winProbability || 'Win Prob'}</span>
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
+              <span className="text-slate-600">एकूण मालाचे मूल्य:</span>
+              <span className="font-black text-slate-900">₹{(baseline.modal_price * lot_quantity_qtl).toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+
+          {/* Future Predicted Price Box */}
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-emerald-900 uppercase">२ दिवसांनंतरचा अंदाजित भाव (Future)</span>
+              <span className="text-xs font-bold text-emerald-700">{chosen.market}</span>
+            </div>
+            <div>
+              <span className="text-2xl font-black text-emerald-900">₹{record.forecast.expected.toLocaleString('en-IN')}</span>
+              <span className="text-xs font-bold text-emerald-700 ml-1">/ क्विंटल</span>
+            </div>
+            <div className="pt-2 border-t border-emerald-200 flex items-center justify-between text-xs">
+              <span className="text-emerald-800">अंदाजे एकूण मालाचे मूल्य:</span>
+              <span className="font-black text-emerald-950">₹{(record.forecast.expected * lot_quantity_qtl).toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Key Deterministic Decision Parameters Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Reservation Price Card */}
-        <div className="bg-white p-5 rounded-3xl space-y-2 border-l-4 border-l-emerald-600 border border-emerald-100 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span>{labels.reservationPrice || 'Reservation Price'}</span>
-            <DollarSign className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="text-2xl font-black text-slate-900">
-            ₹{chosen.reservation_price.toLocaleString('en-IN')}
-            <span className="text-xs font-medium text-slate-500"> {labels.step3Unit || '/qtl'}</span>
-          </div>
-          <p className="text-[11px] text-slate-600 font-medium">
-            {labels.reservationSub || 'Do NOT accept any bid below this threshold to preserve baseline net profit.'}
-          </p>
-        </div>
-
-        {/* Forecast Range Card */}
-        <div className="bg-white p-5 rounded-3xl space-y-2 border-l-4 border-l-teal-600 border border-emerald-100 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span>{labels.forecast || 'Forecast Range'}</span>
-            <TrendingUp className="w-4 h-4 text-teal-600" />
-          </div>
-          <div className="text-2xl font-black text-slate-900">
-            ₹{forecast.expected.toLocaleString('en-IN')}
-            <span className="text-xs font-medium text-slate-500"> (q50)</span>
-          </div>
-          <div className="text-[11px] text-slate-600 font-semibold flex items-center justify-between">
-            <span>q10: ₹{forecast.low}</span>
-            <span>q90: ₹{forecast.high}</span>
-          </div>
-        </div>
-
-        {/* Risk State Card */}
-        <div className="bg-white p-5 rounded-3xl space-y-2 border-l-4 border-l-amber-500 border border-emerald-100 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span>{labels.riskLevel || 'Composite Risk'}</span>
-            <ShieldAlert className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`text-2xl font-black ${
-              risk.overall === 'GREEN' ? 'text-emerald-700' : risk.overall === 'YELLOW' ? 'text-amber-600' : 'text-rose-600'
-            }`}>
-              {risk.overall}
-            </span>
-            <span className="text-xs font-mono font-bold text-slate-500">({risk.score.toFixed(2)})</span>
-          </div>
-          <p className="text-[11px] text-slate-600 font-medium">
-            {risk.flags.filter(f => f.status !== 'GREEN').length} {labels.factorsMonitored || 'elevated risk factor(s) monitored.'}
-          </p>
-        </div>
-
-        {/* Avoided Loss & Spoilage Factor */}
-        <div className="bg-white p-5 rounded-3xl space-y-2 border-l-4 border-l-blue-600 border border-emerald-100 shadow-sm hover:shadow-md transition">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span>{labels.costs || 'Cost Deductions'}</span>
-            <Info className="w-4 h-4 text-blue-600" />
-          </div>
-          <div className="text-2xl font-black text-slate-900">
-            ₹{(chosen.cost_breakdown.transport + chosen.cost_breakdown.hamali_tolai + chosen.cost_breakdown.storage + chosen.cost_breakdown.financing).toLocaleString('en-IN')}
-          </div>
-          <p className="text-[11px] text-slate-600 font-medium">
-            {labels.step2Sub || 'Transport, storage, labor & sequential holding/travel loss factored.'}
-          </p>
-        </div>
-      </div>
-
-      {/* 3. Evidence-Backed "Why?" Cards */}
-      <div className="bg-white p-6 rounded-3xl border border-emerald-100 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>{labels.whyTitle || 'Key Evidence & Reasons'}</span>
-          </h2>
-          <button
-            onClick={onOpenScenarios}
-            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
-          >
-            <span>{labels.stressTestBtn || labels.scenarios || 'Stress Test This Decision'}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {explanation.why.map((reason, idx) => (
-            <div key={idx} className="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100 text-xs text-slate-800 space-y-1.5 shadow-xs">
-              <span className="font-extrabold text-emerald-800 uppercase tracking-wider text-[10px] block">
-                {labels.factPrefix || 'Fact #'}{idx + 1}
-              </span>
-              <p className="leading-relaxed font-medium">{reason}</p>
-            </div>
-          ))}
-        </div>
+      {/* 5. Navigation Buttons: Go to Pocket Calculator */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <button
+          onClick={() => onOpenCosts ? onOpenCosts() : onOpenScenarios && onOpenScenarios()}
+          className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm shadow-md shadow-emerald-700/20 transition active:scale-95"
+        >
+          <Receipt className="w-4 h-4 text-emerald-200" />
+          <span>साधा हिशोब व पावती पहा (Pocket Calculator) ➔</span>
+        </button>
       </div>
     </div>
   );

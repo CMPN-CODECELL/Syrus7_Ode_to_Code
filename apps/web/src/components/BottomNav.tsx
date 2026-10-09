@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Home,
-  Sprout,
-  Calendar,
-  TrendingUp,
-  Sliders,
-  Mic,
-  User
-} from 'lucide-react';
+import { Sprout, Scale, Receipt } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: string;
@@ -19,51 +11,30 @@ interface BottomNavProps {
 export const BottomNav: React.FC<BottomNavProps> = ({
   activeTab,
   setActiveTab,
-  labels,
   language
 }) => {
   const navItems = [
     {
       id: 'home',
-      label: labels.home || 'Home',
-      icon: Home
-    },
-    {
-      id: 'decision',
-      label: labels.decision || 'Decision',
+      label: language === 'mr-IN' ? 'माझे पीक' : language === 'hi-IN' ? 'मेरी फसल' : 'My Crop',
       icon: Sprout
     },
     {
-      id: 'heatmap',
-      label: labels.heatmap || '3×7 Heatmap',
-      icon: Calendar
-    },
-    {
-      id: 'forecast',
-      label: labels.forecast || 'Forecast',
-      icon: TrendingUp
-    },
-    {
-      id: 'scenarios',
-      label: labels.scenarios || 'What-If',
-      icon: Sliders
-    },
-    {
-      id: 'assistant',
-      label: language === 'mr-IN' ? 'कृषी मित्र' : language === 'hi-IN' ? 'कृषि मित्र' : 'Co-Pilot',
-      icon: Mic,
+      id: 'decision',
+      label: language === 'mr-IN' ? 'योग्य निर्णय' : language === 'hi-IN' ? 'सही निर्णय' : 'Smart Decision',
+      icon: Scale,
       isHighlight: true
     },
     {
-      id: 'profile',
-      label: labels.profile || 'My Farm',
-      icon: User
+      id: 'costs',
+      label: language === 'mr-IN' ? 'साधा हिशोब' : language === 'hi-IN' ? 'सीधा हिसाब' : 'Calculator',
+      icon: Receipt
     }
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-emerald-100 shadow-lg px-2 py-1.5 transition-colors duration-200">
-      <div className="max-w-3xl mx-auto flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-emerald-100 shadow-xl px-4 py-2 md:hidden">
+      <div className="max-w-md mx-auto flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -76,15 +47,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 className="flex flex-col items-center justify-center -mt-5 group"
                 title={item.label}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 active:scale-95 ${
+                <div className={`w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 active:scale-95 ${
                   isActive
                     ? 'bg-emerald-600 text-white ring-4 ring-emerald-100 shadow-emerald-700/30'
                     : 'bg-emerald-700 text-white shadow-emerald-700/25'
                 }`}>
-                  <Icon className="w-5 h-5 text-white animate-pulse" />
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <span className={`text-[10px] font-black mt-1 ${
-                  isActive ? 'text-emerald-800' : 'text-slate-600'
+                <span className={`text-[11px] font-black mt-1 ${
+                  isActive ? 'text-emerald-900' : 'text-slate-600'
                 }`}>
                   {item.label}
                 </span>
@@ -96,17 +67,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center py-1 px-1.5 rounded-xl transition ${
+              className={`flex flex-col items-center justify-center py-1 px-4 rounded-2xl transition ${
                 isActive
-                  ? 'text-emerald-700 font-black'
+                  ? 'text-emerald-800 font-black'
                   : 'text-slate-500 hover:text-slate-800 font-bold'
               }`}
             >
-              <div className={`p-1 rounded-xl transition ${isActive ? 'bg-emerald-50' : ''}`}>
+              <div className={`p-1.5 rounded-xl transition ${isActive ? 'bg-emerald-50 text-emerald-700' : ''}`}>
                 <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-700' : 'text-slate-500'}`} />
               </div>
-              <span className={`text-[10px] leading-tight mt-0.5 line-clamp-1 ${
-                isActive ? 'text-emerald-900 font-extrabold' : 'text-slate-600'
+              <span className={`text-[11px] leading-tight mt-0.5 ${
+                isActive ? 'text-emerald-950 font-black' : 'text-slate-600'
               }`}>
                 {item.label}
               </span>

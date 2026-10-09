@@ -1,24 +1,14 @@
 import React, { useState } from 'react';
 import {
   Sprout,
-  Calendar,
-  TrendingUp,
-  Sliders,
-  Sun,
-  ShieldCheck,
-  Search,
-  Mic,
-  ArrowRight,
-  TrendingDown,
-  CheckCircle2,
-  DollarSign,
-  AlertTriangle,
-  ChevronRight,
-  Sparkles,
+  Truck,
   MapPin,
-  Clock,
-  Layers,
-  HelpCircle
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  Scale,
+  Calendar,
+  DollarSign
 } from 'lucide-react';
 import { DecisionRecord, SlotSchema } from '../types';
 
@@ -37,349 +27,452 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   record,
   slots,
   onNavigateTab,
-  onOpenVoice,
-  onOpenEditLot,
   onSelectCropPreset,
   labels,
   language
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  // 1. Farmer Location State
+  const [selectedLocation, setSelectedLocation] = useState<string>('Nashik');
+  
+  // Locations with nearby mandis
+  const locationOptions = [
+    { id: 'Nashik', name: language === 'mr-IN' ? 'नाशिक (Nashik)' : language === 'hi-IN' ? 'नासिक (Nashik)' : 'Nashik', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] },
+    { id: 'Niphad', name: language === 'mr-IN' ? 'निफाड (Niphad)' : language === 'hi-IN' ? 'निफाड़ (Niphad)' : 'Niphad', mandis: ['Pimpalgaon Baswant APMC', 'Lasalgaon APMC', 'Nashik APMC'] },
+    { id: 'Lasalgaon', name: language === 'mr-IN' ? 'लासलगाव (Lasalgaon)' : language === 'hi-IN' ? 'लासलगांव (Lasalgaon)' : 'Lasalgaon', mandis: ['Lasalgaon APMC', 'Pimpalgaon Baswant APMC', 'Nashik APMC'] },
+    { id: 'Pune', name: language === 'mr-IN' ? 'पुणे (Pune)' : language === 'hi-IN' ? 'पुणे (Pune)' : 'Pune', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] }
+  ];
+
+  // 2. Crop Selection State
+  const [selectedCrop, setSelectedCrop] = useState<string>(slots.commodity || 'Tomato');
 
   const crops = [
     {
-      name: 'Tomato',
-      label: language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato',
-      variety: labels.vegCrop || 'Vegetable Crop',
-      mandi: 'Nashik APMC',
-      defaultQty: 20,
-      active: (slots.commodity || '').toLowerCase().includes('tomato'),
-      image: '🍅',
-      tag: labels.activeLot || 'Active Lot',
-      tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+      id: 'Tomato',
+      name: language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato',
+      icon: '🍅',
+      defaultPrice: 1800,
+      futurePrice: 1950,
+      unit: language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl'
     },
     {
-      name: 'Onion',
-      label: language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion',
-      variety: labels.rabiCrop || 'Rabi Red',
-      mandi: 'Lasalgaon APMC',
-      defaultQty: 30,
-      active: (slots.commodity || '').toLowerCase().includes('onion'),
-      image: '🧅',
-      tag: labels.asiaLargest || 'Asia’s Largest Mandi',
-      tagColor: 'bg-amber-100 text-amber-800 border-amber-300'
+      id: 'Onion',
+      name: language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion',
+      icon: '🧅',
+      defaultPrice: 2100,
+      futurePrice: 2280,
+      unit: language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl'
     },
     {
-      name: 'Wheat',
-      label: language === 'mr-IN' ? 'गहू' : language === 'hi-IN' ? 'गेहूं' : 'Wheat',
-      variety: labels.sharbatiGrain || 'Sharbati Grain',
-      mandi: 'Daund Mandi',
-      defaultQty: 25,
-      active: (slots.commodity || '').toLowerCase().includes('wheat'),
-      image: '🌾',
-      tag: labels.longStorage || 'Long Storage',
-      tagColor: 'bg-blue-100 text-blue-800 border-blue-300'
+      id: 'Wheat',
+      name: language === 'mr-IN' ? 'गहू' : language === 'hi-IN' ? 'गेहूं' : 'Wheat',
+      icon: '🌾',
+      defaultPrice: 2450,
+      futurePrice: 2500,
+      unit: language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl'
     },
     {
-      name: 'Soybean',
-      label: language === 'mr-IN' ? 'सोयाबीन' : language === 'hi-IN' ? 'सोयाबीन' : 'Soybean',
-      variety: labels.oilseedCrop || 'Yellow Grade-A',
-      mandi: 'Latur APMC',
-      defaultQty: 15,
-      active: (slots.commodity || '').toLowerCase().includes('soybean'),
-      image: '🌱',
-      tag: labels.oilseedBench || 'Oilseed Benchmark',
-      tagColor: 'bg-purple-100 text-purple-800 border-purple-300'
+      id: 'Soybean',
+      name: language === 'mr-IN' ? 'सोयाबीन' : language === 'hi-IN' ? 'सोयाबीन' : 'Soybean',
+      icon: '🌱',
+      defaultPrice: 4200,
+      futurePrice: 4350,
+      unit: language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl'
     }
   ];
 
-  const quickActions = [
+  // 3. Quantity State
+  const [quantity, setQuantity] = useState<number>(slots.quantity || 20);
+  const [unit, setUnit] = useState<'qtl' | 'bag'>('qtl');
+
+  // 4. Transport Preference State
+  const [selectedVehicle, setSelectedVehicle] = useState<string>('pickup');
+
+  const vehicles = [
     {
-      id: 'decision',
-      title: labels.decision || 'Market Decision',
-      desc: language === 'mr-IN' ? 'आज विकावे की थांबावे?' : language === 'hi-IN' ? 'आज बेचें या रुकें?' : 'Sell Now vs Hold Decision',
-      icon: Sprout,
-      bg: 'bg-emerald-500 text-white',
-      border: 'border-emerald-200 hover:border-emerald-400'
+      id: 'pickup',
+      title: language === 'mr-IN' ? 'पिकअप / बोलेरो' : language === 'hi-IN' ? 'पिकअप / बोलेरो' : 'Pickup Bolero',
+      desc: language === 'mr-IN' ? '२० ते २५ क्विंटल (शिफारस)' : language === 'hi-IN' ? '20 से 25 क्विंटल (अनुशंसित)' : '20–25 quintal (Recommended)',
+      icon: '🚚',
+      rateHint: language === 'mr-IN' ? 'भाडे: ₹६००' : language === 'hi-IN' ? 'भाड़ा: ₹600' : 'Freight: ₹600'
     },
     {
-      id: 'heatmap',
-      title: labels.heatmap || '3×7 Heatmap',
-      desc: language === 'mr-IN' ? '३ दिवस व ७ बाजार समित्या' : language === 'hi-IN' ? '३ दिन व ७ प्रमुख मंडियां' : '3 Days × 7 Regional Mandis',
-      icon: Calendar,
-      bg: 'bg-teal-600 text-white',
-      border: 'border-teal-200 hover:border-teal-400'
+      id: 'mini',
+      title: language === 'mr-IN' ? 'छोटा टेम्पो' : language === 'hi-IN' ? 'छोटा टेम्पो' : 'Mini Tempo',
+      desc: language === 'mr-IN' ? '१० क्विंटलपर्यंत' : language === 'hi-IN' ? '10 क्विंटल तक' : 'Up to 10 quintal',
+      icon: '🛺',
+      rateHint: language === 'mr-IN' ? 'भाडे: ₹४००' : language === 'hi-IN' ? 'भाड़ा: ₹400' : 'Freight: ₹400'
     },
     {
-      id: 'forecast',
-      title: labels.forecast || 'Price Forecast',
-      desc: language === 'mr-IN' ? 'किंमत अंदाज व आलेख' : language === 'hi-IN' ? 'मूल्य पूर्वानुमान व रुझान' : 'Quantile Machine Learning',
-      icon: TrendingUp,
-      bg: 'bg-blue-600 text-white',
-      border: 'border-blue-200 hover:border-blue-400'
+      id: 'truck',
+      title: language === 'mr-IN' ? 'आयशर / मोठा ट्रक' : language === 'hi-IN' ? 'बड़ा ट्रक / आयशर' : 'Eicher / Truck',
+      desc: language === 'mr-IN' ? '५०+ क्विंटल' : language === 'hi-IN' ? '50+ क्विंटल' : '50+ quintal',
+      icon: '🚛',
+      rateHint: language === 'mr-IN' ? 'भाडे: ₹१,२००' : language === 'hi-IN' ? 'भाड़ा: ₹1,200' : 'Freight: ₹1,200'
     },
     {
-      id: 'scenarios',
-      title: labels.scenarios || 'What-If Simulator',
-      desc: language === 'mr-IN' ? 'डिझेल व नासाडी ताण चाचणी' : language === 'hi-IN' ? 'डीजल व खराबी तनाव जांच' : '1-Click Stress Test Presets',
-      icon: Sliders,
-      bg: 'bg-indigo-600 text-white',
-      border: 'border-indigo-200 hover:border-indigo-400'
+      id: 'tractor',
+      title: language === 'mr-IN' ? 'स्वतःचे वाहन / ट्रॅक्टर' : language === 'hi-IN' ? 'खुद का ट्रैक्टर' : 'Own Tractor / Shared',
+      desc: language === 'mr-IN' ? 'केवळ डिझेल खर्च' : language === 'hi-IN' ? 'केवल डीजल खर्च' : 'Fuel cost only',
+      icon: '🚜',
+      rateHint: language === 'mr-IN' ? 'भाडे: ₹३५०' : language === 'hi-IN' ? 'भाड़ा: ₹350' : 'Fuel: ₹350'
     }
   ];
 
-  const isWait = record?.chosen.action === 'WAIT';
+  // 5. Mandi Preference State
+  const [selectedMandi, setSelectedMandi] = useState<string>(slots.home_mandi || 'auto');
+
+  const mandis = [
+    {
+      id: 'auto',
+      name: language === 'mr-IN' ? '🌟 सर्वोत्तम भाव देणारा बाजार शोधा' : language === 'hi-IN' ? '🌟 सर्वोत्तम भाव वाली मंडी खोजें' : '🌟 Auto Find Best Mandi',
+      dist: language === 'mr-IN' ? 'सर्व बाजारांची तुलना' : language === 'hi-IN' ? 'सभी मंडियों की तुलना' : 'Compares all regional mandis',
+      recommended: true
+    },
+    {
+      id: 'Nashik APMC',
+      name: language === 'mr-IN' ? 'नाशिक बाजार समिती (Nashik APMC)' : language === 'hi-IN' ? 'नासिक मंडी (Nashik APMC)' : 'Nashik APMC',
+      dist: '१२ किमी (12 km)',
+      recommended: false
+    },
+    {
+      id: 'Pimpalgaon Baswant APMC',
+      name: language === 'mr-IN' ? 'पिंपळगाव बसवंत बाजार (Pimpalgaon)' : language === 'hi-IN' ? 'पिंपलगांव मंडी (Pimpalgaon)' : 'Pimpalgaon Baswant APMC',
+      dist: '२८ किमी (28 km)',
+      recommended: false
+    },
+    {
+      id: 'Lasalgaon APMC',
+      name: language === 'mr-IN' ? 'लासलगाव बाजार समिती (Lasalgaon)' : language === 'hi-IN' ? 'लासलगांव मंडी (Lasalgaon)' : 'Lasalgaon APMC',
+      dist: '५२ किमी (52 km)',
+      recommended: false
+    }
+  ];
+
+  // Price calculations based on crop and quantity
+  const activeCropObj = crops.find((c) => c.id === selectedCrop) || crops[0];
+  const todayTotal = (activeCropObj.defaultPrice * quantity).toLocaleString('en-IN');
+  const futureTotal = (activeCropObj.futurePrice * quantity).toLocaleString('en-IN');
+
+  const handleApplyAndGo = () => {
+    const finalMandi = selectedMandi === 'auto' ? 'Nashik APMC' : selectedMandi;
+    onSelectCropPreset(selectedCrop, finalMandi, quantity);
+    onNavigateTab('decision');
+  };
 
   return (
-    <div className="space-y-6">
-      {/* 1. Farmer Greeting & Search / Voice Bar (Screen 2 Mockup Style) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-emerald-700/20">
-              🌾
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-black text-slate-900 font-serif">
-                  {labels.goodMorning || 'Good Morning, Kisan Friend! 🌾'}
-                </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                  {labels.verifiedFarmer || 'Verified'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">
-                {labels.farmerSubtitle || 'Healthy crops, prosperous farmers • Maximizing net realization'}
-              </p>
-            </div>
+    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+      {/* 1. Welcoming Farmer Header Card */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-500 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-emerald-700/20 flex-shrink-0">
+            🧑‍🌾
           </div>
-
-          <button
-            onClick={onOpenEditLot}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition shadow-2xs"
-          >
-            <Sprout className="w-4 h-4 text-emerald-700" />
-            <span>{slots.quantity} {slots.quantity_unit} {slots.commodity} • {slots.home_mandi}</span>
-            <span className="text-emerald-700 underline ml-1">{labels.changeProduce || 'Edit'}</span>
-          </button>
-        </div>
-
-        {/* Search & Voice Bar */}
-        <div className="relative flex items-center">
-          <div className="absolute left-4 text-slate-400">
-            <Search className="w-4 h-4" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={labels.searchPlaceholder || 'Search mandi, commodity, prices or speak...'}
-            className="w-full pl-11 pr-24 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
-          />
-          <button
-            onClick={onOpenVoice}
-            className="absolute right-2 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95"
-            title="Speak with Krishi Mitra Voice Assistant"
-          >
-            <Mic className="w-3.5 h-3.5 text-white" />
-            <span className="hidden sm:inline">{labels.speak || 'Speak'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Today's Weather & Mandi Status Banner (From AgriCare Mockup) */}
-      <div className="relative rounded-3xl overflow-hidden p-6 sm:p-7 text-white bg-gradient-to-r from-emerald-800 via-emerald-700 to-green-700 shadow-lg shadow-emerald-950/10">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-white/5 blur-2xl pointer-events-none"></div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-bold text-emerald-100">
-              <Sun className="w-3.5 h-3.5 text-amber-300" />
-              <span>{labels.todaysWeather || "Today's Weather & Mandi Status"}</span>
-            </div>
-
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl sm:text-5xl font-black font-serif">28°C</span>
-              <span className="text-sm sm:text-base font-bold text-emerald-100">
-                {labels.sunnyClear || 'Sunny • Clear Sky'}
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-black text-slate-900 font-serif">
+                {language === 'mr-IN' ? 'नमस्कार, शेतकरी बंधू!' : language === 'hi-IN' ? 'नमस्ते, किसान भाई!' : 'Welcome, Farmer Friend!'}
+              </h1>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                {labels.verifiedFarmer || 'Verified'}
               </span>
             </div>
-
-            <p className="text-xs text-emerald-200 font-medium flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-emerald-300" />
-              <span>{slots.home_mandi || 'Nashik APMC'} • {labels.activeTrading || 'Active Trading'}</span>
-              <span className="bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                {labels.verified || '100% Verified'}
-              </span>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              {language === 'mr-IN'
+                ? 'तुमचे पीक, प्रमाण आणि गाडी निवडा — अचूक भाव व निर्णय क्षणात मिळवा.'
+                : language === 'hi-IN'
+                ? 'अपनी फसल, मात्रा और वाहन चुनें — सही भाव और बिक्री निर्णय तुरंत पाएं।'
+                : 'Select your crop, quantity, and vehicle to get the optimal selling decision.'}
             </p>
           </div>
+        </div>
 
-          {/* Quick Decision Snapshot on Banner */}
-          {record && (
-            <div className="bg-black/25 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/20 flex flex-col justify-between space-y-2 min-w-[220px]">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-200">
-                {labels.expectedNet || 'Expected Net Realization'}
-              </span>
-              <div className="text-2xl sm:text-3xl font-black text-white">
-                ₹{record.chosen.net_total.toLocaleString('en-IN')}
-              </div>
-              <div className="flex items-center justify-between text-xs text-emerald-100 pt-1 border-t border-white/10">
-                <span>{record.chosen.gain_total > 0 ? `+₹${record.chosen.gain_total.toLocaleString('en-IN')}` : '₹0'}</span>
-                <span className="font-extrabold text-emerald-300">
-                  {Math.round(record.chosen.probability_beat_baseline * 100)}% {labels.winProbability || 'Win Prob'}
-                </span>
-              </div>
-            </div>
-          )}
+        {/* Location Selector Pill */}
+        <div className="flex items-center gap-2 bg-emerald-50 px-3.5 py-2 rounded-2xl border border-emerald-200">
+          <MapPin className="w-4 h-4 text-emerald-700 flex-shrink-0" />
+          <div className="text-xs">
+            <span className="text-[10px] text-emerald-800 font-bold block uppercase tracking-wider">
+              {language === 'mr-IN' ? 'तुमचा तालुका / जिल्हा' : language === 'hi-IN' ? 'आपका क्षेत्र / जिला' : 'Your Location'}
+            </span>
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="bg-transparent font-black text-emerald-950 text-xs focus:outline-none cursor-pointer"
+            >
+              {locationOptions.map((loc) => (
+                <option key={loc.id} value={loc.id}>{loc.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* 3. 4 Main Quick Action Buttons (Matching Mockup Screen 2 Grid) */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-          {labels.quickActions || 'Quick Action Features'}
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
+      {/* 2. Step 1: Select Your Crop (मोठे चित्र आणि पीक निवडा) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+              १
+            </span>
+            <h2 className="text-base font-black text-slate-900">
+              {language === 'mr-IN' ? 'तुम्हाला कोणते पीक विकायचे आहे?' : language === 'hi-IN' ? 'आपको कौन सी फसल बेचनी है?' : 'Which crop do you want to sell?'}
+            </h2>
+          </div>
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+            {language === 'mr-IN' ? 'टॅप करा' : language === 'hi-IN' ? 'टैप करें' : 'Tap to select'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {crops.map((c) => {
+            const isSelected = selectedCrop === c.id;
             return (
               <button
-                key={action.id}
-                onClick={() => onNavigateTab(action.id)}
-                className={`p-4 rounded-2xl bg-white border ${action.border} shadow-xs hover:shadow-md transition text-left space-y-2.5 group`}
+                key={c.id}
+                onClick={() => setSelectedCrop(c.id)}
+                className={`p-4 rounded-2xl border text-center transition transform active:scale-95 flex flex-col items-center justify-between space-y-2 ${
+                  isSelected
+                    ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-600/30 shadow-md'
+                    : 'bg-slate-50/60 border-slate-200 hover:bg-slate-100'
+                }`}
               >
-                <div className={`w-11 h-11 rounded-2xl ${action.bg} flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform`}>
-                  <Icon className="w-5 h-5" />
-                </div>
+                <span className="text-4xl">{c.icon}</span>
                 <div>
-                  <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition">
-                    {action.title}
+                  <h3 className={`text-base font-black ${isSelected ? 'text-emerald-950' : 'text-slate-800'}`}>
+                    {c.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5">
-                    {action.desc}
-                  </p>
+                  <span className="text-[11px] font-bold text-slate-500 block mt-0.5">
+                    ₹{c.defaultPrice} / {c.unit}
+                  </span>
                 </div>
+                {isSelected && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-200/80 px-2 py-0.5 rounded-full">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                    {language === 'mr-IN' ? 'निवडले' : language === 'hi-IN' ? 'चयनित' : 'Selected'}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 4. Active Recommendation Spotlight Card */}
-      {record && (
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-200 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping"></span>
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
-                {labels.decision || 'Optimal Recommendation'}
-              </span>
-            </div>
-            <button
-              onClick={() => onNavigateTab('decision')}
-              className="text-xs font-extrabold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition"
-            >
-              <span>{labels.viewDecision || 'View Full Decision'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
-            {/* Step 1 Pill */}
-            <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black text-base flex items-center justify-center flex-shrink-0 shadow-xs">
-                1
-              </div>
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
-                  {labels.step1Title || 'Step 1: Action'}
-                </span>
-                <p className="text-sm font-black text-emerald-950">
-                  {isWait
-                    ? (labels.step1Wait ? labels.step1Wait.replace('{days}', String(record.chosen.wait_days)) : `Wait ${record.chosen.wait_days} Days`)
-                    : `${labels.sellNow || 'Sell Today'} (${record.baseline.market})`}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 2 Pill */}
-            <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white font-black text-base flex items-center justify-center flex-shrink-0 shadow-xs">
-                2
-              </div>
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 block">
-                  {labels.step2Title || 'Step 2: Net In-Hand'}
-                </span>
-                <p className="text-sm font-black text-emerald-950">
-                  ₹{record.chosen.net_total.toLocaleString('en-IN')}
-                  {record.chosen.gain_total > 0 && (
-                    <span className="text-xs font-black text-emerald-700 ml-1.5">
-                      (+₹{record.chosen.gain_total.toLocaleString('en-IN')})
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 Pill */}
-            <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-600 text-white font-black text-base flex items-center justify-center flex-shrink-0 shadow-xs">
-                3
-              </div>
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 block">
-                  {labels.step3Title || 'Step 3: Reservation Price'}
-                </span>
-                <p className="text-sm font-black text-amber-950">
-                  ₹{record.chosen.reservation_price.toLocaleString('en-IN')} {labels.step3Unit || '/ qtl'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. My Produce & Crops Cards (Matching Screen 2 & Screen 10 in Mockup) */}
-      <div className="space-y-3">
+      {/* 3. Step 2: Enter Quantity (प्रमाण निवडा) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-            {labels.myCrops || 'My Produce & Crops'}
-          </h2>
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+              २
+            </span>
+            <h2 className="text-base font-black text-slate-900">
+              {language === 'mr-IN' ? 'तुमच्याकडे किती माल आहे?' : language === 'hi-IN' ? 'आपके पास कितनी उपज है?' : 'How much quantity do you have?'}
+            </h2>
+          </div>
           <span className="text-xs font-bold text-slate-500">
-            {language === 'mr-IN' ? 'लॉट निवडण्यासाठी टॅप करा' : language === 'hi-IN' ? 'लॉट चुनने हेतु टैप करें' : 'Tap to switch active lot'}
+            {language === 'mr-IN' ? 'एकूण प्रमाण' : language === 'hi-IN' ? 'कुल मात्रा' : 'Total Quantity'}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          {crops.map((crop) => (
-            <div
-              key={crop.name}
-              onClick={() => onSelectCropPreset(crop.name, crop.mandi, crop.defaultQty)}
-              className={`p-4 rounded-2xl bg-white border cursor-pointer transition shadow-xs hover:shadow-md ${
-                crop.active
-                  ? 'border-emerald-600 ring-2 ring-emerald-600/20'
-                  : 'border-slate-200 hover:border-emerald-300'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-3xl">{crop.image}</span>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${crop.tagColor}`}>
-                  {crop.tag}
-                </span>
-              </div>
-              <h3 className="text-base font-black text-slate-900">
-                {crop.label}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium">
-                {crop.variety}
-              </p>
-              <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-slate-600 font-bold">{crop.defaultQty} qtl</span>
-                <span className="text-emerald-700 font-extrabold">{crop.mandi}</span>
-              </div>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          {/* Main Number Input */}
+          <div className="flex items-center gap-2 w-full sm:w-1/2 bg-slate-50 border-2 border-emerald-200 rounded-2xl p-2 focus-within:border-emerald-600 focus-within:bg-white transition">
+            <Scale className="w-6 h-6 text-emerald-600 ml-2 flex-shrink-0" />
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseFloat(e.target.value) || 1))}
+              className="w-full text-2xl font-black text-slate-900 bg-transparent focus:outline-none px-2"
+            />
+            <div className="flex items-center bg-white rounded-xl p-1 border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setUnit('qtl')}
+                className={`px-3 py-1 rounded-lg text-xs font-black transition ${
+                  unit === 'qtl' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                {language === 'mr-IN' ? 'क्विंटल' : language === 'hi-IN' ? 'क्विंटल' : 'qtl'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUnit('bag')}
+                className={`px-3 py-1 rounded-lg text-xs font-black transition ${
+                  unit === 'bag' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                {language === 'mr-IN' ? 'पोती' : language === 'hi-IN' ? 'बोरी' : 'Bags'}
+              </button>
             </div>
-          ))}
+          </div>
+
+          {/* Quick Increment Buttons (+5, +10, +20, +50) */}
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-1/2">
+            {[5, 10, 20, 50].map((num) => (
+              <button
+                key={num}
+                type="button"
+                onClick={() => setQuantity((prev) => prev + num)}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-emerald-100 border border-slate-200 hover:border-emerald-300 text-slate-800 text-xs font-black transition"
+              >
+                +{num} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विं' : 'qtl') : (language === 'mr-IN' ? 'पोती' : 'bags')}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setQuantity(20)}
+              className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-extrabold border border-emerald-200 transition"
+            >
+              {language === 'mr-IN' ? 'रीसेट (२०)' : language === 'hi-IN' ? 'रीसेट (20)' : 'Reset (20)'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Step 3: Vehicle / Transport Preference (गाडी / वाहतूक निवडा) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+              ३
+            </span>
+            <h2 className="text-base font-black text-slate-900">
+              {language === 'mr-IN' ? 'बाजारात माल नेण्यासाठी कोणती गाडी वापरणार?' : language === 'hi-IN' ? 'मंडी में माल ले जाने हेतु कौन सा वाहन चुनेंगे?' : 'Which transport vehicle will you use?'}
+            </h2>
+          </div>
+          <span className="text-[11px] font-bold text-slate-500">
+            {language === 'mr-IN' ? 'पर्याय न निवडल्यास पिकअप निवडले जाईल' : language === 'hi-IN' ? 'डिफ़ॉल्ट: पिकअप' : 'Default: Pickup Bolero'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {vehicles.map((v) => {
+            const isSelected = selectedVehicle === v.id;
+            return (
+              <div
+                key={v.id}
+                onClick={() => setSelectedVehicle(v.id)}
+                className={`p-3.5 rounded-2xl border cursor-pointer transition transform active:scale-95 space-y-2 ${
+                  isSelected
+                    ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-600/30 shadow-md'
+                    : 'bg-slate-50/60 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl">{v.icon}</span>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    {v.rateHint}
+                  </span>
+                </div>
+                <div>
+                  <h3 className={`text-sm font-black ${isSelected ? 'text-emerald-950' : 'text-slate-800'}`}>
+                    {v.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    {v.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 5. Step 4: Mandi Preference (कोणत्या बाजारात विकायचे आहे?) */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+              ४
+            </span>
+            <h2 className="text-base font-black text-slate-900">
+              {language === 'mr-IN' ? 'कोणत्या बाजार समितीत माल विकण्याची इच्छा आहे?' : language === 'hi-IN' ? 'किस मंडी में माल बेचना चाहते हैं?' : 'Preferred Mandi for Sale?'}
+            </h2>
+          </div>
+          <span className="text-xs font-bold text-emerald-700">
+            {language === 'mr-IN' ? 'जवळचे बाजार' : language === 'hi-IN' ? 'निकटतम मंडियां' : 'Nearby APMCs'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {mandis.map((m) => {
+            const isSelected = selectedMandi === m.id;
+            return (
+              <div
+                key={m.id}
+                onClick={() => setSelectedMandi(m.id)}
+                className={`p-4 rounded-2xl border cursor-pointer transition flex items-center justify-between gap-3 ${
+                  isSelected
+                    ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-600/30 shadow-md'
+                    : 'bg-slate-50/60 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <div>
+                  <h3 className={`text-sm font-black ${isSelected ? 'text-emerald-950' : 'text-slate-800'}`}>
+                    {m.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    {m.dist}
+                  </p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                  isSelected ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                }`}>
+                  {isSelected && <span className="w-2 h-2 rounded-full bg-white"></span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 6. Live Price Estimate Banner for Entered Quantity */}
+      <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-emerald-800 to-green-700 text-white shadow-lg space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{activeCropObj.icon}</span>
+            <div>
+              <span className="text-[11px] text-emerald-200 font-bold uppercase tracking-wider block">
+                {language === 'mr-IN' ? 'आजचा व अंदाजित भाव (तुमच्या मालासाठी)' : language === 'hi-IN' ? 'आज का व अनुमानित भाव' : 'Estimated Revenue for your produce'}
+              </span>
+              <h3 className="text-lg font-black font-serif">
+                {quantity} {unit === 'qtl' ? (language === 'mr-IN' ? 'क्विंटल' : 'qtl') : (language === 'mr-IN' ? 'पोती' : 'bags')} {activeCropObj.name}
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 text-right">
+            <div>
+              <span className="text-[10px] text-emerald-200 uppercase font-bold block">
+                {language === 'mr-IN' ? 'आज विकल्यास' : language === 'hi-IN' ? 'आज बेचने पर' : 'Today (Sell Now)'}
+              </span>
+              <span className="text-xl font-black">₹{todayTotal}</span>
+            </div>
+            <div className="h-8 w-px bg-white/20"></div>
+            <div>
+              <span className="text-[10px] text-emerald-300 uppercase font-extrabold block">
+                {language === 'mr-IN' ? '२ दिवसांनंतर' : language === 'hi-IN' ? '2 दिन बाद' : 'In 2 Days'}
+              </span>
+              <span className="text-xl font-black text-emerald-300">₹{futureTotal}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Primary Call to Action Button */}
+        <div className="pt-2">
+          <button
+            onClick={handleApplyAndGo}
+            className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-base sm:text-lg shadow-xl shadow-black/10 transition transform hover:scale-101 active:scale-98"
+          >
+            <span>
+              {language === 'mr-IN'
+                ? 'निर्णय आणि अचूक नफा पहा (काय करावे?)'
+                : language === 'hi-IN'
+                ? 'निर्णय और शुद्ध मुनाफा देखें (क्या करें?)'
+                : 'Get Recommendation & Pocket Realization'}
+            </span>
+            <ArrowRight className="w-5 h-5 text-emerald-800" />
+          </button>
         </div>
       </div>
     </div>
