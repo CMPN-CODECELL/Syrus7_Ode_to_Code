@@ -41,9 +41,9 @@
       }
     },
     {
-      "id": "lasalgaon_apmc",
-      "name": "Lasalgaon APMC",
-      "district": "Nashik",
+      "id": "sangamner_apmc",
+      "name": "Sangamner APMC",
+      "district": "Ahmednagar",
       "state": "Maharashtra",
       "freshness": "FRESH",
       "trading_day_age": 0,
@@ -60,7 +60,7 @@
     }
   ],
   "heatmap_3x7": {
-    "mandis": ["Nashik APMC", "Pimpalgaon Baswant APMC", "Lasalgaon APMC"],
+    "mandis": ["Nashik APMC", "Pimpalgaon Baswant APMC", "Sangamner APMC"],
     "days": ["Today (09 Oct)", "+1 Day (10 Oct)", "+2 Days (11 Oct)", "+3 Days (12 Oct)", "+4 Days (13 Oct)", "+5 Days (14 Oct)", "+6 Days (15 Oct)"],
     "matrix": [
       [
@@ -82,13 +82,13 @@
         {"mandi": "Pimpalgaon Baswant APMC", "day_offset": 6, "date_str": "2026-10-15", "net_realization": 32100.0, "is_open": true, "is_best": false, "gain_vs_baseline": -1860.0, "risk": "RED", "modal_price": 1820.0}
       ],
       [
-        {"mandi": "Lasalgaon APMC", "day_offset": 0, "date_str": "2026-10-09", "net_realization": 33968.0, "is_open": true, "is_best": false, "gain_vs_baseline": 8.0, "risk": "GREEN", "modal_price": 1820.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 1, "date_str": "2026-10-10", "net_realization": 34600.0, "is_open": true, "is_best": false, "gain_vs_baseline": 640.0, "risk": "GREEN", "modal_price": 1870.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 2, "date_str": "2026-10-11", "net_realization": 35200.0, "is_open": true, "is_best": false, "gain_vs_baseline": 1240.0, "risk": "YELLOW", "modal_price": 1910.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 3, "date_str": "2026-10-12", "net_realization": 0.0, "is_open": false, "is_best": false, "gain_vs_baseline": 0.0, "risk": "RED", "modal_price": 0.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 4, "date_str": "2026-10-13", "net_realization": 34100.0, "is_open": true, "is_best": false, "gain_vs_baseline": 140.0, "risk": "YELLOW", "modal_price": 1870.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 5, "date_str": "2026-10-14", "net_realization": 33200.0, "is_open": true, "is_best": false, "gain_vs_baseline": -760.0, "risk": "YELLOW", "modal_price": 1840.0},
-        {"mandi": "Lasalgaon APMC", "day_offset": 6, "date_str": "2026-10-15", "net_realization": 31900.0, "is_open": true, "is_best": false, "gain_vs_baseline": -2060.0, "risk": "RED", "modal_price": 1790.0}
+        {"mandi": "Sangamner APMC", "day_offset": 0, "date_str": "2026-10-09", "net_realization": 33968.0, "is_open": true, "is_best": false, "gain_vs_baseline": 8.0, "risk": "GREEN", "modal_price": 1820.0},
+        {"mandi": "Sangamner APMC", "day_offset": 1, "date_str": "2026-10-10", "net_realization": 34600.0, "is_open": true, "is_best": false, "gain_vs_baseline": 640.0, "risk": "GREEN", "modal_price": 1870.0},
+        {"mandi": "Sangamner APMC", "day_offset": 2, "date_str": "2026-10-11", "net_realization": 35200.0, "is_open": true, "is_best": false, "gain_vs_baseline": 1240.0, "risk": "YELLOW", "modal_price": 1910.0},
+        {"mandi": "Sangamner APMC", "day_offset": 3, "date_str": "2026-10-12", "net_realization": 0.0, "is_open": false, "is_best": false, "gain_vs_baseline": 0.0, "risk": "RED", "modal_price": 0.0},
+        {"mandi": "Sangamner APMC", "day_offset": 4, "date_str": "2026-10-13", "net_realization": 34100.0, "is_open": true, "is_best": false, "gain_vs_baseline": 140.0, "risk": "YELLOW", "modal_price": 1870.0},
+        {"mandi": "Sangamner APMC", "day_offset": 5, "date_str": "2026-10-14", "net_realization": 33200.0, "is_open": true, "is_best": false, "gain_vs_baseline": -760.0, "risk": "YELLOW", "modal_price": 1840.0},
+        {"mandi": "Sangamner APMC", "day_offset": 6, "date_str": "2026-10-15", "net_realization": 31900.0, "is_open": true, "is_best": false, "gain_vs_baseline": -2060.0, "risk": "RED", "modal_price": 1790.0}
       ]
     ]
   }

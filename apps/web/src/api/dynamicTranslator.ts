@@ -15,7 +15,7 @@ const translationCache: Record<string, Record<string, string>> = {
   'Soybean': { 'mr-IN': 'सोयाबीन', 'hi-IN': 'सोयाबीन', 'en-IN': 'Soybean' },
   'Nashik APMC': { 'mr-IN': 'नाशिक बाजार समिती', 'hi-IN': 'नासिक मंडी', 'en-IN': 'Nashik APMC' },
   'Pimpalgaon Baswant APMC': { 'mr-IN': 'पिंपळगाव बसवंत बाजार समिती', 'hi-IN': 'पिंपलगांव मंडी', 'en-IN': 'Pimpalgaon Baswant APMC' },
-  'Lasalgaon APMC': { 'mr-IN': 'लासलगाव बाजार समिती', 'hi-IN': 'लासलगांव मंडी', 'en-IN': 'Lasalgaon APMC' },
+  'Sangamner APMC': { 'mr-IN': 'संगमनेर बाजार समिती', 'hi-IN': 'संगमनेर मंडी', 'en-IN': 'Sangamner APMC' },
   'WAIT': { 'mr-IN': 'थांबा', 'hi-IN': 'रुकें', 'en-IN': 'WAIT' },
   'SELL_NOW': { 'mr-IN': 'आजच विका', 'hi-IN': 'आज ही बेचें', 'en-IN': 'SELL NOW' },
   'GO': { 'mr-IN': 'दुसऱ्या बाजारात जा', 'hi-IN': 'दूसरी मंडी जाएं', 'en-IN': 'GO TO ANOTHER MANDI' },

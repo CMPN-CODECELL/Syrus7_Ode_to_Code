@@ -24,7 +24,7 @@ TRANSLATION_DICT: Dict[str, Dict[str, str]] = {
     # Mandis
     "Nashik APMC": {"mr-IN": "नाशिक बाजार समिती", "hi-IN": "नासिक मंडी", "en-IN": "Nashik APMC"},
     "Pimpalgaon Baswant APMC": {"mr-IN": "पिंपळगाव बसवंत बाजार समिती", "hi-IN": "पिंपलगांव बसवंत मंडी", "en-IN": "Pimpalgaon Baswant APMC"},
-    "Lasalgaon APMC": {"mr-IN": "लासलगाव बाजार समिती", "hi-IN": "लासलगांव मंडी", "en-IN": "Lasalgaon APMC"},
+    "Sangamner APMC": {"mr-IN": "संगमनेर बाजार समिती", "hi-IN": "संगमनेर मंडी", "en-IN": "Sangamner APMC"},
     "Pune APMC": {"mr-IN": "पुणे बाजार समिती", "hi-IN": "पुणे मंडी", "en-IN": "Pune APMC"},
     
     # Crops
@@ -175,7 +175,7 @@ def get_market_calendar(
             holiday_name="Sunday APMC Holiday" if "Pimpalgaon" not in mandi else None,
             modal_price=1950.0 if "Pimpalgaon" in mandi else 0.0,
             expected_arrivals_tonnes=85.0 if "Pimpalgaon" in mandi else 0.0,
-            advisory="Nashik & Lasalgaon closed on Sunday! Divert to Pimpalgaon private yard or sell on Saturday."
+            advisory="Nashik & Sangamner closed on Sunday! Divert to Pimpalgaon private yard or sell on Saturday."
         ),
         MandiDayStatus(
             day_offset=3,

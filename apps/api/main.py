@@ -99,7 +99,7 @@ async def websocket_market_feed(websocket: WebSocket):
                     "weather_alert": "Open Sunday via private yard"
                 },
                 {
-                    "name": "Lasalgaon APMC",
+                    "name": "Sangamner APMC",
                     "commodity": "Tomato",
                     "modal_price": 1820.0,
                     "min_price": 1350.0,
@@ -126,7 +126,7 @@ async def websocket_market_feed(websocket: WebSocket):
             "🟢 09:15 AM: Pimpalgaon Baswant APMC opened active tomato trading at ₹1,860/qtl",
             "📦 09:45 AM: Nashik APMC received 142 tonnes; modal price steady at ₹1,800/qtl",
             "🌧️ 10:30 AM: IMD updates: 18mm thunderstorm alert active across Niphad catchment for Saturday night",
-            "🛑 11:00 AM: APMC Advisory: Sunday closure notice issued for Nashik & Lasalgaon APMC yards",
+            "🛑 11:00 AM: APMC Advisory: Sunday closure notice issued for Nashik & Sangamner APMC yards",
             "📈 11:45 AM: High retail demand in Pune and Mumbai pulling up premium A-grade tomato bids by +₹50/qtl"
         ]
         ticker_idx = 0

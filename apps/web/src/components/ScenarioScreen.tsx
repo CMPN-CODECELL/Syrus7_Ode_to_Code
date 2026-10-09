@@ -312,7 +312,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels = {}, language 
                 🛑 MANDI CLOSED: Regional Festival (Amavasya Bazaar Holiday)
               </span>
               <p className="text-xs font-medium text-rose-800 mt-0.5">
-                All auction gates at Nashik and Lasalgaon APMCs are strictly closed on Day 4 (Tuesday). Transporting produce on this day will result in stranded cargo and quality degradation. Please sell on Day 3 or Day 5!
+                All auction gates at Nashik and Sangamner APMCs are strictly closed on Day 4 (Tuesday). Transporting produce on this day will result in stranded cargo and quality degradation. Please sell on Day 3 or Day 5!
               </p>
             </div>
           </div>
@@ -323,7 +323,7 @@ export const ScenarioScreen: React.FC<Props> = ({ record, labels = {}, language 
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-amber-900 block">
-                ⚠️ SUNDAY CLOSURE ALERT: Nashik & Lasalgaon APMCs Closed
+                ⚠️ SUNDAY CLOSURE ALERT: Nashik & Sangamner APMCs Closed
               </span>
               <p className="text-xs font-medium text-amber-800 mt-0.5">
                 Nashik main APMC yard is closed for weekly Sunday off. Only Pimpalgaon Baswant sub-market operates special private trades. We recommend selling on Saturday (Day 1) or routing specifically to Pimpalgaon.

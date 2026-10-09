@@ -36,10 +36,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   
   // Locations with nearby mandis
   const locationOptions = [
-    { id: 'Nashik', name: language === 'mr-IN' ? 'नाशिक' : language === 'hi-IN' ? 'नासिक' : 'Nashik', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] },
-    { id: 'Niphad', name: language === 'mr-IN' ? 'निफाड' : language === 'hi-IN' ? 'निफाड़' : 'Niphad', mandis: ['Pimpalgaon Baswant APMC', 'Lasalgaon APMC', 'Nashik APMC'] },
-    { id: 'Lasalgaon', name: language === 'mr-IN' ? 'लासलगाव' : language === 'hi-IN' ? 'लासलगांव' : 'Lasalgaon', mandis: ['Lasalgaon APMC', 'Pimpalgaon Baswant APMC', 'Nashik APMC'] },
-    { id: 'Pune', name: language === 'mr-IN' ? 'पुणे' : language === 'hi-IN' ? 'पुणे' : 'Pune', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Lasalgaon APMC'] }
+    { id: 'Nashik', name: language === 'mr-IN' ? 'नाशिक' : language === 'hi-IN' ? 'नासिक' : 'Nashik', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Sangamner APMC'] },
+    { id: 'Niphad', name: language === 'mr-IN' ? 'निफाड' : language === 'hi-IN' ? 'निफाड़' : 'Niphad', mandis: ['Pimpalgaon Baswant APMC', 'Sangamner APMC', 'Nashik APMC'] },
+    { id: 'Sangamner', name: language === 'mr-IN' ? 'संगमनेर' : language === 'hi-IN' ? 'संगमनेर' : 'Sangamner', mandis: ['Sangamner APMC', 'Pimpalgaon Baswant APMC', 'Nashik APMC'] },
+    { id: 'Pune', name: language === 'mr-IN' ? 'पुणे' : language === 'hi-IN' ? 'पुणे' : 'Pune', mandis: ['Nashik APMC', 'Pimpalgaon Baswant APMC', 'Sangamner APMC'] }
   ];
 
   // 2. Crop Selection State
@@ -141,8 +141,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       recommended: false
     },
     {
-      id: 'Lasalgaon APMC',
-      name: language === 'mr-IN' ? 'लासलगाव बाजार समिती' : language === 'hi-IN' ? 'लासलगांव मंडी' : 'Lasalgaon APMC',
+      id: 'Sangamner APMC',
+      name: language === 'mr-IN' ? 'संगमनेर बाजार समिती' : language === 'hi-IN' ? 'संगमनेर मंडी' : 'Sangamner APMC',
       dist: language === 'mr-IN' ? '५२ किमी (दूर)' : language === 'hi-IN' ? '52 किमी (दूर)' : '52 km (Far)',
       recommended: false
     }

@@ -31,7 +31,7 @@ class DeterministicEngine:
         self.MANDI_DISTANCES = {
             "Nashik APMC": 60.0,
             "Pimpalgaon Baswant APMC": 85.0,
-            "Lasalgaon APMC": 110.0,
+            "Sangamner APMC": 110.0,
         }
 
         # Stored failure injection state
@@ -56,7 +56,7 @@ class DeterministicEngine:
         prices = {
             "Nashik APMC": (1800.0, 1300.0, 2000.0, 142.0),
             "Pimpalgaon Baswant APMC": (1860.0, 1400.0, 2100.0, 210.0),
-            "Lasalgaon APMC": (1820.0, 1350.0, 2050.0, 98.0)
+            "Sangamner APMC": (1820.0, 1350.0, 2050.0, 98.0)
         }
         modal, min_p, max_p, arr = prices.get(mandi, (1800.0, 1300.0, 2000.0, 142.0))
 

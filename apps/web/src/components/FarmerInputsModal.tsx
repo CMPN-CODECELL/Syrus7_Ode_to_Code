@@ -135,7 +135,7 @@ export const FarmerInputsModal: React.FC<Props> = ({
               >
                 <option value="Nashik APMC">Nashik APMC (Home Baseline)</option>
                 <option value="Pimpalgaon Baswant APMC">Pimpalgaon Baswant APMC</option>
-                <option value="Lasalgaon APMC">Lasalgaon APMC</option>
+                <option value="Sangamner APMC">Sangamner APMC</option>
               </select>
             </div>
 

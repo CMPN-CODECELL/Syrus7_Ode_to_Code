@@ -131,7 +131,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
   const mandis = [
     { id: 'Nashik APMC', name: 'Nashik APMC', distanceKm: 60, todayRate: 1800, expectedRate: 1950, isSundayOpen: false },
     { id: 'Pimpalgaon Baswant APMC', name: 'Pimpalgaon Baswant APMC', distanceKm: 85, todayRate: 1860, expectedRate: 1980, isSundayOpen: true },
-    { id: 'Lasalgaon APMC', name: 'Lasalgaon APMC', distanceKm: 110, todayRate: 1820, expectedRate: 1910, isSundayOpen: false }
+    { id: 'Sangamner APMC', name: 'Sangamner APMC', distanceKm: 110, todayRate: 1820, expectedRate: 1910, isSundayOpen: false }
   ];
 
   // Active vehicle and storage
@@ -765,7 +765,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               <span>Live Weather Conditions & Market Price Impact</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Nashik Agricultural Belt (Niphad / Dindori / Lasalgaon catchment area)
+              Nashik Agricultural Belt (Niphad / Dindori / Sangamner catchment area)
             </p>
           </div>
           <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 flex items-center gap-1.5">

@@ -72,7 +72,7 @@ GLOSSARY_MAP: Dict[str, Dict[str, str]] = {
     "नाशिक": {"canonical": "Nashik APMC", "type": "mandi"},
     "पिंपळगाव": {"canonical": "Pimpalgaon Baswant APMC", "type": "mandi"},
     "पिंपलगाव": {"canonical": "Pimpalgaon Baswant APMC", "type": "mandi"},
-    "लासलगाव": {"canonical": "Lasalgaon APMC", "type": "mandi"},
+    "संगमनेर": {"canonical": "Sangamner APMC", "type": "mandi"},
     "पुणे": {"canonical": "Pune APMC", "type": "mandi"}
 }
 
