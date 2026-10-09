@@ -36,9 +36,13 @@ weather_engine = WeatherEffectsEngine()
 
 
 class ScenarioRunPayload(BaseModel):
-    """Payload for running what-if scenarios."""
-    request: DecisionRequest
+    """Payload for running what-if scenarios supporting both rich and Division 3 gateway schemas."""
+    request: Optional[DecisionRequest] = None
+    base_decision: Optional[Dict[str, Any]] = None
     parameters: Optional[ScenarioParameters] = None
+    price_delta_pct: Optional[float] = None
+    transport_delta_pct: Optional[float] = None
+    arrival_multiplier: Optional[float] = None
 
 
 @app.get("/internal/health", tags=["System"])
@@ -71,18 +75,57 @@ def analyze_sale_decision_endpoint(request: DecisionRequest) -> DecisionRecord:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/internal/run-scenario", response_model=ScenarioResult, tags=["Scenario"])
-def run_scenario_endpoint(payload: ScenarioRunPayload) -> ScenarioResult:
+@app.post("/internal/run-scenario", tags=["Scenario"])
+def run_scenario_endpoint(payload: ScenarioRunPayload) -> Dict[str, Any]:
     """
     Clones baseline request state, applies stress scenario parameters,
     and executes the EXACT SAME decision engine pipeline.
     """
     try:
+        # Resolve scenario parameters
+        if payload.parameters is not None:
+            params = payload.parameters
+        else:
+            # Check top-level stress inputs (handling decimal or percentage representations)
+            p_delta = payload.price_delta_pct if payload.price_delta_pct is not None else -10.0
+            if abs(p_delta) <= 1.0 and p_delta != 0.0:
+                p_delta = p_delta * 100.0 # e.g. -0.10 -> -10%
+
+            t_delta = payload.transport_delta_pct if payload.transport_delta_pct is not None else 20.0
+            if abs(t_delta) <= 1.0 and t_delta != 0.0:
+                t_delta = t_delta * 100.0 # e.g. 0.20 -> +20%
+
+            arr_mult = payload.arrival_multiplier if payload.arrival_multiplier is not None else 2.0
+            params = ScenarioParameters(
+                price_delta_pct=p_delta,
+                transport_delta_pct=t_delta,
+                arrival_multiplier=arr_mult
+            )
+
+        # Resolve DecisionRequest
+        if payload.request is not None:
+            req = payload.request
+        elif payload.base_decision is not None:
+            bd = payload.base_decision
+            commodity = bd.get("commodity") or bd.get("forecast", {}).get("crop") or "Tomato"
+            quantity = float(bd.get("lot_quantity_qtl") or bd.get("baseline", {}).get("quantity_sold_qtl") or 20.0)
+            home_mandi = bd.get("baseline", {}).get("market") or "Nashik APMC"
+            sale_day = bd.get("baseline", {}).get("sale_day") or "2026-10-09"
+            req = DecisionRequest(
+                commodity=commodity,
+                quantity=quantity,
+                home_mandi=home_mandi,
+                observation_date=sale_day,
+                risk_profile=bd.get("risk_profile", "Balanced")
+            )
+        else:
+            raise ValueError("Either 'request' or 'base_decision' must be provided in scenario payload.")
+
         result = scenario_engine.run_scenario(
-            baseline_request=payload.request,
-            scenario_params=payload.parameters
+            baseline_request=req,
+            scenario_params=params
         )
-        return result
+        return result.model_dump()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

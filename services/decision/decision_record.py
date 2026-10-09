@@ -36,6 +36,22 @@ class SourceRefRecord(BaseModel):
     fetched_at: Optional[str] = None
 
 
+class CostBreakdown(BaseModel):
+    """Detailed logistics and perishability cost breakdown."""
+    gross_revenue: float = Field(..., description="Gross revenue before deductions (INR)")
+    transport: float = Field(..., description="Transport cost including round trip & trips (INR)")
+    hamali_tolai: float = Field(..., description="Hamali/weighment labor fees (INR)")
+    commission_fees: float = Field(0.0, description="Market commission and APMC cess (INR)")
+    storage: float = Field(0.0, description="Holding storage cost (INR)")
+    financing: float = Field(0.0, description="Financing cost of tied capital (INR)")
+    travel_loss_pct: float = Field(0.0, description="Perishability transit loss percentage (e.g. 0.01 for 1%)")
+    holding_loss_pct: float = Field(0.0, description="Perishability holding loss percentage (e.g. 0.02 for 2%)")
+    quality_factor: float = Field(1.0, description="Quality multiplier (1.0 = standard grade)")
+    quantity_initial_qtl: float = Field(..., description="Initial lot quantity in quintals")
+    quantity_sold_qtl: float = Field(..., description="Net saleable quantity in quintals after sequential losses")
+    final_net: float = Field(..., description="Final net realization (INR)")
+
+
 class BaselineRecord(BaseModel):
     """The baseline action: sell at home mandi today."""
     market: str
@@ -44,7 +60,9 @@ class BaselineRecord(BaseModel):
     gross_revenue: float
     quantity_sold_qtl: float
     price_inr_per_qtl: float
+    modal_price: Optional[float] = None
     costs: Dict[str, float]
+    cost_breakdown: Optional[CostBreakdown] = None
 
 
 class ChosenRecord(BaseModel):
@@ -60,7 +78,10 @@ class ChosenRecord(BaseModel):
     required_gain_pct: float
     quantity_sold_qtl: float
     holding_days: int
+    wait_days: Optional[int] = None
+    modal_price_expected: Optional[float] = None
     costs: Dict[str, float]
+    cost_breakdown: Optional[CostBreakdown] = None
 
 
 class CandidateEvaluation(BaseModel):
@@ -96,6 +117,10 @@ class DecisionRecord(BaseModel):
     weather_snapshot_id: str = Field("weather-snap-v1", description="ID of weather context snapshot")
     route_snapshot_id: str = Field("route-snap-v1", description="ID of routing context snapshot")
     timestamp: str = Field(..., description="ISO-8601 generation timestamp")
+
+    commodity: str = Field("Tomato", description="Commodity name")
+    lot_quantity_qtl: float = Field(20.0, description="Lot quantity in quintals")
+    risk_profile: str = Field("BALANCED", description="Risk profile")
 
     baseline: BaselineRecord = Field(..., description="Home mandi sell-today baseline")
     chosen: ChosenRecord = Field(..., description="Selected policy recommendation")

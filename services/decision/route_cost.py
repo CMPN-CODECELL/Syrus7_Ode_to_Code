@@ -30,19 +30,9 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-# Known verified coordinates for core Maharashtra mandis
-DEFAULT_MANDI_COORDINATES: Dict[str, Tuple[float, float]] = {
-    # Mandi ID / Name -> (latitude, longitude)
-    "Nashik APMC": (19.9975, 73.7898),
-    "Pimpalgaon APMC": (20.1738, 73.9877),
-    "Lasalgaon APMC": (20.1472, 74.2263),
-    "Pune APMC": (18.5204, 73.8567),
-    "Mumbai APMC (Vashi)": (19.0760, 72.9986),
-    "Sangamner APMC": (19.5760, 74.2070),
-    "Ahmednagar APMC": (19.0952, 74.7496),
-    "Kalvan APMC": (20.4855, 73.9631),
-    "Yeola APMC": (20.0435, 74.4878)
-}
+from .market_mapping import canonicalize_mandi_name, CANONICAL_MANDI_COORDS
+
+DEFAULT_MANDI_COORDINATES: Dict[str, Tuple[float, float]] = CANONICAL_MANDI_COORDS
 
 
 class RouteInfo(BaseModel):
@@ -123,9 +113,13 @@ class RouteCostEngine:
         Retrieves route via fallback hierarchy:
           ORS live -> cached route -> haversine * road-factor estimate
         """
+        # Canonicalize names
+        c_origin = canonicalize_mandi_name(origin_name) if origin_name != "farm_gate" else origin_name
+        c_dest = canonicalize_mandi_name(dest_name)
+
         # Resolve coords
-        o_coords = origin_coords or DEFAULT_MANDI_COORDINATES.get(origin_name)
-        d_coords = dest_coords or DEFAULT_MANDI_COORDINATES.get(dest_name)
+        o_coords = origin_coords or DEFAULT_MANDI_COORDINATES.get(c_origin)
+        d_coords = dest_coords or DEFAULT_MANDI_COORDINATES.get(c_dest)
 
         if d_coords is None:
             # Fallback to default Nashik APMC coords if destination coords missing

@@ -42,10 +42,12 @@ from .decision_record import (
     DecisionRecord,
     BaselineRecord,
     ChosenRecord,
+    CostBreakdown,
     CandidateEvaluation,
     AssumptionRecord,
     SourceRefRecord
 )
+from .market_mapping import canonicalize_mandi_name, get_source_mandi_name
 
 
 class MarketSnapshotInput(BaseModel):
@@ -67,6 +69,7 @@ class MarketSnapshotInput(BaseModel):
     recent_daily_prices: List[float] = Field(default_factory=list)
     prior_8w_same_weekday_arrivals: List[float] = Field(default_factory=list)
     is_post_closure_catchup: bool = False
+    warnings: List[str] = Field(default_factory=list)
 
 
 class ForecastTargetInput(BaseModel):
@@ -98,7 +101,9 @@ class DecisionRequest(BaseModel):
     bag_weight_kg: Optional[float] = None
     home_mandi: str
     home_coords: Optional[Tuple[float, float]] = None
-    observation_date: str
+    observation_date: str = "2026-10-09"
+    requested_wait_days: Optional[int] = None
+    distance_km: Optional[float] = None
     horizon_days: int = 7
     risk_profile: str = "Balanced" # Cautious | Balanced | Aggressive
     vehicle_type: str = "medium_truck"
@@ -225,8 +230,16 @@ class DecisionEngine:
         v_rate_km = request.rate_per_km or 12.0
         hamali_total = request.hamali_per_qtl * quantity_qtl
 
-        # 4. Baseline: Sell Now at Home Mandi today
+        # 4. Baseline: Sell Now at Home Mandi today (with canonical alias resolution)
+        canonical_home = canonicalize_mandi_name(request.home_mandi)
         home_snapshot = request.market_snapshots.get(request.home_mandi)
+        if home_snapshot is None:
+            # Check canonical alias match in snapshots
+            for k, snap in request.market_snapshots.items():
+                if canonicalize_mandi_name(k) == canonical_home or canonicalize_mandi_name(snap.market) == canonical_home:
+                    home_snapshot = snap
+                    break
+
         warnings: List[str] = []
 
         if home_snapshot is None:
@@ -299,6 +312,21 @@ class DecisionEngine:
             financing_cost=0.0
         )
 
+        baseline_cb = CostBreakdown(
+            gross_revenue=round(baseline_breakdown.gross_revenue, 2),
+            transport=round(baseline_breakdown.transport_cost, 2),
+            hamali_tolai=round(baseline_breakdown.hamali_tolai_cost, 2),
+            commission_fees=round(baseline_breakdown.commission_and_fees, 2),
+            storage=round(baseline_breakdown.storage_cost, 2),
+            financing=round(baseline_breakdown.financing_cost, 2),
+            travel_loss_pct=round(baseline_breakdown.travel_loss_pct, 4),
+            holding_loss_pct=round(baseline_breakdown.holding_loss_pct, 4),
+            quality_factor=baseline_breakdown.quality_factor,
+            quantity_initial_qtl=round(quantity_qtl, 4),
+            quantity_sold_qtl=round(baseline_breakdown.quantity_sold_qtl, 4),
+            final_net=round(baseline_breakdown.net_realization, 2)
+        )
+
         baseline_record = BaselineRecord(
             market=request.home_mandi,
             sale_day=request.observation_date,
@@ -306,13 +334,15 @@ class DecisionEngine:
             gross_revenue=round(baseline_breakdown.gross_revenue, 2),
             quantity_sold_qtl=round(baseline_breakdown.quantity_sold_qtl, 4),
             price_inr_per_qtl=home_snapshot.modal_price_inr_per_qtl,
+            modal_price=home_snapshot.modal_price_inr_per_qtl,
             costs={
                 "transport": round(baseline_breakdown.transport_cost, 2),
                 "hamali": round(baseline_breakdown.hamali_tolai_cost, 2),
                 "storage": 0.0,
                 "financing": 0.0,
                 "commission_and_fees": 0.0
-            }
+            },
+            cost_breakdown=baseline_cb
         )
 
         # 5. Evaluate Six Risks for the situation
@@ -620,6 +650,21 @@ class DecisionEngine:
                 hysteresis_applied = True
                 warnings.append("Hysteresis applied: Preserved SELL_NOW due to near-boundary threshold.")
 
+        chosen_cb = CostBreakdown(
+            gross_revenue=round(chosen_breakdown.gross_revenue, 2),
+            transport=round(chosen_breakdown.transport_cost, 2),
+            hamali_tolai=round(chosen_breakdown.hamali_tolai_cost, 2),
+            commission_fees=round(chosen_breakdown.commission_and_fees, 2),
+            storage=round(chosen_breakdown.storage_cost, 2),
+            financing=round(chosen_breakdown.financing_cost, 2),
+            travel_loss_pct=round(chosen_breakdown.travel_loss_pct, 4),
+            holding_loss_pct=round(chosen_breakdown.holding_loss_pct, 4),
+            quality_factor=chosen_breakdown.quality_factor,
+            quantity_initial_qtl=round(quantity_qtl, 4),
+            quantity_sold_qtl=round(chosen_breakdown.quantity_sold_qtl, 4),
+            final_net=round(chosen_breakdown.net_realization, 2)
+        )
+
         chosen_record = ChosenRecord(
             action=chosen_action,
             market=chosen_market,
@@ -632,13 +677,16 @@ class DecisionEngine:
             required_gain_pct=round(required_gain, 4),
             quantity_sold_qtl=round(chosen_breakdown.quantity_sold_qtl, 4),
             holding_days=chosen_holding_days,
+            wait_days=chosen_holding_days,
+            modal_price_expected=chosen_breakdown.price_inr_per_qtl,
             costs={
                 "transport": round(chosen_breakdown.transport_cost, 2),
                 "hamali": round(chosen_breakdown.hamali_tolai_cost, 2),
                 "storage": round(chosen_breakdown.storage_cost, 2),
                 "financing": round(chosen_breakdown.financing_cost, 2),
                 "commission_and_fees": round(chosen_breakdown.commission_and_fees, 2)
-            }
+            },
+            cost_breakdown=chosen_cb
         )
 
         # 9. Explanation & Why cards
@@ -717,6 +765,9 @@ class DecisionEngine:
             weather_snapshot_id="weather-v1",
             route_snapshot_id="route-v1",
             timestamp=now_iso,
+            commodity=request.commodity,
+            lot_quantity_qtl=quantity_qtl,
+            risk_profile=request.risk_profile.upper(),
             baseline=baseline_record,
             chosen=chosen_record,
             forecast={"commodity": request.commodity, "horizon_days": request.horizon_days},
@@ -794,6 +845,9 @@ class DecisionEngine:
             weather_snapshot_id="none",
             route_snapshot_id="none",
             timestamp=timestamp,
+            commodity=request.commodity,
+            lot_quantity_qtl=float(request.quantity),
+            risk_profile=request.risk_profile.upper(),
             baseline=zero_baseline,
             chosen=chosen,
             forecast={},

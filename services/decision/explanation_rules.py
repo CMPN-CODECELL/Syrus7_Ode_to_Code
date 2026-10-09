@@ -24,9 +24,11 @@ from .reservation_price import ReservationPriceResult
 
 class ExplanationPayload(BaseModel):
     """Immutable deterministic explanation evidence."""
+    verdict: Optional[str] = Field(None, description="Concise headline verdict")
     why: List[str] = Field(..., description="High-level bulleted rationale for the farmer")
     key_drivers: List[str] = Field(..., description="Top quantitative drivers that determined the outcome")
     evidence: Dict[str, Any] = Field(..., description="Strict machine-readable evidence dictionary")
+    spoken_summary: Optional[str] = Field(None, description="Short 3-part spoken text: verdict, net amount, main risk")
 
 
 def generate_explanation(
@@ -139,8 +141,25 @@ def generate_explanation(
         "is_route_estimate": is_route_estimate
     }
 
+    # 6. Concise spoken summary (3 parts: verdict, net amount, main risk)
+    if action == "SELL_NOW":
+        verdict = f"Sell Now at {baseline_market}"
+    elif action == "WAIT":
+        verdict = f"Wait {holding_days} days to sell at {chosen_market}"
+    elif action == "GO":
+        verdict = f"Go to {chosen_market} today"
+    else:
+        verdict = "Insufficient Evidence"
+
+    spoken_summary = (
+        f"Verdict: {verdict}. Net amount: ₹{round(chosen_net):,}. "
+        f"Risk: {risk_assessment.overall}."
+    )
+
     return ExplanationPayload(
+        verdict=verdict,
         why=why_bullets,
         key_drivers=key_drivers,
-        evidence=evidence
+        evidence=evidence,
+        spoken_summary=spoken_summary
     )
