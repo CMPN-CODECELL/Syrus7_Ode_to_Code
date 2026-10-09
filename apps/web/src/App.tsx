@@ -31,6 +31,7 @@ import { RiskScreen } from './components/RiskScreen';
 import { ScenarioScreen } from './components/ScenarioScreen';
 import { VoiceAssistantDrawer } from './components/VoiceAssistantDrawer';
 import { FarmerInputsModal } from './components/FarmerInputsModal';
+import { LandingPage } from './components/LandingPage';
 
 import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus } from './types';
 import { ApiClient } from './api/client';
@@ -40,6 +41,7 @@ import hiDict from './localization/hi.json';
 import enDict from './localization/en.json';
 
 export const App: React.FC = () => {
+  const [showLanding, setShowLanding] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('decision');
   const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('mr-IN');
   const [riskProfile, setRiskProfile] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
@@ -147,6 +149,10 @@ export const App: React.FC = () => {
     { id: 'scenarios', label: labels.scenarios || 'काय होईल जर?', icon: Sliders, color: 'text-purple-700 bg-purple-50 border-purple-200' },
   ];
 
+  if (showLanding) {
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F7F4] text-slate-900 pb-20 md:pb-6">
       {/* 1. Judge Demo Failure Mode Switcher Bar */}
@@ -168,6 +174,7 @@ export const App: React.FC = () => {
         onToggleTheme={handleToggleTheme}
         onOpenVoice={() => setIsVoiceOpen(true)}
         onOpenEditLot={() => setIsEditModalOpen(true)}
+        onOpenLanding={() => setShowLanding(true)}
         lotSummary={lotSummary}
         labels={labels}
       />
@@ -198,8 +205,17 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Produce Chip (Tap to Edit) */}
+            {/* Quick Produce Chip + Video Intro Button + Voice */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowLanding(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition shadow-xs"
+                title="Watch Intro Video / Landing Page"
+              >
+                <span>🎬</span>
+                <span>{language === 'mr-IN' ? 'व्हिडिओ' : language === 'hi-IN' ? 'वीडियो' : 'Intro'}</span>
+              </button>
+
               <button
                 onClick={() => setIsEditModalOpen(true)}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition shadow-xs"

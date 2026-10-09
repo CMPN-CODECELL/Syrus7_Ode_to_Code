@@ -12,6 +12,7 @@ interface Props {
   onToggleTheme: () => void;
   onOpenVoice: () => void;
   onOpenEditLot: () => void;
+  onOpenLanding?: () => void;
   lotSummary: string;
   labels: Record<string, string>;
 }
@@ -27,6 +28,7 @@ export const Navbar: React.FC<Props> = ({
   onToggleTheme,
   onOpenVoice,
   onOpenEditLot,
+  onOpenLanding,
   lotSummary,
   labels
 }) => {
@@ -44,9 +46,13 @@ export const Navbar: React.FC<Props> = ({
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo & Tagline (PS_02 badge removed) */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 to-green-600 flex items-center justify-center shadow-md shadow-emerald-700/20">
+          {/* Brand Logo & Tagline (Clickable to return to Landing Page & Video) */}
+          <button
+            onClick={onOpenLanding}
+            className="flex items-center gap-3 text-left hover:opacity-90 transition group"
+            title="Go to Welcome / Landing Page"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 to-green-600 flex items-center justify-center shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
               <Sprout className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -59,7 +65,7 @@ export const Navbar: React.FC<Props> = ({
                 “Sahi Bhav Se, Samriddhi Ki Raah Pe.”
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Lot Summary & Quick Edit */}
           <div className="hidden lg:flex items-center gap-2 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 text-xs text-emerald-900 font-medium">
