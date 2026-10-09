@@ -43,6 +43,9 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('decision');
   const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('mr-IN');
   const [riskProfile, setRiskProfile] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('krishi_theme') as 'light' | 'dark') || 'light';
+  });
   const [demoMode, setDemoMode] = useState<DemoFailureMode>('NORMAL');
   const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
 
@@ -51,6 +54,19 @@ export const App: React.FC = () => {
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('krishi_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const [currentSlots, setCurrentSlots] = useState<SlotSchema>({
     commodity: 'Tomato',
@@ -148,6 +164,8 @@ export const App: React.FC = () => {
         setLanguage={setLanguage}
         riskProfile={riskProfile}
         setRiskProfile={setRiskProfile}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         onOpenVoice={() => setIsVoiceOpen(true)}
         onOpenEditLot={() => setIsEditModalOpen(true)}
         lotSummary={lotSummary}

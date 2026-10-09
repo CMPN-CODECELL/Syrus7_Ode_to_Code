@@ -4,8 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-[#F4F7F4] text-slate-900 font-sans antialiased;
+    @apply bg-[#F4F7F4] text-slate-900 font-sans antialiased transition-colors duration-200;
   }
+}
+
+.dark body {
+  background-color: #020617 !important;
+  color: #f8fafc !important;
 }
 
 /* Crisp Clean White-and-Green Farmer Design System */
@@ -30,6 +35,85 @@
   box-shadow: 0 8px 24px -4px rgba(21, 128, 61, 0.25);
 }
 
+/* High-Contrast Dark Mode Styles */
+.dark .bg-white {
+  background-color: #0f172a !important;
+}
+.dark .bg-slate-50 {
+  background-color: #1e293b !important;
+}
+.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+.dark .bg-\[\#F8FAF8\],
+.dark .bg-\[\#F4F7F4\] {
+  background-color: #020617 !important;
+}
+.dark .glass-panel,
+.dark .card-farmer,
+.dark .glass-panel-elevated,
+.dark .card-farmer-elevated {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+.dark .bg-emerald-50\/80,
+.dark .bg-emerald-50\/50,
+.dark .bg-emerald-50\/40,
+.dark .bg-emerald-50\/20,
+.dark .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.25) !important;
+}
+.dark .border-emerald-100 {
+  border-color: #1e293b !important;
+}
+.dark .border-emerald-200 {
+  border-color: #1e3a2e !important;
+}
+.dark .border-slate-200 {
+  border-color: #334155 !important;
+}
+.dark .border-slate-100 {
+  border-color: #1e293b !important;
+}
+.dark .text-slate-900 {
+  color: #f8fafc !important;
+}
+.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+.dark .text-emerald-950 {
+  color: #ecfdf5 !important;
+}
+.dark .text-emerald-900 {
+  color: #a7f3d0 !important;
+}
+.dark .text-emerald-800 {
+  color: #6ee7b7 !important;
+}
+.dark .divide-emerald-50,
+.dark .divide-emerald-100,
+.dark .divide-slate-100 {
+  border-color: #1e293b !important;
+}
+.dark footer {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+}
+.dark nav.md\:hidden {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #1e293b !important;
+}
+.dark header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #1e293b !important;
+}
+
 /* Glowing Pulse Animations */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -48,9 +132,15 @@
 ::-webkit-scrollbar-track {
   background: #e2e8f0;
 }
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
 ::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;

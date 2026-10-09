@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sprout, Mic, Edit3, Globe, Shield, Sparkles } from 'lucide-react';
+import { Sprout, Mic, Edit3, Globe, Shield, Sparkles, Sun, Moon } from 'lucide-react';
 
 interface Props {
   activeTab: string;
@@ -8,6 +8,8 @@ interface Props {
   setLanguage: (lang: 'mr-IN' | 'hi-IN' | 'en-IN') => void;
   riskProfile: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE';
   setRiskProfile: (prof: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE') => void;
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
   onOpenVoice: () => void;
   onOpenEditLot: () => void;
   lotSummary: string;
@@ -21,6 +23,8 @@ export const Navbar: React.FC<Props> = ({
   setLanguage,
   riskProfile,
   setRiskProfile,
+  theme,
+  onToggleTheme,
   onOpenVoice,
   onOpenEditLot,
   lotSummary,
@@ -40,7 +44,7 @@ export const Navbar: React.FC<Props> = ({
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo & Tagline */}
+          {/* Brand Logo & Tagline (PS_02 badge removed) */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-700 to-green-600 flex items-center justify-center shadow-md shadow-emerald-700/20">
               <Sprout className="w-6 h-6 text-white" />
@@ -49,9 +53,6 @@ export const Navbar: React.FC<Props> = ({
               <div className="flex items-center gap-2">
                 <span className="text-xl font-extrabold tracking-tight text-emerald-950 font-serif">
                   KrishiNirnay
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  PS_02
                 </span>
               </div>
               <p className="text-[11px] text-emerald-800 font-medium hidden sm:block">
@@ -119,6 +120,26 @@ export const Navbar: React.FC<Props> = ({
                 EN
               </button>
             </div>
+
+            {/* Contrast / Theme Toggle (Light / Dark Mode) */}
+            <button
+              onClick={onToggleTheme}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold transition shadow-xs"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle light or dark contrast mode"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span className="hidden sm:inline text-[11px] text-amber-200 font-extrabold">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-700" />
+                  <span className="hidden sm:inline text-[11px] text-slate-700 font-extrabold">Dark</span>
+                </>
+              )}
+            </button>
 
             {/* Voice Assistant Button */}
             <button
