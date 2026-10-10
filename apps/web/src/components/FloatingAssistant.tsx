@@ -20,6 +20,7 @@ interface FloatingAssistantProps {
   slots: SlotSchema;
   language: 'mr-IN' | 'hi-IN' | 'en-IN';
   onPlayVoice: (text: string) => void;
+  onUpdateSlots?: (updatedSlots: Partial<SlotSchema>) => void;
 }
 
 interface ChatMessage {
@@ -34,7 +35,8 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   decisionRecord,
   slots,
   language,
-  onPlayVoice
+  onPlayVoice,
+  onUpdateSlots
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>('');
@@ -52,11 +54,13 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
     const gain = decisionRecord?.chosen.gain_total?.toLocaleString('en-IN') || '2,095';
 
     if (language === 'mr-IN') {
-      return `नमस्कार! मी तुमचा कृषिमित्र AI सल्लागार आहे. सध्या ${qty} क्विंटल ${crop == 'Tomato' ? 'टोमॅटो' : 'कांदा'} साठी ${mandi} मध्ये ${action === 'WAIT' ? `२ दिवस थांबण्याचा सल्ला आहे, ज्यातून ₹${gain} जास्त नफा (एकूण ₹${net}) मिळू शकतो.` : 'आजच विक्री करण्याचा सल्ला आहे.'} बाजारभाव, वाहतूक खर्च किंवा धोक्यांविषयी काहीही विचारा!`;
+      const cropMr = crop === 'Tomato' ? 'टोमॅटो' : 'कांदा';
+      return `नमस्कार! मी आपला कृषिमित्र AI सल्लागार आहे. सध्या ${qty} क्विंटल ${cropMr} साठी ${mandi} मध्ये ${action === 'WAIT' ? `२ दिवस थांबण्याचा सल्ला आहे, ज्यातून ₹${gain} जास्त नफा (एकूण ₹${net}) मिळू शकतो.` : 'आजच विक्री करण्याचा सल्ला आहे.'} बाजारभाव, वाहतूक खर्च किंवा विक्री वेळेविषयी काहीही विचारा!`;
     } else if (language === 'hi-IN') {
-      return `नमस्ते! मैं आपका कृषिमित्र AI सलाहकार हूँ। आपके ${qty} क्विंटल ${crop == 'Tomato' ? 'टमाटर' : 'प्याज'} के लिए ${mandi} में ${action === 'WAIT' ? `2 दिन रुकने की सलाह है, जिससे ₹${gain} अतिरिक्त लाभ (कुल ₹${net}) होगा।` : 'आज ही बेचने की सलाह है।'} मंडी भाव या खर्चों के बारे में बेझिझक पूछें!`;
+      const cropHi = crop === 'Tomato' ? 'टमाटर' : 'प्याज';
+      return `नमस्ते! मैं आपका कृषिमित्र AI सलाहकार हूँ। आपके ${qty} क्विंटल ${cropHi} के लिए ${mandi} में ${action === 'WAIT' ? `2 दिन रुकने की सलाह है, जिससे ₹${gain} अतिरिक्त लाभ (कुल ₹${net}) होगा।` : 'आज ही बेचने की सलाह है।'} मंडी भाव या खर्चों के बारे में बेझिझक पूछें!`;
     }
-    return `Namaskar! I am your Krishi Mitra AI Advisor. For your ${qty} qtl ${crop} at ${mandi}, our engine recommends ${action === 'WAIT' ? `WAITING (+₹${gain} extra gain, ₹${net} net in hand).` : 'SELLING TODAY.'} Ask me anything about prices, transport costs, or risk!`;
+    return `Namaskar! I am your Krishi Mitra AI Advisor. For your ${qty} qtl ${crop} at ${mandi}, our engine recommends ${action === 'WAIT' ? `WAITING (+₹${gain} extra gain, ₹${net} net in hand).` : 'SELLING TODAY.'} Ask me anything about prices, transport costs, or selling window!`;
   };
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -70,7 +74,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
 
   // Update initial message when decision record changes
   useEffect(() => {
-    setMessages((prev) => [
+    setMessages([
       {
         id: `msg-${Date.now()}`,
         sender: 'assistant',
@@ -78,7 +82,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
-  }, [slots.commodity, slots.quantity, slots.home_mandi, decisionRecord?.chosen.net_total]);
+  }, [slots.commodity, slots.quantity, slots.home_mandi, decisionRecord?.chosen.net_total, language]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -113,17 +117,26 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
         }
       });
 
+      if (resp.slots && onUpdateSlots) {
+        onUpdateSlots({
+          commodity: resp.slots.commodity || slots.commodity,
+          quantity: resp.slots.quantity || slots.quantity,
+          home_mandi: resp.slots.home_mandi || slots.home_mandi,
+          requested_wait_days: resp.slots.requested_wait_days ?? slots.requested_wait_days
+        });
+      }
+
       const assistantMsg: ChatMessage = {
         id: `asst-${Date.now()}`,
         sender: 'assistant',
-        text: resp.assistant_text || resp.spoken_summary || 'I have analyzed your request based on deterministic mandi models.',
+        text: resp.assistant_text || resp.spoken_summary || 'I have analyzed your request based on verified mandi models.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (e) {
       // Fallback response with accurate local calculation context
       const fallbackText = language === 'mr-IN'
-        ? `आपल्या ${slots.quantity || 20} क्विंटल ${slots.commodity || 'टोमॅटो'} साठी निव्वळ नफा ₹${decisionRecord?.chosen.net_total?.toLocaleString('en-IN') || '36,055'} आहे. वाहतूक व हमाली वजा जाता हा हिशोब पूर्णपणे अचूक आहे.`
+        ? `आपल्या ${slots.quantity || 20} क्विंटल ${slots.commodity === 'Tomato' ? 'टोमॅटो' : 'कांदा'} साठी निव्वळ नफा ₹${decisionRecord?.chosen.net_total?.toLocaleString('en-IN') || '36,055'} आहे. वाहतूक व हमाली वजा जाता हा हिशोब पूर्णपणे अचूक आहे.`
         : `For your ${slots.quantity || 20} qtl ${slots.commodity || 'Tomato'}, expected net in-hand realization is ₹${decisionRecord?.chosen.net_total?.toLocaleString('en-IN') || '36,055'} after logistics and spoilage deductions.`;
 
       setMessages((prev) => [
@@ -143,7 +156,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   const handleVoiceInput = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser. Please type your query.');
+      alert(language === 'mr-IN' ? 'या ब्राउझरमध्ये आवाज ओळखणे समर्थित नाही. कृपया टाईप करा.' : 'Speech recognition is not supported in this browser. Please type your query.');
       return;
     }
 
@@ -167,24 +180,24 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
 
   const quickPrompts = [
     {
+      en: 'Should I sell onion today or tomorrow?',
+      hi: 'आज प्याज बेचूं या कल बेचने पर ज्यादा फायदा होगा?',
+      mr: 'आज कांदा विकू का उद्या विकला तर जास्त फायदा होईल?'
+    },
+    {
       en: 'Why wait instead of selling today?',
       hi: 'आज बेचने के बजाय रुकना क्यों सही है?',
       mr: 'आज न विकता थांबणे का फायद्याचे आहे?'
     },
     {
-      en: 'What are today prices in all mandis?',
-      hi: 'सभी मंडियों में आज का क्या भाव है?',
-      mr: 'सर्व बाजार समित्यांमध्ये आजचे भाव काय आहेत?'
+      en: 'What will my total expenses be?',
+      hi: 'मेरा कुल खर्च कितना होगा?',
+      mr: 'माझा एकूण खर्च किती होईल?'
     },
     {
       en: 'What is my reservation floor price?',
-      hi: 'न्यूनतम ब्रेक-इवन भाव क्या है?',
-      mr: 'माझा किमान हमी भाव (Reservation Price) काय आहे?'
-    },
-    {
-      en: 'How much are transport & handling costs?',
-      hi: 'गाड़ी भाड़ा और हमाली कितनी लगेगी?',
-      mr: 'गाडी भाडे आणि हमाली किती वजा होईल?'
+      hi: 'न्यूनतम आरक्षण भाव क्या है?',
+      mr: 'माझा किमान आरक्षण हमी भाव काय आहे?'
     }
   ];
 

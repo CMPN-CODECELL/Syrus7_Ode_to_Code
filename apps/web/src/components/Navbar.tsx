@@ -36,23 +36,23 @@ export const Navbar: React.FC<Props> = ({
   labels,
   wsStatus = 'connected'
 }) => {
-  // Clear, intuitive tabs that any user understands at a glance
+  // Clear, intuitive tabs localized cleanly without hybrid strings
   const farmerTabs = [
     {
       id: 'advice',
-      label: '📈 Market Advice'
+      label: language === 'mr-IN' ? '📈 बाजार सल्ला' : language === 'hi-IN' ? '📈 मंडी सलाह' : '📈 Market Advice'
     },
     {
       id: 'simulator',
-      label: '🧪 What-If Planner'
+      label: language === 'mr-IN' ? '🧪 काय घडेल नियोजन' : language === 'hi-IN' ? '🧪 क्या होगा अगर' : '🧪 What-If Planner'
     },
     {
       id: 'costs',
-      label: '💰 Expense Bill'
+      label: language === 'mr-IN' ? '💰 खर्च पावती' : language === 'hi-IN' ? '💰 खर्च रसीद' : '💰 Expense Bill'
     },
     {
       id: 'farm',
-      label: '🌾 My Farm'
+      label: language === 'mr-IN' ? '🌾 माझे शेत' : language === 'hi-IN' ? '🌾 मेरा खेत' : '🌾 My Farm'
     }
   ];
 
@@ -74,7 +74,11 @@ export const Navbar: React.FC<Props> = ({
                 KrishiNirnay
               </span>
               <p className="text-[11px] text-emerald-800 font-medium hidden sm:block">
-                “Sahi Bhav Se, Samriddhi Ki Raah Pe.”
+                {language === 'mr-IN'
+                  ? 'योग्य भावात, समृद्धीच्या वाटेवर.'
+                  : language === 'hi-IN'
+                  ? 'सही भाव से, समृद्धि की राह पे.'
+                  : 'Sahi Bhav Se, Samriddhi Ki Raah Pe.'}
               </p>
             </div>
           </button>
@@ -97,34 +101,50 @@ export const Navbar: React.FC<Props> = ({
             {/* Live WebSocket Status Pill */}
             <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 text-[11px] font-bold text-emerald-900 shadow-2xs">
               <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : wsStatus === 'connecting' ? 'bg-amber-500 animate-ping' : 'bg-red-400'}`}></span>
-              <span className="hidden sm:inline font-mono">{wsStatus === 'connected' ? 'Live Stream' : 'Connecting...'}</span>
+              <span className="hidden sm:inline font-mono">
+                {wsStatus === 'connected'
+                  ? language === 'mr-IN'
+                    ? 'थेट बाजार प्रवाह'
+                    : language === 'hi-IN'
+                    ? 'लाइव स्ट्रीम'
+                    : 'Live Stream'
+                  : 'Connecting...'}
+              </span>
             </div>
 
-            {/* Language Selector (मराठी | हिंदी | EN) */}
-            <div className="flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 text-xs">
+            {/* Prominent, Persistent Language Selector [ 🇮🇳 मराठी | 🌐 English ] */}
+            <div className="flex items-center bg-emerald-50/90 rounded-2xl p-1 border-2 border-emerald-300 shadow-xs text-xs">
               <button
                 onClick={() => setLanguage('mr-IN')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                  language === 'mr-IN' ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                className={`px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1 ${
+                  language === 'mr-IN'
+                    ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-600'
+                    : 'text-emerald-900 hover:bg-emerald-100'
                 }`}
               >
-                मराठी
+                <span>🇮🇳</span>
+                <span>मराठी</span>
               </button>
               <button
                 onClick={() => setLanguage('hi-IN')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                  language === 'hi-IN' ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                className={`px-2 py-1 rounded-xl text-xs font-bold transition-all ${
+                  language === 'hi-IN'
+                    ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-600'
+                    : 'text-emerald-800 hover:bg-emerald-100'
                 }`}
               >
                 हिंदी
               </button>
               <button
                 onClick={() => setLanguage('en-IN')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                  language === 'en-IN' ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                className={`px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1 ${
+                  language === 'en-IN'
+                    ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-600'
+                    : 'text-emerald-900 hover:bg-emerald-100'
                 }`}
               >
-                EN
+                <span>🌐</span>
+                <span>English</span>
               </button>
             </div>
 
@@ -144,7 +164,7 @@ export const Navbar: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* 3 Main Farmer Tabs */}
+        {/* 4 Main Farmer Tabs */}
         <nav className="flex items-center space-x-2 py-2 border-t border-emerald-50">
           {farmerTabs.map((t) => (
             <button

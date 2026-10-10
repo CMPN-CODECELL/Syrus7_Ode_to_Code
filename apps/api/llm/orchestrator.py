@@ -33,6 +33,22 @@ class Orchestrator:
         new_slots = AgriculturalGlossary.extract_semantic_slots(req.message, session.active_slots)
         if req.risk_profile_override:
             new_slots.risk_profile = req.risk_profile_override
+
+        # Populate missing slots from active UI context if provided
+        if req.context:
+            if not new_slots.commodity and req.context.get("crop"):
+                new_slots.commodity = req.context.get("crop")
+            if new_slots.quantity is None and req.context.get("quantity"):
+                try:
+                    new_slots.quantity = float(req.context.get("quantity"))
+                except (ValueError, TypeError):
+                    pass
+            if not new_slots.home_mandi and req.context.get("mandi"):
+                new_slots.home_mandi = req.context.get("mandi")
+            if new_slots.commodity and new_slots.quantity is not None and new_slots.home_mandi:
+                new_slots.is_complete = True
+                new_slots.missing_slots = [s for s in new_slots.missing_slots if s not in ["commodity", "quantity", "home_mandi"]]
+
         active_slots = session.update_slots(new_slots)
 
         # 2. Check for missing or ambiguous critical slots
@@ -86,7 +102,7 @@ class Orchestrator:
         commodity = active_slots.commodity or "Tomato"
         qty = active_slots.quantity or 20.0
         mandi = active_slots.home_mandi or "Nashik APMC"
-        wait_days = active_slots.requested_wait_days or 2
+        wait_days = active_slots.requested_wait_days if active_slots.requested_wait_days is not None else 2
         risk_profile = active_slots.risk_profile or "BALANCED"
 
         decision_record = tool_analyze_sale_decision(
@@ -98,9 +114,39 @@ class Orchestrator:
         )
         session.set_last_decision(decision_record)
 
-        # 4. Generate deterministic reference text and spoken summary
-        deterministic_text = DeterministicTemplates.render_recommendation(decision_record, lang)
-        spoken_summary = DeterministicTemplates.render_spoken_summary(decision_record, lang)
+        # 4. Detect specific query intents (e.g. today vs tomorrow comparison, expenses breakdown)
+        msg_lower = req.message.lower()
+        is_comparison = (
+            ("आज" in msg_lower and ("उद्या" in msg_lower or "थांबू" in msg_lower or "विकू का" in msg_lower or "फायदा" in msg_lower)) or
+            ("today" in msg_lower and ("tomorrow" in msg_lower or "wait" in msg_lower or "profit" in msg_lower)) or
+            ("आज" in msg_lower and ("कल" in msg_lower or "रुकें" in msg_lower))
+        )
+        is_expense_query = (
+            any(w in msg_lower for w in ["खर्च", "भाडं", "भाडे", "हमाली", "बिल", "तोलाई"]) or
+            any(w in msg_lower for w in ["cost", "expense", "bill", "transport charge", "hamali", "breakdown"])
+        )
+
+        if is_comparison:
+            deterministic_text = DeterministicTemplates.render_comparison(decision_record, lang)
+            gain_val = int(decision_record.chosen.gain_total)
+            if lang == "mr-IN":
+                spoken_summary = f"आज विकण्यापेक्षा {decision_record.chosen.wait_days} दिवस थांबल्यास अंदाजे {gain_val:,} रुपये जास्त फायदा होईल."
+            elif lang == "hi-IN":
+                spoken_summary = f"आज बेचने के बजाय {decision_record.chosen.wait_days} दिन रुकने पर {gain_val:,} रुपये अतिरिक्त लाभ होगा।"
+            else:
+                spoken_summary = f"Waiting {decision_record.chosen.wait_days} days yields {gain_val:,} rupees higher net profit than selling today."
+        elif is_expense_query:
+            deterministic_text = DeterministicTemplates.render_expenses(decision_record, lang)
+            cost_val = int(decision_record.chosen.cost_breakdown.transport + decision_record.chosen.cost_breakdown.hamali_tolai + decision_record.chosen.cost_breakdown.storage)
+            if lang == "mr-IN":
+                spoken_summary = f"वाहतूक, हमाली आणि साठवणूक असा एकूण प्रत्यक्ष खर्च {cost_val:,} रुपये आहे."
+            elif lang == "hi-IN":
+                spoken_summary = f"परिवहन, हम्माली और भंडारण का कुल खर्च {cost_val:,} रुपये है।"
+            else:
+                spoken_summary = f"Total direct logistics and storage cost is {cost_val:,} rupees."
+        else:
+            deterministic_text = DeterministicTemplates.render_recommendation(decision_record, lang)
+            spoken_summary = DeterministicTemplates.render_spoken_summary(decision_record, lang)
 
         # 5. For follow-up conversational queries or conversational styling, attempt LLM
         fallback_path = "TEMPLATE"

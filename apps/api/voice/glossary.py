@@ -160,10 +160,17 @@ class AgriculturalGlossary:
                 if "कट्टा / पोतं वजन" not in slots.ambiguous_slots:
                     slots.ambiguous_slots.append("कट्टा / पोतं वजन (एका पोत्याचे वजन किती किलो आहे?)")
 
-        # 4. Check wait days if mentioned separately
+        # 4. Check wait days: explicit numbers or relative days
         day_match = re.search(r'(\d+)\s*(?:दिवस|day|days|दिन)', ascii_text)
         if day_match:
             slots.requested_wait_days = int(day_match.group(1))
+        elif "उद्या" in lower_text or "tomorrow" in lower_text or "कल" in lower_text:
+            slots.requested_wait_days = 1
+        elif "परवा" in lower_text or "day after tomorrow" in lower_text or "परसों" in lower_text:
+            slots.requested_wait_days = 2
+        elif "आज" in lower_text or "today" in lower_text or "आजच" in lower_text:
+            if "उद्या" not in lower_text and "tomorrow" not in lower_text:
+                slots.requested_wait_days = 0
 
         # Check completeness
         slots.missing_slots = []

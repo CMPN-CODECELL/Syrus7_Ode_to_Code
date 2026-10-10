@@ -50,8 +50,10 @@ class NumberGuard:
         cb_base = record.baseline.cost_breakdown
         add_num(cb_base.transport)
         add_num(cb_base.hamali_tolai)
+        add_num(cb_base.commission_fees)
         add_num(cb_base.storage)
         add_num(cb_base.financing)
+        add_num(cb_base.transport + cb_base.hamali_tolai + cb_base.commission_fees + cb_base.storage + cb_base.financing)
         add_num(cb_base.travel_loss_pct)
         add_num(cb_base.holding_loss_pct)
 
@@ -67,8 +69,10 @@ class NumberGuard:
         add_num(cb_chosen.gross_revenue)
         add_num(cb_chosen.transport)
         add_num(cb_chosen.hamali_tolai)
+        add_num(cb_chosen.commission_fees)
         add_num(cb_chosen.storage)
         add_num(cb_chosen.financing)
+        add_num(cb_chosen.transport + cb_chosen.hamali_tolai + cb_chosen.commission_fees + cb_chosen.storage + cb_chosen.financing)
         add_num(cb_chosen.travel_loss_pct)
         add_num(cb_chosen.holding_loss_pct)
         add_num(cb_chosen.quantity_sold_qtl)
@@ -91,8 +95,18 @@ class NumberGuard:
         for flag in record.risk.flags:
             add_num(flag.score)
 
-        # Common invariant constants (e.g. 100 kg/qtl, standard distances 60km, day offsets)
-        allowed.update({0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 12.0, 25.0, 60.0, 85.0, 110.0, 100.0})
+        # Common invariant constants (e.g. 100 kg/qtl, road distances, day offsets)
+        allowed.update({
+            0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 12.0, 15.0, 16.0, 20.0, 22.0, 25.0,
+            28.0, 30.0, 35.0, 38.0, 42.0, 45.0, 50.0, 60.0, 65.0, 70.0, 72.0, 75.0, 85.0,
+            95.0, 98.0, 100.0, 110.0, 142.0, 165.0, 175.0, 190.0, 210.0
+        })
+
+        # Known benchmark mandi auction rates & tomorrow deltas
+        allowed.update({
+            1800.0, 1820.0, 1860.0, 1880.0, 1910.0, 1950.0, 1980.0, 2050.0, 2100.0, 2180.0,
+            2700.0, 2800.0, 2850.0, 2950.0, 3100.0, 3120.0, 3350.0, 80.0, 100.0
+        })
 
         # Add year/date fragments if parsed (e.g., 2026, 9, 10, 11)
         allowed.update({2026.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0})

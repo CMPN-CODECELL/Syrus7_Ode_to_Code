@@ -78,23 +78,82 @@ export class ApiClient {
     }
   }
 
-  static async getWeatherImpact(crop: string = 'Tomato', mandi: string = 'Nashik APMC'): Promise<WeatherImpactResponse> {
+  static async getWeatherImpact(
+    crop: string = 'Tomato',
+    mandi: string = 'Nashik APMC',
+    location: string = 'Default Catchment'
+  ): Promise<WeatherImpactResponse> {
     try {
-      const res = await fetch(`${API_BASE}/api/weather-impact?crop=${encodeURIComponent(crop)}&mandi=${encodeURIComponent(mandi)}`);
+      const res = await fetch(
+        `${API_BASE}/api/weather-impact?crop=${encodeURIComponent(crop)}&mandi=${encodeURIComponent(mandi)}&location=${encodeURIComponent(location)}`
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (e) {
+      const isDindori = location.toLowerCase().includes('dindori');
+      const isSinnar = location.toLowerCase().includes('sinnar');
+      const isNiphad = location.toLowerCase().includes('niphad');
+      const isSangamner = location.toLowerCase().includes('sangamner');
+      const isOnion = crop.toLowerCase().includes('onion');
+
+      let temp = 28.4;
+      let humidity = 78;
+      let rain = 18.0;
+      let alert = 'YELLOW';
+      let roadLabel = 'Wet Approaches (+20% Travel Time)';
+      let roadLabelMr = 'ओले रस्ते (+२०% वेळ)';
+      let summary = 'IMD Yellow Alert: Moderate rain (18mm) expected over Day 1 night to Day 2.';
+      let summaryMr = 'हवामान खात्याचा यलो अलर्ट: मध्य नाशिक पट्ट्यात मध्यम पाऊस व मेघगर्जनेची शक्यता.';
+
+      if (isDindori) {
+        temp = 25.8; humidity = 86; rain = 26.5; roadLabel = 'Slippery Ghat Tracks (+30% Time)'; roadLabelMr = 'निसरडे घाट रस्ते (+३०% वेळ)';
+        summary = 'Foothill rainfall alert: 26.5mm heavy showers along Western Ghats foothills.';
+        summaryMr = 'सह्याद्री पायथा पाऊस इशारा: २६.५ मिमी मुसळधार सरी व थंड हवामान संभवते.';
+      } else if (isNiphad) {
+        temp = 27.6; humidity = 82; rain = 22.0; roadLabel = 'Flooded Approach Roads (+25% Time)'; roadLabelMr = 'पाणथळ रस्ते (+२५% वेळ)';
+        summary = 'River basin high-moisture alert: 22mm rainfall expected with persistent morning humidity.';
+        summaryMr = 'गोदावरी खोरे उच्च आर्द्रता इशारा: २२ मिमी पाऊस व सकाळी धुके/दमट हवामान संभवते.';
+      } else if (isSinnar) {
+        temp = 30.5; humidity = 58; rain = 6.5; alert = 'GREEN'; roadLabel = 'Dry Highway Network (+5% Time)'; roadLabelMr = 'कोरडे महामार्ग (+५% वेळ)';
+        summary = 'Isolated light drizzle (6.5mm) on leeward plateau; clear road haulage conditions.';
+        summaryMr = 'पठारावर हलकी रिमझिम (६.५ मिमी); वाहतुकीसाठी हवामान पूर्णपणे अनुकूल.';
+      } else if (isSangamner) {
+        temp = 31.0; humidity = 62; rain = 8.0; alert = 'GREEN'; roadLabel = 'Clear State Highway (+8% Time)'; roadLabelMr = 'स्वच्छ राज्य महामार्ग (+८% वेळ)';
+        summary = 'Warm semi-arid conditions (31°C) with light scattered showers (8mm).';
+        summaryMr = 'उबदार हवामान (३१° से) आणि तुरळक पावसाच्या सरी (८ मिमी).';
+      }
+
       return {
-        district: 'Nashik Agricultural Belt',
-        temperature_c: 28.4,
-        humidity_pct: 78,
-        rainfall_forecast_mm: 18.0,
-        alert_level: 'YELLOW',
-        weather_summary: 'IMD Yellow Alert: Moderate rain (18mm) expected over Day 1 night to Day 2.',
-        price_impact_direction: 'UPWARD_SHORT_TERM',
-        harvest_disruption: 'Wet fields slow picking labor and transport loading by ~25%.',
-        storage_spoilage_risk: 'High humidity causes fungal softening; holding decay increases to 2%/day.',
-        recommended_action: 'Harvest and sell on Saturday or use covered tarpaulin transport.'
+        district: `${location} Agricultural Belt`,
+        location,
+        temperature_c: temp,
+        humidity_pct: humidity,
+        rainfall_forecast_mm: rain,
+        wind_speed_kmh: 14.0,
+        road_condition_label: roadLabel,
+        road_slowdown_pct: alert === 'GREEN' ? 5 : 20,
+        alert_level: alert,
+        weather_summary: summary,
+        price_impact_direction: rain > 10 ? 'UPWARD_SHORT_TERM' : 'STABLE',
+        harvest_disruption: isOnion
+          ? `Rain of ${rain}mm delays field lifting; wet topsoil must dry before harvesting.`
+          : 'Wet fields slow picking labor and transport loading by ~25%.',
+        storage_spoilage_risk: isOnion
+          ? `Elevated humidity (${humidity}%) risks neck-rot in open field piles (0.4%/day). Ventilated bamboo chawls keep loss safe at 0.2%/day.`
+          : `High humidity (${humidity}%) causes fruit fungal softening; perishable crate decay doubles to 2.0%/day.`,
+        recommended_action: isOnion
+          ? `Store in elevated ventilated chawls. Tie down waterproof tarpaulins against ${rain}mm rainfall.`
+          : 'Harvest and sell on Saturday (Day 1) or transport in covered crates early Sunday.',
+        weather_summary_mr: summaryMr,
+        harvest_disruption_mr: isOnion
+          ? `${rain} मिमी पावसामुळे शेतातील कांदा काढणी लांबणीवर पडेल; जमीन सुकेपर्यंत काढणी थांबवा.`
+          : 'पावसामुळे शेतात चिखल होऊन तोडणी २५% लांबेल; बाजारात सकाळची आवक घटल्याने भावात तात्पुरती वाढ होईल.',
+        storage_spoilage_risk_mr: isOnion
+          ? `हवेतील दमटपणामुळे (${humidity}%) उघड्या ढिगाऱ्यात सड लागण्याची भीती आहे. हवेशीर चाळीत साठवणूक नुकसान ०.२%/दिवस इतके नियंत्रित राहते.`
+          : `जास्त आर्द्रतेमुळे (${humidity}%) टोमॅटो मऊ पडून नासण्याची शक्यता वाढते; क्रेटमधील नासाडी २%/दिवस होते.`,
+        recommended_action_mr: isOnion
+          ? `कांदा हवेशीर चाळीत सुरक्षित ठेवा. ${rain} मिमी पावसापासून संरक्षणासाठी ताडपत्री बांधून माल बाजारात पाठवा.`
+          : 'पावसापूर्वी तोडणी करून माल शनिवारीच विका किंवा रविवारी सकाळी प्लास्टिक क्रेट्सवर ताडपत्री झाकून विक्री करा.'
       };
     }
   }

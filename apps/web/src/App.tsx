@@ -52,7 +52,7 @@ export const App: React.FC = () => {
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isJudgeModalOpen, setIsJudgeModalOpen] = useState<boolean>(false);
-  const [judgeSubTab, setJudgeSubTab] = useState<'heatmap' | 'forecast' | 'history' | 'scenarios' | 'ai'>('heatmap');
+  const [judgeSubTab, setJudgeSubTab] = useState<'heatmap' | 'forecast' | 'history' | 'scenarios'>('heatmap');
   const [loading, setLoading] = useState<boolean>(true);
 
   const [currentSlots, setCurrentSlots] = useState<SlotSchema>({
@@ -152,7 +152,19 @@ export const App: React.FC = () => {
     loadDecisionData(updated, riskProfile);
   };
 
-  const lotSummary = `${currentSlots.quantity || 20} ${currentSlots.quantity_unit || 'qtl'} ${currentSlots.commodity || 'Tomato'} • ${currentSlots.home_mandi || 'Nashik APMC'}`;
+  const handleUpdateSlots = (updated: Partial<SlotSchema>) => {
+    const newSlots = { ...currentSlots, ...updated };
+    setCurrentSlots(newSlots);
+    const newRisk = (updated.risk_profile as any) || riskProfile;
+    if (updated.risk_profile && updated.risk_profile !== riskProfile) {
+      setRiskProfile(newRisk);
+    }
+    loadDecisionData(newSlots, newRisk);
+  };
+
+  const lotSummary = language === 'mr-IN'
+    ? `${currentSlots.quantity || 20} क्विंटल ${currentSlots.commodity === 'Tomato' ? 'टोमॅटो' : 'कांदा'} • ${currentSlots.home_mandi ? currentSlots.home_mandi.replace(' APMC', ' बाजार समिती') : 'नाशिक बाजार समिती'}`
+    : `${currentSlots.quantity || 20} qtl ${currentSlots.commodity || 'Tomato'} • ${currentSlots.home_mandi || 'Nashik APMC'}`;
 
   // Welcome Screen (Fast, clean, no video loop)
   if (showLanding) {
@@ -203,15 +215,7 @@ export const App: React.FC = () => {
               <DecisionScreen
                 record={decisionRecord}
                 slots={currentSlots}
-                onUpdateSlots={(updated) => {
-                  const newSlots = { ...currentSlots, ...updated };
-                  setCurrentSlots(newSlots);
-                  const newRisk = (updated.risk_profile as any) || riskProfile;
-                  if (updated.risk_profile && updated.risk_profile !== riskProfile) {
-                    setRiskProfile(newRisk);
-                  }
-                  loadDecisionData(newSlots, newRisk);
-                }}
+                onUpdateSlots={handleUpdateSlots}
                 onPlayVoice={handlePlayVoice}
                 onOpenCosts={() => setActiveTab('costs')}
                 onOpenScenarios={() => setActiveTab('simulator')}
@@ -300,10 +304,18 @@ export const App: React.FC = () => {
               <div>
                 <h3 className="font-black text-sm sm:text-base flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-emerald-400" />
-                  <span>सखोल तांत्रिक अहवाल (Judge & Expert Analytics)</span>
+                  <span>
+                    {language === 'mr-IN'
+                      ? 'सखोल तांत्रिक अहवाल (तज्ज्ञ व परीक्षक साधन)'
+                      : language === 'hi-IN'
+                      ? 'विशेषज्ञ व निर्णायक तकनीकी रिपोर्ट'
+                      : 'Judge & Expert Analytics Engine'}
+                  </span>
                 </h3>
                 <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                  100% Verified PS2 Engine: XGBoost Conformal, 3×7 Matrix, Sequential Losses & Failure Circuit Breakers
+                  {language === 'mr-IN'
+                    ? '१००% प्रमाणित निर्णय इंजिन: XGBoost कॉन्फॉर्मल अंदाज, ३×७ नफा मॅट्रिक्स, क्रमिक नासाडी व फॉलबॅक सुरक्षा'
+                    : '100% Verified Engine: XGBoost Conformal, 3×7 Matrix, Sequential Losses & Circuit Breakers'}
                 </p>
               </div>
               <button
@@ -321,14 +333,29 @@ export const App: React.FC = () => {
               demoStatus={demoStatus}
             />
 
-            {/* Expert Sub-tabs */}
+            {/* Expert Sub-tabs (Clean 4 Analytics views; persistent Floating AI Assistant handles conversation) */}
             <div className="flex items-center gap-2 p-3 bg-slate-100 border-b border-slate-200 overflow-x-auto">
               {[
-                { id: 'heatmap', label: '3×7 Heatmap', icon: Calendar },
-                { id: 'forecast', label: 'XGBoost Forecast', icon: TrendingUp },
-                { id: 'history', label: 'Historical Trend', icon: History },
-                { id: 'scenarios', label: 'What-If Simulator', icon: Sliders },
-                { id: 'ai', label: 'AI Voice Expert', icon: Bot },
+                {
+                  id: 'heatmap',
+                  label: language === 'mr-IN' ? '३×७ नफा मॅट्रिक्स' : language === 'hi-IN' ? '3×7 मैट्रिक्स' : '3×7 Heatmap',
+                  icon: Calendar
+                },
+                {
+                  id: 'forecast',
+                  label: language === 'mr-IN' ? 'XGBoost भाव अंदाज' : language === 'hi-IN' ? 'XGBoost पूर्वानुमान' : 'XGBoost Forecast',
+                  icon: TrendingUp
+                },
+                {
+                  id: 'history',
+                  label: language === 'mr-IN' ? 'ऐतिहासिक भाव कल' : language === 'hi-IN' ? 'ऐतिहासिक रुझान' : 'Historical Trend',
+                  icon: History
+                },
+                {
+                  id: 'scenarios',
+                  label: language === 'mr-IN' ? 'काय घडेल नियोजन' : language === 'hi-IN' ? 'क्या होगा अगर' : 'What-If Simulator',
+                  icon: Sliders
+                }
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isSel = judgeSubTab === tab.id;
@@ -374,13 +401,6 @@ export const App: React.FC = () => {
                   labels={labels}
                 />
               )}
-              {judgeSubTab === 'ai' && (
-                <AssistantScreen
-                  language={language}
-                  labels={labels}
-                  onPlayVoice={handlePlayVoice}
-                />
-              )}
             </div>
           </div>
         </div>
@@ -412,6 +432,9 @@ export const App: React.FC = () => {
         slots={currentSlots}
         language={language}
         onPlayVoice={handlePlayVoice}
+        onUpdateSlots={(updated) => {
+          handleUpdateSlots(updated);
+        }}
       />
     </div>
   );

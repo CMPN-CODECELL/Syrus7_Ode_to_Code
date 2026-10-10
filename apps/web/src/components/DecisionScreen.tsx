@@ -23,7 +23,9 @@ import {
   Check,
   Navigation
 } from 'lucide-react';
-import { DecisionRecord, SlotSchema } from '../types';
+import { DecisionRecord, SlotSchema, WeatherImpactResponse } from '../types';
+import { ApiClient } from '../api/client';
+import { localizeCrop, localizeMandi, formatCurrency } from '../localization/translator';
 
 interface DecisionScreenProps {
   record: DecisionRecord | null;
@@ -63,8 +65,8 @@ export const FARM_LOCATIONS: Record<
   },
   'Niphad': {
     id: 'Niphad',
-    name: 'Niphad Taluka (निफाड - Onion Heartland)',
-    label: { en: 'Niphad Taluka (निफाड)', mr: 'निफाड तालुका (कांदा पट्टा)', hi: 'निफाड तहसील (प्याज बेल्ट)' },
+    name: 'Niphad Taluka',
+    label: { en: 'Niphad Taluka (Onion Heartland)', mr: 'निफाड तालुका (कांदा पट्टा)', hi: 'निफाड तहसील (प्याज बेल्ट)' },
     taluka: 'Niphad',
     distances: {
       'Nashik APMC': 38,
@@ -74,8 +76,8 @@ export const FARM_LOCATIONS: Record<
   },
   'Dindori': {
     id: 'Dindori',
-    name: 'Dindori Taluka (दिंडोरी - Tomato Belt)',
-    label: { en: 'Dindori Taluka (दिंडोरी)', mr: 'दिंडोरी तालुका (टोमॅटो पट्टा)', hi: 'दिंडोरी तहसील (टमाटर बेल्ट)' },
+    name: 'Dindori Taluka',
+    label: { en: 'Dindori Taluka (Tomato Belt)', mr: 'दिंडोरी तालुका (टोमॅटो पट्टा)', hi: 'दिंडोरी तहसील (टमाटर बेल्ट)' },
     taluka: 'Dindori',
     distances: {
       'Nashik APMC': 28,
@@ -85,8 +87,8 @@ export const FARM_LOCATIONS: Record<
   },
   'Nashik Rural': {
     id: 'Nashik Rural',
-    name: 'Nashik Rural (नाशिक ग्रामीण)',
-    label: { en: 'Nashik Rural (नाशिक ग्रामीण)', mr: 'नाशिक ग्रामीण परिसर', hi: 'नासिक ग्रामीण क्षेत्र' },
+    name: 'Nashik Rural',
+    label: { en: 'Nashik Rural', mr: 'नाशिक ग्रामीण परिसर', hi: 'नासिक ग्रामीण क्षेत्र' },
     taluka: 'Nashik Rural',
     distances: {
       'Nashik APMC': 15,
@@ -96,8 +98,8 @@ export const FARM_LOCATIONS: Record<
   },
   'Sinnar': {
     id: 'Sinnar',
-    name: 'Sinnar Taluka (सिन्नर)',
-    label: { en: 'Sinnar Taluka (सिन्नर)', mr: 'सिन्नर तालुका', hi: 'सिन्नर तहसील' },
+    name: 'Sinnar Taluka',
+    label: { en: 'Sinnar Taluka', mr: 'सिन्नर तालुका', hi: 'सिन्नर तहसील' },
     taluka: 'Sinnar',
     distances: {
       'Nashik APMC': 30,
@@ -107,8 +109,8 @@ export const FARM_LOCATIONS: Record<
   },
   'Sangamner Rural': {
     id: 'Sangamner Rural',
-    name: 'Sangamner Rural (संगमनेर ग्रामीण)',
-    label: { en: 'Sangamner Rural (संगमनेर ग्रामीण)', mr: 'संगमनेर ग्रामीण परिसर', hi: 'संगमनेर ग्रामीण क्षेत्र' },
+    name: 'Sangamner Rural',
+    label: { en: 'Sangamner Rural', mr: 'संगमनेर ग्रामीण परिसर', hi: 'संगमनेर ग्रामीण क्षेत्र' },
     taluka: 'Sangamner',
     distances: {
       'Nashik APMC': 72,
@@ -168,8 +170,8 @@ export const COMMODITY_PROFILES: Record<
     defaultHoldingLoss: 0.002, // 0.2% per day
     travelLoss: 0.003, // 0.3%
     storages: [
-      { id: 'open', name: 'Field Stack (ओपन ढीग)', lossPerDay: 0.006, desc: 'Direct moisture exposure (0.6%/d)' },
-      { id: 'crates', name: 'Ventilated Chawl (कांदा चाळ)', lossPerDay: 0.002, desc: 'Aerated traditional chawl (0.2%/d)' },
+      { id: 'open', name: 'Field Stack', lossPerDay: 0.006, desc: 'Direct moisture exposure (0.6%/d)' },
+      { id: 'crates', name: 'Ventilated Traditional Chawl', lossPerDay: 0.002, desc: 'Aerated traditional chawl (0.2%/d)' },
       { id: 'cold', name: 'Controlled Storage', lossPerDay: 0.001, desc: 'Low moisture environment (0.1%/d)' }
     ]
   }
@@ -208,6 +210,20 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
   const [selectedStorage, setSelectedStorage] = useState<string>('crates');
   const [selectedWaitDays, setSelectedWaitDays] = useState<number>(slots?.requested_wait_days ?? 2);
   const [showInputPanel, setShowInputPanel] = useState<boolean>(true);
+  const [weatherData, setWeatherData] = useState<WeatherImpactResponse | null>(null);
+
+  // Dynamically fetch microclimate observations for catchment location and crop
+  useEffect(() => {
+    let isMounted = true;
+    ApiClient.getWeatherImpact(selectedCrop, selectedMandi, selectedFarmLocation)
+      .then((data) => {
+        if (isMounted) setWeatherData(data);
+      })
+      .catch((err) => console.warn('Weather fetch error:', err));
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCrop, selectedMandi, selectedFarmLocation]);
 
   // Sync when parent slots change
   useEffect(() => {
@@ -251,9 +267,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
     ? 0
     : Math.round(activeVehicle.ratePerKm * distanceKm * activeVehicle.roundTripFactor * vehicleTrips);
 
-  // Road journey travel time
-  const isRainForecast = true; // 18mm rain alert in Nashik
-  const weatherTimeFactor = isRainForecast ? 1.2 : 1.0;
+  // Road journey travel time derived from microclimate slowdown
+  const weatherSlowdown = weatherData?.road_slowdown_pct ?? 20;
+  const weatherTimeFactor = 1.0 + (weatherSlowdown / 100.0);
   const oneWayMinutes = Math.round((distanceKm / activeVehicle.avgSpeedKmH) * 60 * weatherTimeFactor);
   const roundTripHours = ((oneWayMinutes * 2) / 60).toFixed(1);
 
@@ -423,7 +439,11 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
 
   // Spoken voice summary
   const spokenText = isWait
-    ? `Wait ${selectedWaitDays} days. For your ${selectedQuantity} quintal ${selectedCrop} at ${selectedMandi}, estimated net realization is ₹${calculatedWaitNet.toLocaleString('en-IN')}, which is ₹${calculatedGain.toLocaleString('en-IN')} higher than selling today. Minimum reservation price is ₹${calculatedReservation} per quintal.`
+    ? language === 'mr-IN'
+      ? `${selectedWaitDays} दिवस थांबा. आपल्या ${selectedQuantity} क्विंटल ${selectedCrop === 'Tomato' ? 'टोमॅटो' : 'कांदा'} साठी ${selectedMandi} मध्ये अंदाजे ₹${calculatedWaitNet.toLocaleString('en-IN')} निव्वळ नफा मिळेल, जो आजपेक्षा ₹${calculatedGain.toLocaleString('en-IN')} जास्त आहे. किमान आरक्षण भाव ₹${calculatedReservation} प्रति क्विंटल आहे.`
+      : `Wait ${selectedWaitDays} days. For your ${selectedQuantity} quintal ${selectedCrop} at ${selectedMandi}, estimated net realization is ₹${calculatedWaitNet.toLocaleString('en-IN')}, which is ₹${calculatedGain.toLocaleString('en-IN')} higher than selling today. Minimum reservation price is ₹${calculatedReservation} per quintal.`
+    : language === 'mr-IN'
+    ? `आजच ${selectedMandi} मध्ये विक्री करा. अंदाजे निव्वळ नफा ₹${calculatedBaselineNet.toLocaleString('en-IN')} आहे.`
     : `Sell today at ${selectedMandi}. Estimated net realization is ₹${calculatedBaselineNet.toLocaleString('en-IN')}.`;
 
   return (
@@ -478,12 +498,26 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
             {/* Row 1: Crop Selection (Tomato & Onion ONLY) */}
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                1. Select Commodity / Crop (Scope: Tomato & Onion)
+                {language === 'mr-IN'
+                  ? '१. शेतीमाल / पीक निवडा (केवळ टोमॅटो आणि कांदा)'
+                  : language === 'hi-IN'
+                  ? '1. फसल चुनें (टमाटर और प्याज)'
+                  : '1. Select Commodity / Crop (Scope: Tomato & Onion)'}
               </span>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 {[
-                  { id: 'Tomato', name: 'Tomato (टोमॅटो)', icon: '🍅', desc: 'Perishable • Crates • ₹1,800/qtl' },
-                  { id: 'Onion', name: 'Onion (कांदा)', icon: '🧅', desc: 'Durable • Chawl • ₹2,700/qtl' }
+                  {
+                    id: 'Tomato',
+                    name: language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato',
+                    icon: '🍅',
+                    desc: language === 'mr-IN' ? 'नाशवंत माल • प्लास्टिक क्रेट्स • ₹१,८००/क्विंटल' : 'Perishable • Crates • ₹1,800/qtl'
+                  },
+                  {
+                    id: 'Onion',
+                    name: language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion',
+                    icon: '🧅',
+                    desc: language === 'mr-IN' ? 'टिकाऊ माल • हवेशीर चाळ • ₹२,७००/क्विंटल' : 'Durable • Chawl • ₹2,700/qtl'
+                  }
                 ].map((c) => (
                   <button
                     key={c.id}
@@ -795,7 +829,15 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider text-white">
             <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
-            {isDay4Closed
+            {language === 'mr-IN'
+              ? isDay4Closed
+                ? '🛑 बाजार बंद: माल पाठवू नका'
+                : isWait
+                ? '🟢 सर्वोत्तम निर्णय: थांबा'
+                : isGo
+                ? '🔵 सर्वोत्तम निर्णय: दुसऱ्या बाजारात जा'
+                : '🟡 सर्वोत्तम निर्णय: आजच विका'
+              : isDay4Closed
               ? '🛑 MARKET CLOSED: DO NOT DISPATCH'
               : isWait
               ? '🟢 OPTIMAL DECISION: WAIT'
@@ -810,14 +852,22 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
             title="Listen to recommendation"
           >
             <Volume2 className="w-4 h-4 text-emerald-200 animate-pulse" />
-            <span>Listen</span>
+            <span>{language === 'mr-IN' ? 'ऐका' : language === 'hi-IN' ? 'सुनें' : 'Listen'}</span>
           </button>
         </div>
 
         {/* Hero Title */}
         <div className="space-y-2 mb-6">
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight font-serif text-white">
-            {isDay4Closed
+            {language === 'mr-IN'
+              ? isDay4Closed
+                ? '४ थ्या दिवशी बाजार समिती बंद'
+                : isWait
+                ? `${selectedWaitDays} दिवस थांबा (${selectedMandi})`
+                : isGo
+                ? 'पिंपळगाव बसवंत बाजार समितीत विक्री करा'
+                : `आजच ${selectedMandi} मध्ये विक्री करा`
+              : isDay4Closed
               ? `Mandi Closed on Day 4`
               : isWait
               ? `Wait ${selectedWaitDays} Days (${selectedMandi})`
@@ -826,7 +876,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               : `Sell Today at ${selectedMandi}`}
           </h1>
           <p className="text-sm sm:text-base text-emerald-100 font-medium">
-            {selectedQuantity} qtl {selectedCrop} • Transport via {activeVehicle.name} • Route: {distanceKm} km ({activeLocation.taluka} → {selectedMandi.replace(' APMC', '')})
+            {language === 'mr-IN'
+              ? `${selectedQuantity} क्विंटल ${selectedCrop === 'Tomato' ? 'टोमॅटो' : 'कांदा'} • ${activeVehicle.name} द्वारे वाहतूक • अंतर: ${distanceKm} किमी (${activeLocation.label.mr} → ${selectedMandi.replace(' APMC', '')})`
+              : `${selectedQuantity} qtl ${selectedCrop} • Transport via ${activeVehicle.name} • Route: ${distanceKm} km (${activeLocation.taluka} → ${selectedMandi.replace(' APMC', '')})`}
           </p>
         </div>
 
@@ -835,20 +887,22 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           {/* Card 1: Net In-Hand Realization */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
             <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider block">
-              Net In-Hand Realization
+              {language === 'mr-IN' ? 'हातात मिळणारा निव्वळ नफा' : 'Net In-Hand Realization'}
             </span>
             <div className="text-2xl sm:text-3xl font-black text-white mt-1">
               ₹{calculatedWaitNet.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-emerald-100 font-medium block mt-1">
-              True cash after freight (-₹{estimatedFreight}) & losses
+              {language === 'mr-IN'
+                ? `वाहतूक (-₹${estimatedFreight}) व नासाडी वजा जाता प्रत्यक्ष रक्कम`
+                : `True cash after freight (-₹${estimatedFreight}) & losses`}
             </span>
           </div>
 
           {/* Card 2: Extra Gain vs Today */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
             <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider block">
-              Extra Gain vs Today
+              {language === 'mr-IN' ? 'आज विकण्यापेक्षा जादा फायदा' : 'Extra Gain vs Today'}
             </span>
             <div
               className={`text-2xl sm:text-3xl font-black mt-1 ${
@@ -858,20 +912,24 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               {calculatedGain > 0 ? `+₹${calculatedGain.toLocaleString('en-IN')}` : '₹0'}
             </div>
             <span className="text-[11px] text-emerald-100 font-medium block mt-1">
-              Selling today: ₹{calculatedBaselineNet.toLocaleString('en-IN')}
+              {language === 'mr-IN'
+                ? `आज विकल्यास: ₹${calculatedBaselineNet.toLocaleString('en-IN')}`
+                : `Selling today: ₹${calculatedBaselineNet.toLocaleString('en-IN')}`}
             </span>
           </div>
 
           {/* Card 3: Reservation Floor Price */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
             <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider block">
-              Reservation Floor Price
+              {language === 'mr-IN' ? 'किमान आरक्षण हमी भाव' : 'Reservation Floor Price'}
             </span>
             <div className="text-2xl sm:text-3xl font-black text-amber-300 mt-1">
               ₹{calculatedReservation.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-amber-200 font-semibold block mt-1">
-              Minimum bid per quintal to accept
+              {language === 'mr-IN'
+                ? 'यापेक्षा कमी भावात लिलाव करू नका (हमी भाव)'
+                : 'Minimum bid per quintal to accept'}
             </span>
           </div>
         </div>
@@ -1064,79 +1122,180 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           <div>
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <span className="text-xl">🌧️</span>
-              <span>Live Weather Conditions & Crop Impact ({selectedCrop})</span>
+              <span>
+                {language === 'mr-IN'
+                  ? `थेट हवामान व पिकावरील परिणाम (${selectedCrop === 'Tomato' ? 'टोमॅटो' : 'कांदा'})`
+                  : `Live Weather Conditions & Crop Impact (${selectedCrop})`}
+              </span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Nashik Agricultural Belt ({activeLocation.name})
+              {language === 'mr-IN'
+                ? `नाशिक कृषी पट्टा (${activeLocation.label.mr})`
+                : `Nashik Agricultural Belt (${activeLocation.label.en})`}
             </p>
           </div>
-          <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            IMD Yellow Weather Alert
+          <span
+            className={`text-xs font-black px-3 py-1 rounded-full border flex items-center gap-1.5 ${
+              weatherData?.alert_level === 'GREEN'
+                ? 'text-emerald-900 bg-emerald-100 border-emerald-300'
+                : 'text-amber-900 bg-amber-100 border-amber-300'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                weatherData?.alert_level === 'GREEN' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
+              }`}
+            ></span>
+            {language === 'mr-IN'
+              ? weatherData?.alert_level === 'GREEN'
+                ? 'हवामान खात्याचा ग्रीन अलर्ट (सुरक्षित)'
+                : 'हवामान खात्याचा यलो अलर्ट'
+              : weatherData?.alert_level === 'GREEN'
+              ? 'IMD Green Safe Condition'
+              : 'IMD Yellow Weather Alert'}
           </span>
         </div>
 
         {/* 4 Weather parameters */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Temperature</span>
-            <span className="text-base font-black text-slate-900">28.4°C</span>
-            <span className="text-[10px] text-slate-500 block">Daytime Warm</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+              {language === 'mr-IN' ? 'तापमान' : 'Temperature'}
+            </span>
+            <span className="text-base font-black text-slate-900">
+              {weatherData ? `${weatherData.temperature_c}°C` : '28.4°C'}
+            </span>
+            <span className="text-[10px] text-slate-500 block">
+              {language === 'mr-IN'
+                ? weatherData && weatherData.temperature_c > 30 ? 'उबदार हवा' : 'मध्यम उबदार'
+                : weatherData && weatherData.temperature_c > 30 ? 'Warm Semi-Arid' : 'Daytime Warm'}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Air Humidity</span>
-            <span className="text-base font-black text-slate-900">78%</span>
-            <span className="text-[10px] text-amber-700 font-semibold block">High Moisture</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+              {language === 'mr-IN' ? 'हवेतील आर्द्रता' : 'Air Humidity'}
+            </span>
+            <span className="text-base font-black text-slate-900">
+              {weatherData ? `${weatherData.humidity_pct}%` : '78%'}
+            </span>
+            <span
+              className={`text-[10px] font-semibold block ${
+                weatherData && weatherData.humidity_pct > 75 ? 'text-amber-700' : 'text-emerald-700'
+              }`}
+            >
+              {language === 'mr-IN'
+                ? weatherData && weatherData.humidity_pct > 75 ? 'उच्च आर्द्रता' : 'मध्यम आर्द्रता'
+                : weatherData && weatherData.humidity_pct > 75 ? 'High Moisture' : 'Normal Humidity'}
+            </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200 text-center">
-            <span className="text-[10px] font-bold text-amber-800 uppercase block">Rainfall Forecast</span>
-            <span className="text-base font-black text-amber-900">18.0 mm</span>
-            <span className="text-[10px] text-amber-800 block">Moderate Showers (Day 2)</span>
+          <div
+            className={`p-3 rounded-2xl border text-center ${
+              weatherData && weatherData.rainfall_forecast_mm > 15
+                ? 'bg-amber-50/70 border-amber-200'
+                : 'bg-slate-50 border-slate-200'
+            }`}
+          >
+            <span className="text-[10px] font-bold text-slate-600 uppercase block">
+              {language === 'mr-IN' ? 'पाऊस अंदाज' : 'Rainfall Forecast'}
+            </span>
+            <span
+              className={`text-base font-black ${
+                weatherData && weatherData.rainfall_forecast_mm > 15 ? 'text-amber-900' : 'text-slate-900'
+              }`}
+            >
+              {weatherData ? `${weatherData.rainfall_forecast_mm} mm` : '18.0 mm'}
+            </span>
+            <span className="text-[10px] text-slate-500 block">
+              {language === 'mr-IN'
+                ? weatherData && weatherData.rainfall_forecast_mm > 15 ? 'मध्यम पाऊस सरी' : 'हलकी रिमझिम'
+                : weatherData && weatherData.rainfall_forecast_mm > 15 ? 'Moderate Showers' : 'Light Drizzle'}
+            </span>
           </div>
 
           <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Road Condition</span>
-            <span className="text-base font-black text-slate-900">+20% Time</span>
-            <span className="text-[10px] text-slate-500 block">Wet Approaches</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+              {language === 'mr-IN' ? 'रस्त्याची स्थिती' : 'Road Condition'}
+            </span>
+            <span className="text-base font-black text-slate-900">
+              +{weatherData?.road_slowdown_pct ?? 20}% {language === 'mr-IN' ? 'वेळ' : 'Time'}
+            </span>
+            <span className="text-[10px] text-slate-500 block truncate">
+              {language === 'mr-IN'
+                ? weatherData?.road_condition_label
+                  ? weatherData.road_condition_label
+                      .replace('Slippery Ghat Tracks (+30% Time)', 'निसरडे घाट रस्ते')
+                      .replace('Flooded Approach Roads (+25% Time)', 'पाणथळ रस्ते')
+                      .replace('Damp Highway Approaches (+15% Time)', 'दमट रस्ते')
+                      .replace('Dry Highway Network (+5% Time)', 'कोरडे महामार्ग')
+                      .replace('Clear State Highway (+8% Time)', 'स्वच्छ राज्य महामार्ग')
+                      .replace('Wet Approaches (+20% Travel Time)', 'ओले रस्ते')
+                  : 'ओले रस्ते'
+                : weatherData?.road_condition_label || 'Wet Approaches'}
+            </span>
           </div>
         </div>
 
         {/* Impact Analysis */}
-        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-2 text-xs">
-          <span className="font-black text-amber-950 uppercase tracking-wider block text-[11px]">
-            ⚡ How This Weather Affects Your Prices & Risk:
+        <div
+          className={`p-4 rounded-2xl border space-y-2 text-xs ${
+            weatherData?.alert_level === 'GREEN'
+              ? 'bg-emerald-50/80 border-emerald-200'
+              : 'bg-amber-50/80 border-amber-200'
+          }`}
+        >
+          <span className="font-black text-slate-900 uppercase tracking-wider block text-[11px]">
+            {language === 'mr-IN'
+              ? '⚡ या हवामानाचा बाजारभाव व जोखमीवर होणारा परिणाम:'
+              : '⚡ How This Weather Affects Your Prices & Risk:'}
           </span>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-            <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
-              <span className="font-black text-slate-900 block">1. Field Picking Delays</span>
-              <p className="text-slate-600 font-medium mt-1">
-                Muddy farm approaches delay manual harvesting by ~25%, causing a temporary morning supply dip and price spike.
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
+            <div className="p-3 rounded-xl bg-white/80 border border-slate-200/60">
               <span className="font-black text-slate-900 block">
-                2. {selectedCrop === 'Tomato' ? 'Perishable Crate Rot' : 'Chawl Moisture Protection'}
+                {language === 'mr-IN' ? '१. शेतात तोडणी / काढणी विलंब' : '1. Field Picking / Lifting Delays'}
               </span>
               <p className="text-slate-600 font-medium mt-1">
-                {selectedCrop === 'Tomato'
-                  ? '78% humidity accelerates skin softening. Holding decay doubles to 2.0%/day unless ventilated plastic crates are used.'
-                  : 'Onion aerated chawl protects produce against rot. Ensure roof plastic sheets are secured against 18mm rain.'}
+                {language === 'mr-IN' && weatherData?.harvest_disruption_mr
+                  ? weatherData.harvest_disruption_mr
+                  : weatherData?.harvest_disruption ||
+                    'Wet fields slow picking labor and transport loading by ~25%.'}
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
-              <span className="font-black text-slate-900 block">3. Post-Rain Market Influx</span>
+            <div className="p-3 rounded-xl bg-white/80 border border-slate-200/60">
+              <span className="font-black text-slate-900 block">
+                {language === 'mr-IN'
+                  ? selectedCrop === 'Tomato' ? '२. क्रेट्समधील नासाडी धोका' : '२. कांदा चाळ आर्द्रता संरक्षण'
+                  : selectedCrop === 'Tomato' ? '2. Perishable Crate Decay Risk' : '2. Chawl Moisture Protection'}
+              </span>
               <p className="text-slate-600 font-medium mt-1">
-                Delayed harvest lots will reach mandis together once rain clears on Day 4/5, leading to heavy supply gluts and price drops.
+                {language === 'mr-IN' && weatherData?.storage_spoilage_risk_mr
+                  ? weatherData.storage_spoilage_risk_mr
+                  : weatherData?.storage_spoilage_risk ||
+                    'High humidity causes fruit decay; perishable decay increases to 2%/day.'}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/80 border border-slate-200/60">
+              <span className="font-black text-slate-900 block">
+                {language === 'mr-IN' ? '३. पाऊस थांबल्यानंतर बाजारात आवक' : '3. Post-Rain Market Supply Influx'}
+              </span>
+              <p className="text-slate-600 font-medium mt-1">
+                {language === 'mr-IN'
+                  ? 'पाऊस थांबल्यानंतर थांबलेला माल बाजारात आल्यास आवक वाढून भावात घसरण होऊ शकते.'
+                  : 'Delayed harvest lots will reach mandis once rain clears, leading to supply gluts and price drops.'}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-[11px] text-amber-900 font-bold flex items-center gap-1.5">
-            <span>👉 Actionable Advice:</span>
-            <span>Harvest and sell on Saturday (Day 1) or early Sunday (Day 2) via Pimpalgaon private yard using waterproof tarpaulins.</span>
+          <div className="pt-2 text-[11px] text-slate-800 font-bold flex items-center gap-1.5">
+            <span>{language === 'mr-IN' ? '👉 कृतीयोग्य सल्ला:' : '👉 Actionable Advice:'}</span>
+            <span>
+              {language === 'mr-IN' && weatherData?.recommended_action_mr
+                ? weatherData.recommended_action_mr
+                : weatherData?.recommended_action ||
+                  'Harvest and sell on Saturday (Day 1) or transport in covered crates early Sunday.'}
+            </span>
           </div>
         </div>
       </div>

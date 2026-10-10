@@ -77,10 +77,10 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, slots, labels, l
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-black text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
-            {cropIcon} {qtyInitial} {language === 'en-IN' ? 'qtl' : 'क्विंटल'} {crop}
+            {cropIcon} {qtyInitial} {language === 'en-IN' ? 'qtl' : 'क्विंटल'} {crop === 'Tomato' ? (language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato') : (language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion')}
           </span>
           <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-            📍 {chosen.market.replace(' APMC', '')}
+            📍 {chosen.market.replace(' APMC', language === 'mr-IN' ? ' बाजार समिती' : language === 'hi-IN' ? ' मंडी' : ' APMC')}
           </span>
         </div>
       </div>
@@ -99,30 +99,42 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, slots, labels, l
             </h2>
           </div>
           <span className="text-[11px] font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-            {chosen.wait_days === 0 ? 'आजची विक्री (Sell Now)' : `${chosen.wait_days} दिवस थांबून विक्री`}
+            {chosen.wait_days === 0
+              ? (language === 'mr-IN' ? 'आजची विक्री' : language === 'hi-IN' ? 'आज की बिक्री' : 'Sell Today')
+              : (language === 'mr-IN' ? `${chosen.wait_days} दिवस थांबून विक्री` : language === 'hi-IN' ? `${chosen.wait_days} दिन रुककर बिक्री` : `Wait ${chosen.wait_days} Days to Sell`)}
           </span>
         </div>
 
         {/* 3 Step Visual Flow */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">1. Initial Harvest</span>
-            <span className="text-lg font-black text-slate-900 mt-0.5 block">{qtyInitial} qtl</span>
-            <span className="text-[10px] text-slate-500 font-medium">({qtyInitial * 100} kg harvested)</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+              {language === 'mr-IN' ? '१. सुरुवातीची काढणी' : language === 'hi-IN' ? '१. प्रारंभिक कटाई' : '1. Initial Harvest'}
+            </span>
+            <span className="text-lg font-black text-slate-900 mt-0.5 block">{qtyInitial} {language === 'en-IN' ? 'qtl' : 'क्विंटल'}</span>
+            <span className="text-[10px] text-slate-500 font-medium">
+              ({qtyInitial * 100} {language === 'en-IN' ? 'kg harvested' : 'किलो काढणी'})
+            </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-center">
-            <span className="text-[10px] font-bold text-amber-800 uppercase block">2. Total Decay / Shrinkage</span>
-            <span className="text-lg font-black text-amber-900 mt-0.5 block">−{totalPhysicalLossKg} kg</span>
+            <span className="text-[10px] font-bold text-amber-800 uppercase block">
+              {language === 'mr-IN' ? '२. एकूण घट व नासाडी' : language === 'hi-IN' ? '२. कुल खराबी व वजन घट' : '2. Total Decay / Shrinkage'}
+            </span>
+            <span className="text-lg font-black text-amber-900 mt-0.5 block">−{totalPhysicalLossKg} {language === 'en-IN' ? 'kg' : 'किलो'}</span>
             <span className="text-[10px] text-amber-700 font-medium">
-              {holdingLossPct}% holding + {travelLossPct}% transit
+              {holdingLossPct}% {language === 'mr-IN' ? 'साठवणूक' : language === 'hi-IN' ? 'भंडारण' : 'holding'} + {travelLossPct}% {language === 'mr-IN' ? 'वाहतूक' : language === 'hi-IN' ? 'परिवहन' : 'transit'}
             </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
-            <span className="text-[10px] font-bold text-emerald-800 uppercase block">3. Sold at Weighbridge</span>
-            <span className="text-lg font-black text-emerald-950 mt-0.5 block">{qtySold} qtl</span>
-            <span className="text-[10px] text-emerald-700 font-medium">({Math.round(qtySold * 100)} kg weighed)</span>
+            <span className="text-[10px] font-bold text-emerald-800 uppercase block">
+              {language === 'mr-IN' ? '३. काट्यावरील प्रत्यक्ष विक्री' : language === 'hi-IN' ? '३. तौल कांटे पर बिका वजन' : '3. Sold at Weighbridge'}
+            </span>
+            <span className="text-lg font-black text-emerald-950 mt-0.5 block">{qtySold} {language === 'en-IN' ? 'qtl' : 'क्विंटल'}</span>
+            <span className="text-[10px] text-emerald-700 font-medium">
+              ({Math.round(qtySold * 100)} {language === 'en-IN' ? 'kg weighed' : 'किलो वजन'})
+            </span>
           </div>
         </div>
 
@@ -131,7 +143,7 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, slots, labels, l
           <ShieldCheck className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
           <div className="space-y-0.5">
             <span className="font-black text-emerald-900 block">
-              🛡️ {language === 'mr-IN' ? 'दुहेरी वजावट प्रतिबंध नियम (No Double Deduction Guarantee)' : language === 'hi-IN' ? 'दोहरी कटौती निषेध नियम' : 'Zero Double-Deduction Guarantee:'}
+              🛡️ {language === 'mr-IN' ? 'दुहेरी वजावट प्रतिबंध नियम' : language === 'hi-IN' ? 'दोहरी कटौती निषेध नियम' : 'Zero Double-Deduction Guarantee'}
             </span>
             <p className="text-[11px] leading-relaxed text-emerald-800">
               {language === 'mr-IN'
@@ -253,10 +265,14 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, slots, labels, l
                 <DollarSign className="w-4 h-4 text-slate-500" />
                 <div>
                   <span>
-                    {language === 'mr-IN' ? 'भांडवली संधी खर्च (Financing Cost)' : language === 'hi-IN' ? 'पूंजी अवसर लागत (Financing Cost)' : 'Financing / Capital Opportunity Cost'}
+                    {language === 'mr-IN' ? 'भांडवली संधी खर्च' : language === 'hi-IN' ? 'पूंजी अवसर लागत' : 'Financing / Capital Opportunity Cost'}
                   </span>
                   <span className="text-[10px] text-slate-400 block font-normal">
-                    12% annual cost on tied capital for {chosen.wait_days} days
+                    {language === 'mr-IN'
+                      ? `अडकलेल्या भांडवलावर ${chosen.wait_days} दिवसांसाठी १२% वार्षिक व्याज दर`
+                      : language === 'hi-IN'
+                      ? `फंसे हुए पैसे पर ${chosen.wait_days} दिनों हेतु 12% वार्षिक ब्याज`
+                      : `12% annual cost on tied capital for ${chosen.wait_days} days`}
                   </span>
                 </div>
               </div>
@@ -311,9 +327,9 @@ export const CostScreen: React.FC<CostScreenProps> = ({ record, slots, labels, l
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>
               {language === 'mr-IN'
-                ? 'तांत्रिक नियम व सूत्रे पहा (परीक्षकांसाठी)'
+                ? 'तांत्रिक नियम व सूत्रे पहा'
                 : language === 'hi-IN'
-                ? 'तकनीकी नियम व सूत्र देखें (परीक्षकों हेतु)'
+                ? 'तकनीकी नियम व सूत्र देखें'
                 : 'View Mathematical Specifications (For Evaluators & Judges)'}
             </span>
           </span>

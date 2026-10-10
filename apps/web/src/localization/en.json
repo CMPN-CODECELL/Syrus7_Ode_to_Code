@@ -9,9 +9,8 @@
   "costs": "Cost Breakdown",
   "risk": "Risk Assessment",
   "scenarios": "What-If Simulator",
-  "assistant": "Krishi Mitra (Co-Pilot)",
+  "assistant": "Krishi Mitra AI Advisor",
   "profile": "My Farm & Settings",
-  
   "goodMorning": "Good Morning, Kisan Friend! 🌾",
   "farmerSubtitle": "Healthy crops, prosperous farmers • Maximizing net realization",
   "verifiedFarmer": "Verified Farmer",
@@ -24,23 +23,19 @@
   "quickActions": "Quick Action Features",
   "viewDecision": "View Full Decision",
   "introVideo": "Intro Video",
-  
   "stepGuideTitle": "3-Step Farmer Action Guide",
   "stepGuideSubtitle": "3 Simple Rules to Remember",
-  "step1Title": "Step 1: What to do? (Action)",
+  "step1Title": "Step 1: What to do? (Action Recommendation)",
   "step1Wait": "Wait {days} Days",
   "step1SellNow": "Sell Now at {mandi}",
   "step1Go": "Go to {mandi}",
   "step1Sub": "Sell produce at {mandi}",
-  
   "step2Title": "Step 2: Net In-Hand Realization",
   "step2Gain": "+₹{amount} extra gain vs today",
   "step2Sub": "After deducting freight, labor, spoilage & mandi fees",
-  
   "step3Title": "Step 3: Minimum Reservation Price",
   "step3Unit": "/ quintal",
   "step3Sub": "Strictly do not accept any bid below this price",
-  
   "sellNow": "Sell Today",
   "waitDays": "Wait",
   "days": "Days",
@@ -56,7 +51,6 @@
   "riskLevel": "Risk Level",
   "freshness": "Data Freshness",
   "whyTitle": "Key Evidence & Reasons",
-  
   "commodity": "Commodity",
   "quantity": "Quantity (qtl)",
   "homeMandi": "Home Mandi",
@@ -64,14 +58,12 @@
   "cautious": "Cautious (q20)",
   "balanced": "Balanced (q35)",
   "aggressive": "Aggressive (q50)",
-  
   "transport": "Transport & Freight",
   "hamali": "Hamali / Loading Labor",
   "storage": "Storage & Preservation",
   "financing": "Financing & Holding Cost",
   "spoilage": "Perishability & Weight Loss",
   "netRealization": "Final Net In-Hand Realization",
-  
   "insufficientEvidence": "Current market data is not fresh or reliable enough. Recommending holding or distant transport is financially unsafe.",
   "demoMode": "Demo Mode",
   "listen": "Listen",
@@ -84,11 +76,10 @@
   "heatwave": "Heatwave Spoilage (3x decay)",
   "mandiGlut": "Mandi Glut (-10% Crash)",
   "coldStorage": "Cold Storage Freeze",
-  
   "costTitle": "Canonical Logistics & Cost Breakdown",
   "costSubtitle": "Reconciles gross produce revenue to final net realization. Invariant: zero double-spoilage deductions.",
   "costConfigVersion": "Cost Rules v1.0",
-  "lossWaterfallTitle": "Sequential Perishability Loss Cascade",
+  "lossWaterfallTitle": "Sequential Perishable Loss Waterfall",
   "harvestQty": "1. Harvest Lot Quantity",
   "harvestQtySub": "Initial weight at farmgate",
   "afterHoldingLoss": "2. After Holding Loss ({pct}%)",
@@ -105,14 +96,13 @@
   "apmcBylaw": "APMC By-law",
   "assumptionProvenance": "Assumption",
   "transportFreight": "Transport & Freight",
-  "hamaliTolai": "Hamali / Weighment (Tolai)",
+  "hamaliTolai": "Hamali & Weighment",
   "holdingStorage": "Holding Storage Cost",
-  "financingCost": "Capital Financing Cost (Opportunity)",
+  "financingCost": "Capital Financing Cost",
   "totalDeductions": "Total Deductions",
-  "finalNetRealization": "Final Net Realization (In Hand)",
+  "finalNetRealization": "Final Net Realization",
   "finalNetSub": "Gross Revenue − Total Deductions",
   "authorityNet": "Authority Net",
-
   "riskTitle": "Deterministic Six-Risk Engine Evaluation",
   "riskSubtitle": "Weighted composite: 0.25 Price Drop + 0.20 Arrival Spike + 0.15 Volatility + 0.15 Stale + 0.15 Forecast + 0.10 Weather.",
   "compositeScore": "Composite Score",
@@ -120,7 +110,6 @@
   "safetyOverrideNotice": "Safety Override Active:",
   "evalReason": "Evaluation Reason:",
   "riskMonitored": "elevated risk factors monitored.",
-
   "forecastTitle": "1–7 Day Conformal Price Forecast ({mandi})",
   "forecastSubtitle": "XGBoost direct-horizon model with time-ordered conformal residual distribution.",
   "reliability": "Reliability:",
@@ -135,14 +124,12 @@
   "residualSub": "Dynamically adjusted against recent walk-forward prediction errors.",
   "arrivalElasticity": "Arrival Volume Elasticity",
   "arrivalSub": "Captures price depreciation under severe morning supply spikes.",
-
   "historyTitle": "{days}-Day Historical Modal Trend & Arrivals ({mandi})",
   "historySubtitle": "Confirmed daily market observations from {source}.",
   "obsDate": "Observation Date",
   "modalPrice": "Modal Price",
   "minMaxRange": "Min – Max Range",
   "arrivalVolume": "Arrivals Volume",
-
   "scenarioTitle": "Deterministic What-If Scenario Stress Testing",
   "scenarioSubtitle": "Re-runs the canonical decision engine under market shocks without mutating historical data.",
   "rerunScenario": "Rerun Backend Scenario",
@@ -164,7 +151,6 @@
   "stressedRec": "Stressed Scenario",
   "netImpact": "Net Impact",
   "resetBaseline": "Reset Baseline",
-
   "deductionsAccounted": "Deductions Accounted",
   "deductionsSub": "Transport, storage, labor & sequential holding/travel loss factored.",
   "forecastRange": "Forecast Range",
@@ -172,7 +158,6 @@
   "factorsMonitored": "elevated risk factors monitored.",
   "stressTestBtn": "Stress Test This Decision",
   "factPrefix": "Fact #",
-
   "skipIntro": "Skip Intro",
   "appInitializing": "Initializing KrishiNirnay...",
   "getStarted": "Get Started",
@@ -180,20 +165,18 @@
   "tagMandis": "3 Verified APMCs",
   "tagVoice": "Marathi / Hindi Voice",
   "heroSubtitle": "Maximizing true pocket realization by factoring freight and sequential perishability losses.",
-
   "farmerModalTitle": "Farmer Lot & Selling Parameters",
   "commodityLabel": "Commodity",
   "quantityUnitLabel": "Quantity & Unit",
   "bagWeightLabel": "Bag Weight (kg per bag) — Required Invariant",
   "bagWeightInvariantNote": "When selecting bags, kilograms per bag is strictly required.",
-  "homeMandiLabel": "Home / Local APMC Mandi",
-  "riskProfileLabel": "Risk Profile & Appetite",
-  "targetWaitLabel": "Target Holding Window (Days)",
+  "homeMandiLabel": "Home Mandi",
+  "riskProfileLabel": "Risk Profile",
+  "targetWaitLabel": "Target Holding Days",
   "saveAndCalc": "Save & Recalculate Decision",
   "quintalUnit": "Quintal",
   "tonneUnit": "Tonne",
   "bagUnit": "Bag",
-
   "judgeToolsTitle": "Judge Demo Tools:",
   "simulateOutagesSub": "(Simulate real-world API outages & graceful fallback)",
   "normalMode": "Normal (Live/Verified)",
@@ -202,7 +185,6 @@
   "weatherOutageMode": "Weather API Outage",
   "llmOutageMode": "LLM Outage (Template Fallback)",
   "selectMode": "Select Mode:",
-
   "kisanName": "Kisan Friend",
   "locationTag": "Nashik Division • Maharashtra",
   "editLotBtn": "Edit Produce Lot",
@@ -217,15 +199,13 @@
   "darkMode": "Dark Mode",
   "demoToolsTitle": "Live Fallback Simulation",
   "demoToolsSub": "Simulate outages for live pitch demonstration",
-
-  "copilotTitle": "Krishi Mitra AI Co-Pilot",
+  "copilotTitle": "Krishi Mitra AI Advisor",
   "copilotSub": "24/7 Expert Market Intelligence & Risk Assistant",
   "promptTomato": "What is the net profit if I wait 2 days for tomato?",
   "promptNashik": "What are today’s modal prices in Nashik APMC?",
   "promptCosts": "How much will transport and spoilage cost?",
   "promptReservation": "What minimum reservation price should I accept?",
   "assistantWelcome": "Hello! I am your KrishiNirnay AI Expert. Ask me anything about mandi prices, optimal sell decisions, or transport costs.",
-
   "vegCrop": "Vegetable Crop",
   "rabiCrop": "Rabi Red Onion",
   "sharbatiGrain": "Sharbati Grain",
@@ -234,10 +214,8 @@
   "longStorage": "Long Storage Grain",
   "oilseedBench": "Oilseed Benchmark",
   "activeLot": "Active Lot",
-
   "light": "Light",
   "dark": "Dark",
-
   "heatmapTitle": "3×7 Best-Day / Best-Mandi Decision Heatmap",
   "heatmapSubtitle": "Risk-adjusted net realization (₹) across 3 verified Maharashtra mandis and 7 sale horizons.",
   "bestCell": "Best Feasible Cell",
@@ -249,12 +227,10 @@
   "baseline": "Baseline",
   "heatmapInvariantNote": "All cell values reflect true risk-adjusted net realization after sequential holding loss, travel loss, transport trips, storage, and financing. Closed trading days are disabled and cannot be chosen as recommendations.",
   "loadingHeatmap": "Loading 3×7 Best-Day / Best-Mandi Heatmap matrix...",
-
   "cancel": "Cancel",
   "updateRecalculate": "Update & Recalculate Decision",
   "recommended": "Recommended",
   "homeBaseline": "Home Baseline",
-
   "expertTitle": "Dr. Imran Siddiqui / Krishi Mitra",
   "expertSubtitle": "Senior Agricultural Decision Expert • Online",
   "analyzingEngine": "Analyzing KrishiNirnay decision engine...",
@@ -262,15 +238,12 @@
   "speechNotSupported": "Speech recognition is not supported in this browser.",
   "verifiedExpert": "4.9 ★ Verified",
   "coPilot": "Krishi Mitra",
-
   "numberGuardBadge": "Number Guard Protected (0% Hallucination)",
   "bagWeightRequired": "Bag weight required",
   "serverErrorOffline": "Unable to reach server. Showing verified offline cache.",
   "quickDemoQuestions": "Quick Demo Questions:",
-
   "invariantsCertifiedTitle": "100% Contract Invariant & Number Guard Verified",
   "invariantsCertifiedText": "Strict anti-hallucination Number Guard blocks any unauthorized numeric deviation. All holding vs sell-now calculations are guaranteed against double-spoilage deductions with verified Agmarknet APMC pricing contracts.",
-
   "engineStarting": "Initializing KrishiNirnay Engine...",
   "sdgNotice": "SDG 2.3 (Net realization & market access) & SDG 12.3 (Perishability & avoidable food-loss reduction)."
 }

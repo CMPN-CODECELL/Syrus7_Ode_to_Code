@@ -282,15 +282,23 @@ export interface MarketCalendarResponse {
 
 export interface WeatherImpactResponse {
   district: string;
+  location?: string;
   temperature_c: number;
   humidity_pct: number;
   rainfall_forecast_mm: number;
+  wind_speed_kmh?: number;
+  road_condition_label?: string;
+  road_slowdown_pct?: number;
   alert_level: string;
   weather_summary: string;
   price_impact_direction: string;
   harvest_disruption: string;
   storage_spoilage_risk: string;
   recommended_action: string;
+  weather_summary_mr?: string;
+  harvest_disruption_mr?: string;
+  storage_spoilage_risk_mr?: string;
+  recommended_action_mr?: string;
 }
 
 export interface LiveMarketMessage {

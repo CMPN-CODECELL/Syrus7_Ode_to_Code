@@ -32,3 +32,13 @@ def test_bag_with_known_weight_converts_correctly():
     assert slots.quantity == 25.0 # 50 * 50 / 100
     assert slots.quantity_unit == "qtl"
     assert slots.is_complete is True
+
+def test_relative_date_marathi_slots():
+    text = "आज कांदा विकू का उद्या विकला तर जास्त फायदा होईल?"
+    existing = SlotSchema(quantity=20.0, home_mandi="Nashik APMC")
+    slots = AgriculturalGlossary.extract_semantic_slots(text, existing_slots=existing)
+    assert slots.commodity == "Onion"
+    assert slots.requested_wait_days == 1
+    assert slots.quantity == 20.0
+    assert slots.home_mandi == "Nashik APMC"
+    assert slots.is_complete is True

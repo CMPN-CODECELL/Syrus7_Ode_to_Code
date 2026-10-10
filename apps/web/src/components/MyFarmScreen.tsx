@@ -93,21 +93,31 @@ export const MyFarmScreen: React.FC<MyFarmScreenProps> = ({
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
               {labels.activeCrop || 'Active Crop'}
             </span>
-            <span className="text-lg font-black text-emerald-700 font-serif">{slots.commodity}</span>
+            <span className="text-lg font-black text-emerald-700 font-serif">
+              {slots.commodity === 'Tomato'
+                ? (language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato')
+                : (language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion')}
+            </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
               {labels.quantity || 'Lot Quantity'}
             </span>
-            <span className="text-lg font-black text-slate-900 font-serif">{slots.quantity} {slots.quantity_unit}</span>
+            <span className="text-lg font-black text-slate-900 font-serif">
+              {slots.quantity} {language === 'en-IN' ? 'qtl' : 'क्विंटल'}
+            </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
               {labels.homeMandi || 'Home Mandi'}
             </span>
-            <span className="text-lg font-black text-slate-900 font-serif truncate block">{slots.home_mandi}</span>
+            <span className="text-lg font-black text-slate-900 font-serif truncate block">
+              {slots.home_mandi
+                ? slots.home_mandi.replace(' APMC', language === 'mr-IN' ? ' बाजार समिती' : language === 'hi-IN' ? ' मंडी' : ' APMC')
+                : ''}
+            </span>
           </div>
         </div>
       </div>
