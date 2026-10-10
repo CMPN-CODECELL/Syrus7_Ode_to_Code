@@ -330,3 +330,78 @@ export interface LiveMarketMessage {
   ticker?: string;
 }
 
+export type SupportedLanguage = 'mr-IN' | 'en-IN';
+
+export interface ModelComparisonRow {
+  market: string;
+  commodity: string;
+  horizon_days: number;
+  test_pairs: number;
+  xgboost_mae: number;
+  xgboost_rmse: number;
+  last_observed_mae: number;
+  moving_average_7_mae: number;
+  best_baseline: string;
+  best_baseline_mae: number;
+  improvement_vs_baseline_pct: number;
+  winner: string;
+}
+
+export interface ValidationSummaryResponse {
+  project: string;
+  model_status: string;
+  model_status_label_en: string;
+  model_status_label_mr: string;
+  target_variable: string;
+  target_variable_mr: string;
+  units: string;
+  dataset_file: string;
+  total_records: number;
+  cutoff_date: string;
+  evaluation_method: string;
+  evaluation_method_mr: string;
+  total_test_pairs: number;
+  horizons_evaluated: number[];
+  features_count: number;
+  features_list: string[];
+  winner_counts: Record<string, number>;
+  comparisons: ModelComparisonRow[];
+  overall_avg_xgboost_mae: number;
+  overall_avg_baseline_mae: number;
+}
+
+export interface PredictionDataPoint {
+  origin_date: string;
+  target_date: string;
+  actual_price: number;
+  xgboost_price: number;
+  last_observed_price: number;
+  moving_average_price: number;
+  xgb_residual: number;
+  baseline_residual: number;
+}
+
+export interface SeriesValidationResponse {
+  market: string;
+  commodity: string;
+  horizon_days: number;
+  test_pairs: number;
+  xgboost_mae: number;
+  xgboost_rmse: number;
+  last_observed_mae: number;
+  moving_average_7_mae: number;
+  best_baseline: string;
+  winner: string;
+  improvement_pct: number;
+  predictions: PredictionDataPoint[];
+  residual_stats: {
+    xgb_errors_within_100_inr_pct: number;
+    xgb_errors_within_200_inr_pct: number;
+    base_errors_within_100_inr_pct: number;
+    base_errors_within_200_inr_pct: number;
+    max_xgb_error: number;
+    max_base_error: number;
+  };
+}
+
+

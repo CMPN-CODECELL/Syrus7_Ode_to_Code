@@ -12,13 +12,13 @@ import {
   CheckCircle,
   HelpCircle
 } from 'lucide-react';
-import { AssistResponse, SlotSchema, DecisionRecord } from '../types';
+import { AssistResponse, SlotSchema, DecisionRecord, SupportedLanguage } from '../types';
 import { ApiClient } from '../api/client';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  language: 'mr-IN' | 'hi-IN' | 'en-IN';
+  language: SupportedLanguage;
   onNewDecision: (record: DecisionRecord) => void;
   labels: Record<string, string>;
 }
@@ -38,8 +38,6 @@ export const VoiceAssistantDrawer: React.FC<Props> = ({
       sender: 'assistant',
       text: language === 'mr-IN'
         ? 'नमस्कार! मी कृषिनिर्णय सहाय्यक. आपले पीक, प्रमाण (उदा. २५ क्विंटल टोमॅटो) आणि बाजार सांगा.'
-        : language === 'hi-IN'
-        ? 'नमस्ते! मैं कृषिनिर्णय सहायक हूँ। अपनी फसल, मात्रा (जैसे 25 क्विंटल टमाटर) और मंडी बताएं।'
         : 'Hello! I am KrishiNirnay assistant. Tell me your crop, quantity (e.g. 25 quintal tomato), and preferred mandi.'
     }
   ]);
@@ -49,11 +47,7 @@ export const VoiceAssistantDrawer: React.FC<Props> = ({
   const samplePrompts = language === 'mr-IN' ? [
     '२५ क्विंटल टोमॅटो, आज नाशिकला विकू की २ दिवस थांबू?',
     '२० क्विंटल कांदा, पिंपळगावला पाठवू का?',
-    '५० पोतं टोमॅटो' // Test bag ambiguity!
-  ] : language === 'hi-IN' ? [
-    '25 क्विंटल टमाटर, आज नासिक बेचें या 2 दिन रुकें?',
-    '20 क्विंटल प्याज, क्या पिंपलगांव भेजें?',
-    '50 कट्टा टमाटर'
+    '५० पोती टोमॅटो'
   ] : [
     '20 quintal tomato in Nashik, should I wait 2 days?',
     'What if transport cost rises by 20%?',
@@ -218,7 +212,7 @@ export const VoiceAssistantDrawer: React.FC<Props> = ({
                     className="mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-emerald-700 hover:text-emerald-900 flex items-center gap-1 font-bold"
                   >
                     <Volume2 className="w-3.5 h-3.5" />
-                    <span>{labels.listen || 'Listen (पुन्हा ऐका)'}</span>
+                    <span>{language === 'mr-IN' ? 'पुन्हा ऐका' : 'Listen Again'}</span>
                   </button>
                 )}
               </div>
@@ -227,14 +221,16 @@ export const VoiceAssistantDrawer: React.FC<Props> = ({
           {loading && (
             <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 p-3 rounded-2xl border border-emerald-200 w-fit font-bold">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping"></div>
-              <span>कृषिनिर्णय इंजिन तपासत आहे...</span>
+              <span>{language === 'mr-IN' ? 'कृषिनिर्णय इंजिन तपासत आहे...' : 'Analyzing with KrishiNirnay engine...'}</span>
             </div>
           )}
         </div>
 
         {/* Quick Demo Prompts */}
         <div className="p-2.5 px-4 bg-slate-50 border-t border-slate-200 flex flex-wrap gap-1.5">
-          <span className="text-[10px] text-slate-500 font-bold block w-full">Quick Demo Questions:</span>
+          <span className="text-[10px] text-slate-500 font-bold block w-full">
+            {language === 'mr-IN' ? 'उदाहरणादाखल प्रश्न:' : 'Quick Demo Questions:'}
+          </span>
           {samplePrompts.map((p, i) => (
             <button
               key={i}

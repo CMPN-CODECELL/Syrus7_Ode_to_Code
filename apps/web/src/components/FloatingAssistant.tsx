@@ -12,13 +12,13 @@ import {
   ChevronUp,
   ChevronDown
 } from 'lucide-react';
-import { DecisionRecord, SlotSchema } from '../types';
+import { DecisionRecord, SlotSchema, SupportedLanguage } from '../types';
 import { ApiClient } from '../api/client';
 
 interface FloatingAssistantProps {
   decisionRecord: DecisionRecord | null;
   slots: SlotSchema;
-  language: 'mr-IN' | 'hi-IN' | 'en-IN';
+  language: SupportedLanguage;
   onPlayVoice: (text: string) => void;
   onUpdateSlots?: (updatedSlots: Partial<SlotSchema>) => void;
 }
@@ -56,9 +56,6 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
     if (language === 'mr-IN') {
       const cropMr = crop === 'Tomato' ? 'टोमॅटो' : 'कांदा';
       return `नमस्कार! मी आपला कृषिमित्र AI सल्लागार आहे. सध्या ${qty} क्विंटल ${cropMr} साठी ${mandi} मध्ये ${action === 'WAIT' ? `२ दिवस थांबण्याचा सल्ला आहे, ज्यातून ₹${gain} जास्त नफा (एकूण ₹${net}) मिळू शकतो.` : 'आजच विक्री करण्याचा सल्ला आहे.'} बाजारभाव, वाहतूक खर्च किंवा विक्री वेळेविषयी काहीही विचारा!`;
-    } else if (language === 'hi-IN') {
-      const cropHi = crop === 'Tomato' ? 'टमाटर' : 'प्याज';
-      return `नमस्ते! मैं आपका कृषिमित्र AI सलाहकार हूँ। आपके ${qty} क्विंटल ${cropHi} के लिए ${mandi} में ${action === 'WAIT' ? `2 दिन रुकने की सलाह है, जिससे ₹${gain} अतिरिक्त लाभ (कुल ₹${net}) होगा।` : 'आज ही बेचने की सलाह है।'} मंडी भाव या खर्चों के बारे में बेझिझक पूछें!`;
     }
     return `Namaskar! I am your Krishi Mitra AI Advisor. For your ${qty} qtl ${crop} at ${mandi}, our engine recommends ${action === 'WAIT' ? `WAITING (+₹${gain} extra gain, ₹${net} net in hand).` : 'SELLING TODAY.'} Ask me anything about prices, transport costs, or selling window!`;
   };
@@ -181,22 +178,18 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   const quickPrompts = [
     {
       en: 'Should I sell onion today or tomorrow?',
-      hi: 'आज प्याज बेचूं या कल बेचने पर ज्यादा फायदा होगा?',
       mr: 'आज कांदा विकू का उद्या विकला तर जास्त फायदा होईल?'
     },
     {
       en: 'Why wait instead of selling today?',
-      hi: 'आज बेचने के बजाय रुकना क्यों सही है?',
       mr: 'आज न विकता थांबणे का फायद्याचे आहे?'
     },
     {
       en: 'What will my total expenses be?',
-      hi: 'मेरा कुल खर्च कितना होगा?',
       mr: 'माझा एकूण खर्च किती होईल?'
     },
     {
       en: 'What is my reservation floor price?',
-      hi: 'न्यूनतम आरक्षण भाव क्या है?',
       mr: 'माझा किमान आरक्षण हमी भाव काय आहे?'
     }
   ];
@@ -218,7 +211,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           <div className="text-left">
             <span className="text-xs font-black block leading-tight">Krishi Mitra AI</span>
             <span className="text-[10px] text-emerald-200 block font-medium leading-tight">
-              {language === 'mr-IN' ? 'कृषिसल्लागार विचारा' : language === 'hi-IN' ? 'सलाहकार से पूछें' : 'Decision Copilot'}
+              {language === 'mr-IN' ? 'कृषिसल्लागार विचारा' : 'Decision Copilot'}
             </span>
           </div>
         </button>
@@ -239,7 +232,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 </div>
                 <p className="text-[11px] text-emerald-200 font-medium">
-                  {language === 'mr-IN' ? 'अचूक कृषी निर्णय तज्ज्ञ • ऑनलाइन' : language === 'hi-IN' ? 'सटीक कृषि निर्णय विशेषज्ञ • ऑनलाइन' : 'Agricultural Decision Expert • Number Guard Active'}
+                  {language === 'mr-IN' ? 'अचूक कृषी निर्णय तज्ज्ञ • ऑनलाइन' : 'Agricultural Decision Expert • Number Guard Active'}
                 </p>
               </div>
             </div>
@@ -254,7 +247,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           {/* Context Banner */}
           <div className="bg-emerald-50 px-4 py-2 border-b border-emerald-100 flex items-center justify-between text-[11px] font-bold text-emerald-900">
             <span>
-              🌾 {slots.quantity || 20} qtl {slots.commodity || 'Tomato'} • {slots.home_mandi || 'Nashik APMC'}
+              🌾 {slots.quantity || 20} {language === 'mr-IN' ? 'क्विंटल' : 'qtl'} {slots.commodity === 'Tomato' ? (language === 'mr-IN' ? 'टोमॅटो' : 'Tomato') : (language === 'mr-IN' ? 'कांदा' : 'Onion')} • {slots.home_mandi || 'Nashik APMC'}
             </span>
             <span className="bg-emerald-200/80 text-emerald-950 px-2 py-0.5 rounded-full">
               {decisionRecord?.chosen.action || 'WAIT'}
@@ -306,7 +299,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
                 <div className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce"></div>
                 <div className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.2s]"></div>
                 <div className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.4s]"></div>
-                <span>Analyzing market economics...</span>
+                <span>{language === 'mr-IN' ? 'बाजार विश्लेषणाची पडताळणी करत आहे...' : 'Analyzing market economics...'}</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -315,7 +308,7 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           {/* Quick Prompts */}
           <div className="p-2.5 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             {quickPrompts.map((p, idx) => {
-              const text = language === 'mr-IN' ? p.mr : language === 'hi-IN' ? p.hi : p.en;
+              const text = language === 'mr-IN' ? p.mr : p.en;
               return (
                 <button
                   key={idx}
@@ -349,8 +342,6 @@ export const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
               placeholder={
                 language === 'mr-IN'
                   ? 'काहीही विचारा (उदा. थांबू की विकू?)...'
-                  : language === 'hi-IN'
-                  ? 'पूछिए (जैसे रुकूं या बेचूं?)...'
                   : 'Ask about prices, wait decisions or costs...'
               }
               className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white"

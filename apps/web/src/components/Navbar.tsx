@@ -1,11 +1,12 @@
 import React from 'react';
 import { Sprout, Edit3, Globe, Sun, Moon, Sliders, Layers } from 'lucide-react';
+import { SupportedLanguage } from '../types';
 
 interface Props {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  language: 'mr-IN' | 'hi-IN' | 'en-IN';
-  setLanguage: (lang: 'mr-IN' | 'hi-IN' | 'en-IN') => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
   riskProfile: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE';
   setRiskProfile: (prof: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE') => void;
   theme: 'light' | 'dark';
@@ -40,19 +41,19 @@ export const Navbar: React.FC<Props> = ({
   const farmerTabs = [
     {
       id: 'advice',
-      label: language === 'mr-IN' ? '📈 बाजार सल्ला' : language === 'hi-IN' ? '📈 मंडी सलाह' : '📈 Market Advice'
+      label: language === 'mr-IN' ? '📈 बाजार सल्ला' : '📈 Market Advice'
     },
     {
       id: 'simulator',
-      label: language === 'mr-IN' ? '🧪 काय घडेल नियोजन' : language === 'hi-IN' ? '🧪 क्या होगा अगर' : '🧪 What-If Planner'
+      label: language === 'mr-IN' ? '🧪 काय घडेल नियोजन' : '🧪 What-If Planner'
     },
     {
       id: 'costs',
-      label: language === 'mr-IN' ? '💰 खर्च पावती' : language === 'hi-IN' ? '💰 खर्च रसीद' : '💰 Expense Bill'
+      label: language === 'mr-IN' ? '💰 खर्च पावती' : '💰 Expense Bill'
     },
     {
       id: 'farm',
-      label: language === 'mr-IN' ? '🌾 माझे शेत' : language === 'hi-IN' ? '🌾 मेरा खेत' : '🌾 My Farm'
+      label: language === 'mr-IN' ? '🌾 माझे शेत' : '🌾 My Farm'
     }
   ];
 
@@ -71,14 +72,12 @@ export const Navbar: React.FC<Props> = ({
             </div>
             <div>
               <span className="text-xl font-extrabold tracking-tight text-emerald-950 font-serif block leading-tight">
-                KrishiNirnay
+                {language === 'mr-IN' ? 'कृषिनिर्णय' : 'KrishiNirnay'}
               </span>
               <p className="text-[11px] text-emerald-800 font-medium hidden sm:block">
                 {language === 'mr-IN'
                   ? 'योग्य भावात, समृद्धीच्या वाटेवर.'
-                  : language === 'hi-IN'
-                  ? 'सही भाव से, समृद्धि की राह पे.'
-                  : 'Sahi Bhav Se, Samriddhi Ki Raah Pe.'}
+                  : 'From Right Price to Prosperity.'}
               </p>
             </div>
           </button>
@@ -105,8 +104,6 @@ export const Navbar: React.FC<Props> = ({
                 {wsStatus === 'connected'
                   ? language === 'mr-IN'
                     ? 'थेट बाजार प्रवाह'
-                    : language === 'hi-IN'
-                    ? 'लाइव स्ट्रीम'
                     : 'Live Stream'
                   : 'Connecting...'}
               </span>
@@ -124,16 +121,6 @@ export const Navbar: React.FC<Props> = ({
               >
                 <span>🇮🇳</span>
                 <span>मराठी</span>
-              </button>
-              <button
-                onClick={() => setLanguage('hi-IN')}
-                className={`px-2 py-1 rounded-xl text-xs font-bold transition-all ${
-                  language === 'hi-IN'
-                    ? 'bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-600'
-                    : 'text-emerald-800 hover:bg-emerald-100'
-                }`}
-              >
-                हिंदी
               </button>
               <button
                 onClick={() => setLanguage('en-IN')}
@@ -157,7 +144,7 @@ export const Navbar: React.FC<Props> = ({
               >
                 <Sliders className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="hidden sm:inline">
-                  {language === 'mr-IN' ? '📊 सखोल अहवाल' : language === 'hi-IN' ? '📊 तकनीकी रिपोर्ट' : '📊 Judge Tools'}
+                  {language === 'mr-IN' ? '📊 सखोल अहवाल' : '📊 Judge Tools'}
                 </span>
               </button>
             )}

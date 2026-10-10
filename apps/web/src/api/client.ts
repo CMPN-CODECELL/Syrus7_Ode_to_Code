@@ -15,7 +15,9 @@ import {
   DemoFailureMode,
   MarketCalendarResponse,
   WeatherImpactResponse,
-  LiveMarketMessage
+  LiveMarketMessage,
+  ValidationSummaryResponse,
+  SeriesValidationResponse
 } from '../types';
 
 const API_BASE = ''; // uses vite proxy or relative path
@@ -240,6 +242,24 @@ export class ApiClient {
     } catch (e) {
       return text;
     }
+  }
+
+  static async getModelValidationSummary(): Promise<ValidationSummaryResponse> {
+    const res = await fetch(`${API_BASE}/api/model-validation/summary`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  static async getSeriesValidation(
+    mandi: string = 'Nashik APMC',
+    crop: string = 'Tomato',
+    horizon: number = 1
+  ): Promise<SeriesValidationResponse> {
+    const res = await fetch(
+      `${API_BASE}/api/model-validation/series?mandi=${encodeURIComponent(mandi)}&crop=${encodeURIComponent(crop)}&horizon=${horizon}`
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
   }
 
   static async transcribeAudio(audioBase64?: string, language: string = 'mr-IN', simulatedText?: string): Promise<any> {

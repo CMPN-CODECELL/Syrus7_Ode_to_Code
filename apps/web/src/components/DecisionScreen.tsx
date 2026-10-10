@@ -23,7 +23,7 @@ import {
   Check,
   Navigation
 } from 'lucide-react';
-import { DecisionRecord, SlotSchema, WeatherImpactResponse } from '../types';
+import { DecisionRecord, SlotSchema, WeatherImpactResponse, SupportedLanguage } from '../types';
 import { ApiClient } from '../api/client';
 import { localizeCrop, localizeMandi, formatCurrency } from '../localization/translator';
 
@@ -35,7 +35,7 @@ interface DecisionScreenProps {
   onOpenScenarios?: () => void;
   onOpenCosts?: () => void;
   labels: Record<string, string>;
-  language?: 'mr-IN' | 'hi-IN' | 'en-IN';
+  language?: SupportedLanguage;
   isInsufficientEvidence?: boolean;
   liveTicker?: string;
   wsStatus?: 'connected' | 'disconnected' | 'connecting';
@@ -464,14 +464,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
             ></span>
           </span>
           <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400 flex-shrink-0 font-mono">
-            Live Mandi Stream:
+            {language === 'mr-IN' ? 'थेट बाजार प्रवाह:' : 'Live Mandi Stream:'}
           </span>
           <span className="text-xs text-slate-200 font-medium truncate font-sans">
             {liveTicker}
           </span>
         </div>
         <span className="text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap hidden sm:inline bg-slate-800 px-2 py-0.5 rounded-md">
-          {wsStatus === 'connected' ? '⚡ WS Active' : '🔄 Connecting'}
+          {wsStatus === 'connected'
+            ? language === 'mr-IN' ? '⚡ थेट सुरू' : '⚡ WS Active'
+            : language === 'mr-IN' ? '🔄 जोडत आहे' : '🔄 Connecting'}
         </span>
       </div>
 
@@ -481,14 +483,18 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-emerald-600" />
             <h2 className="text-base sm:text-lg font-black text-slate-900 font-serif">
-              Your Farm Parameters & Selling Conditions
+              {language === 'mr-IN' ? 'तुमचे शेत व विक्री नियोजन तपशील' : 'Your Farm Parameters & Selling Conditions'}
             </h2>
           </div>
           <button
             onClick={() => setShowInputPanel(!showInputPanel)}
             className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
           >
-            <span>{showInputPanel ? 'Hide Controls' : 'Adjust Parameters'}</span>
+            <span>
+              {showInputPanel
+                ? language === 'mr-IN' ? 'तपशील लपवा' : 'Hide Controls'
+                : language === 'mr-IN' ? 'तपशील बदला' : 'Adjust Parameters'}
+            </span>
             {showInputPanel ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
@@ -500,21 +506,19 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
                 {language === 'mr-IN'
                   ? '१. शेतीमाल / पीक निवडा (केवळ टोमॅटो आणि कांदा)'
-                  : language === 'hi-IN'
-                  ? '1. फसल चुनें (टमाटर और प्याज)'
                   : '1. Select Commodity / Crop (Scope: Tomato & Onion)'}
               </span>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 {[
                   {
                     id: 'Tomato',
-                    name: language === 'mr-IN' ? 'टोमॅटो' : language === 'hi-IN' ? 'टमाटर' : 'Tomato',
+                    name: language === 'mr-IN' ? 'टोमॅटो' : 'Tomato',
                     icon: '🍅',
                     desc: language === 'mr-IN' ? 'नाशवंत माल • प्लास्टिक क्रेट्स • ₹१,८००/क्विंटल' : 'Perishable • Crates • ₹1,800/qtl'
                   },
                   {
                     id: 'Onion',
-                    name: language === 'mr-IN' ? 'कांदा' : language === 'hi-IN' ? 'प्याज' : 'Onion',
+                    name: language === 'mr-IN' ? 'कांदा' : 'Onion',
                     icon: '🧅',
                     desc: language === 'mr-IN' ? 'टिकाऊ माल • हवेशीर चाळ • ₹२,७००/क्विंटल' : 'Durable • Chawl • ₹2,700/qtl'
                   }
@@ -549,10 +553,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-emerald-700" />
-                  <span>2. Farm Location / Taluka Catchment (Road Route Geocoding)</span>
+                  <span>
+                    {language === 'mr-IN'
+                      ? '२. शेताचे ठिकाण / तालुका (थेट रस्ता अंतर)'
+                      : '2. Farm Location / Taluka Catchment (Road Route Geocoding)'}
+                  </span>
                 </span>
                 <span className="text-[11px] font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
-                  📍 Nearest: {nearestMandiId.replace(' APMC', '')} ({minDistanceKm} km)
+                  {language === 'mr-IN'
+                    ? `📍 जवळची बाजार समिती: ${nearestMandiId.replace(' APMC', '')} (${minDistanceKm} किमी)`
+                    : `📍 Nearest: ${nearestMandiId.replace(' APMC', '')} (${minDistanceKm} km)`}
                 </span>
               </div>
 
@@ -560,6 +570,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                 {Object.values(FARM_LOCATIONS).map((loc) => {
                   const isSel = selectedFarmLocation === loc.id;
                   const distToNearest = Math.min(...Object.values(loc.distances));
+                  const locTitle = language === 'mr-IN' ? loc.label.mr : loc.name.split(' (')[0];
                   return (
                     <button
                       key={loc.id}
@@ -570,13 +581,15 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                           : 'bg-white hover:bg-emerald-50 text-slate-700 border-emerald-200'
                       }`}
                     >
-                      <div className="truncate">{loc.name.split(' (')[0]}</div>
+                      <div className="truncate">{locTitle}</div>
                       <span
                         className={`text-[10px] font-medium block mt-0.5 truncate ${
                           isSel ? 'text-emerald-100' : 'text-slate-500'
                         }`}
                       >
-                        Nearest APMC: ~{distToNearest} km
+                        {language === 'mr-IN'
+                          ? `जवळची बाजार समिती: ~${distToNearest} किमी`
+                          : `Nearest APMC: ~${distToNearest} km`}
                       </span>
                     </button>
                   );
@@ -586,11 +599,19 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               {/* Status explanation */}
               <div className="flex items-center justify-between text-[11px] font-medium text-emerald-900 pt-1">
                 <span>
-                  🛣️ Selected Mandi: <strong>{selectedMandi}</strong> • Road Distance: <strong>{distanceKm} km</strong> • Travel Time: ~<strong>{oneWayMinutes} mins</strong> ({roundTripHours} hrs round trip)
+                  {language === 'mr-IN' ? (
+                    <>
+                      🛣️ निवडलेली बाजार समिती: <strong>{selectedMandi.replace(' APMC', ' बाजार समिती')}</strong> • रस्ता अंतर: <strong>{distanceKm} किमी</strong> • प्रवासाची वेळ: ~<strong>{oneWayMinutes} मिनिटे</strong> (जाणे-येणे {roundTripHours} तास)
+                    </>
+                  ) : (
+                    <>
+                      🛣️ Selected Mandi: <strong>{selectedMandi}</strong> • Road Distance: <strong>{distanceKm} km</strong> • Travel Time: ~<strong>{oneWayMinutes} mins</strong> ({roundTripHours} hrs round trip)
+                    </>
+                  )}
                 </span>
                 {!isNearestSelected && (
                   <span className="text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300">
-                    🔄 Mandi Override Active
+                    {language === 'mr-IN' ? '🔄 अन्य बाजार समिती निवडली' : '🔄 Mandi Override Active'}
                   </span>
                 )}
               </div>
@@ -602,10 +623,10 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    3. Quantity (Quintals)
+                    {language === 'mr-IN' ? '३. उत्पादन प्रमाण (क्विंटल)' : '3. Quantity (Quintals)'}
                   </span>
                   <span className="text-xs font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    {selectedQuantity} qtl
+                    {selectedQuantity} {language === 'mr-IN' ? 'क्विंटल' : 'qtl'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -619,7 +640,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                           : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                       }`}
                     >
-                      {q} qtl
+                      {q} {language === 'mr-IN' ? 'क्विं.' : 'qtl'}
                     </button>
                   ))}
                   <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
@@ -643,13 +664,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               {/* Mandi Selection */}
               <div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  4. Destination Mandi / Market
+                  {language === 'mr-IN' ? '४. इच्छित बाजार समिती / मंडी' : '4. Destination Mandi / Market'}
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.keys(activeProfile.baseRates).map((mId) => {
                     const isMandiSel = selectedMandi === mId;
                     const isMandiNearest = mId === nearestMandiId;
                     const dKm = mandiDistances[mId] || 60;
+                    const mandiDisplayName = language === 'mr-IN'
+                      ? mId.replace(' APMC', '')
+                      : mId.replace(' APMC', '');
                     return (
                       <button
                         key={mId}
@@ -661,13 +685,13 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                         }`}
                         title={mId}
                       >
-                        <span className="text-xs font-bold block truncate">{mId.replace(' APMC', '')}</span>
+                        <span className="text-xs font-bold block truncate">{mandiDisplayName}</span>
                         <span
                           className={`text-[10px] block truncate mt-0.5 ${
                             isMandiSel ? 'text-emerald-100 font-bold' : 'text-slate-500'
                           }`}
                         >
-                          {dKm} km {isMandiNearest ? '📍' : ''}
+                          {dKm} {language === 'mr-IN' ? 'किमी' : 'km'} {isMandiNearest ? '📍' : ''}
                         </span>
                       </button>
                     );
@@ -681,12 +705,17 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               {/* Transport Vehicle */}
               <div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  5. Transport Vehicle (Round-Trip Freight Model)
+                  {language === 'mr-IN'
+                    ? '५. वाहतूक वाहन (जाणे-येणे भाडे खर्च)'
+                    : '5. Transport Vehicle (Round-Trip Freight Model)'}
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   {VEHICLES.map((v) => {
                     const vTrips = Math.max(1, Math.ceil(selectedQuantity / v.capacity));
                     const vFreight = v.id === 'self' ? 0 : Math.round(v.ratePerKm * distanceKm * v.roundTripFactor * vTrips);
+                    const vDisplayName = language === 'mr-IN'
+                      ? v.id === 'pickup' ? 'बोलेरो / पिकअप' : v.id === 'tractor' ? 'ट्रॅक्टर ट्रॉली' : v.id === 'truck' ? '१०-चाकी ट्रक' : 'स्थानिक विक्री'
+                      : v.name;
                     return (
                       <button
                         key={v.id}
@@ -699,10 +728,10 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                       >
                         <div className="flex items-center gap-1.5">
                           <span className="text-base">{v.icon}</span>
-                          <span className="font-bold text-slate-900 truncate">{v.name}</span>
+                          <span className="font-bold text-slate-900 truncate">{vDisplayName}</span>
                         </div>
                         <span className="text-[10px] text-slate-500 block mt-0.5">
-                          ₹{vFreight} ({vTrips} trip{vTrips > 1 ? 's' : ''})
+                          ₹{vFreight} ({vTrips} {language === 'mr-IN' ? 'फेरी' : vTrips > 1 ? 'trips' : 'trip'})
                         </span>
                       </button>
                     );
@@ -713,30 +742,48 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               {/* Storage Condition & Risk Level */}
               <div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  6. Storage Facility ({selectedCrop})
+                  {language === 'mr-IN'
+                    ? `६. साठवणूक सोय (${selectedCrop === 'Tomato' ? 'टोमॅटो' : 'कांदा'})`
+                    : `6. Storage Facility (${selectedCrop})`}
                 </span>
                 <div className="grid grid-cols-3 gap-1.5">
-                  {activeProfile.storages.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setSelectedStorage(s.id)}
-                      className={`py-2 px-1.5 rounded-xl text-center border transition text-[11px] ${
-                        selectedStorage === s.id
-                          ? 'bg-emerald-50 border-emerald-600 font-bold text-emerald-950 ring-1 ring-emerald-600'
-                          : 'bg-slate-50 border-slate-200 text-slate-600'
-                      }`}
-                    >
-                      <span className="block font-black truncate">{s.name.split(' (')[0]}</span>
-                      <span className="text-[9px] text-slate-500 block truncate">{s.desc}</span>
-                    </button>
-                  ))}
+                  {activeProfile.storages.map((s) => {
+                    const sDisplayName = language === 'mr-IN'
+                      ? s.id === 'open'
+                        ? selectedCrop === 'Tomato' ? 'उघडा शेड' : 'उघडी चाळ'
+                        : s.id === 'crates'
+                        ? selectedCrop === 'Tomato' ? 'हवेशीर क्रेट्स' : 'पारंपारिक चाळ'
+                        : selectedCrop === 'Tomato' ? 'कोल्ड स्टोरेज' : 'शीतगृह'
+                      : s.name.split(' (')[0];
+                    const sDesc = language === 'mr-IN'
+                      ? s.id === 'open'
+                        ? 'घट जास्त (२.५%/दिवस)'
+                        : s.id === 'crates'
+                        ? 'प्रमाणित (१.०%/दिवस)'
+                        : 'कमी घट (०.३%/दिवस)'
+                      : s.desc;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedStorage(s.id)}
+                        className={`py-2 px-1.5 rounded-xl text-center border transition text-[11px] ${
+                          selectedStorage === s.id
+                            ? 'bg-emerald-50 border-emerald-600 font-bold text-emerald-950 ring-1 ring-emerald-600'
+                            : 'bg-slate-50 border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        <span className="block font-black truncate">{sDisplayName}</span>
+                        <span className="text-[9px] text-slate-500 block truncate">{sDesc}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5 mt-2">
                   {[
-                    { id: 'CAUTIOUS' as const, label: '🛡️ Cautious' },
-                    { id: 'BALANCED' as const, label: '⚖️ Balanced' },
-                    { id: 'AGGRESSIVE' as const, label: '🚀 High Return' }
+                    { id: 'CAUTIOUS' as const, label: language === 'mr-IN' ? '🛡️ सुरक्षित' : '🛡️ Cautious' },
+                    { id: 'BALANCED' as const, label: language === 'mr-IN' ? '⚖️ संतुलित' : '⚖️ Balanced' },
+                    { id: 'AGGRESSIVE' as const, label: language === 'mr-IN' ? '🚀 आक्रमक' : '🚀 High Return' }
                   ].map((r) => (
                     <button
                       key={r.id}
@@ -757,15 +804,15 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
             {/* Row 5: Target Selling Horizon */}
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                7. Selling Horizon (When to Sell)
+                {language === 'mr-IN' ? '७. विक्रीची वेळ (कधी विकावे)' : '7. Selling Horizon (When to Sell)'}
               </span>
               <div className="grid grid-cols-5 gap-2">
                 {[
-                  { d: 0, label: 'Today (Sell Now)', icon: '⚡' },
-                  { d: 1, label: 'Tomorrow (+1d)', icon: '📅' },
-                  { d: 2, label: 'In 2 Days (+2d 🌟)', icon: '⭐' },
-                  { d: 3, label: 'In 3 Days (+3d)', icon: '⏳' },
-                  { d: 4, label: 'In 4 Days (Closed 🛑)', icon: '🛑' }
+                  { d: 0, label: language === 'mr-IN' ? 'आज (लगेच)' : 'Today (Sell Now)', icon: '⚡' },
+                  { d: 1, label: language === 'mr-IN' ? 'उद्या (+१ दिवस)' : 'Tomorrow (+1d)', icon: '📅' },
+                  { d: 2, label: language === 'mr-IN' ? '२ दिवसांनी (+२ दिवस 🌟)' : 'In 2 Days (+2d 🌟)', icon: '⭐' },
+                  { d: 3, label: language === 'mr-IN' ? '३ दिवसांनी (+३ दिवस)' : 'In 3 Days (+3d)', icon: '⏳' },
+                  { d: 4, label: language === 'mr-IN' ? '४ दिवसांनी (बंद 🛑)' : 'In 4 Days (Closed 🛑)', icon: '🛑' }
                 ].map((day) => (
                   <button
                     key={day.d}
@@ -793,10 +840,23 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         <div className="p-4 rounded-3xl bg-rose-50 border-2 border-rose-300 flex items-start gap-3 shadow-md animate-in fade-in">
           <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
           <div className="text-xs text-rose-900 space-y-1">
-            <span className="font-black text-sm block">🛑 APMC CLOSED on Day 4 (Amavasya Festival)</span>
+            <span className="font-black text-sm block">
+              {language === 'mr-IN'
+                ? '🛑 दिवस ४ रोजी बाजार समिती बंद (दर्श अमावस्या उत्सव)'
+                : '🛑 APMC CLOSED on Day 4 (Amavasya Festival)'}
+            </span>
             <p>
-              Trading yards across Nashik, Pimpalgaon, and Sangamner are officially closed on Day 4 (Tuesday) for the Amavasya Festival.
-              Produce cannot be auctioned. <strong>We strongly advise selling on Day 2 (+₹{calculatedGain.toLocaleString('en-IN')} gain) or holding until Day 3/5.</strong>
+              {language === 'mr-IN' ? (
+                <>
+                  नाशिक, पिंपळगाव आणि संगमनेर बाजार समित्या दिवस ४ (मंगळवार) रोजी दर्श अमावस्येनिमित्त अधिकृतपणे बंद राहतील.
+                  लिलाव होणार नाही. <strong>आम्ही दिवस २ रोजी विक्री करण्याचा (+₹{calculatedGain.toLocaleString('mr-IN')} जादा नफा) किंवा दिवस ३/५ पर्यंत साठवून ठेवण्याचा ठाम सल्ला देतो.</strong>
+                </>
+              ) : (
+                <>
+                  Trading yards across Nashik, Pimpalgaon, and Sangamner are officially closed on Day 4 (Tuesday) for the Amavasya Festival.
+                  Produce cannot be auctioned. <strong>We strongly advise selling on Day 2 (+₹{calculatedGain.toLocaleString('en-IN')} gain) or holding until Day 3/5.</strong>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -806,9 +866,21 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         <div className="p-4 rounded-3xl bg-amber-50 border-2 border-amber-300 flex items-start gap-3 shadow-md animate-in fade-in">
           <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="text-xs text-amber-900 space-y-1">
-            <span className="font-black text-sm block">⚠️ Sunday APMC Closure Notice</span>
+            <span className="font-black text-sm block">
+              {language === 'mr-IN'
+                ? '⚠️ रविवारी बाजार समिती बंद सूचना'
+                : '⚠️ Sunday APMC Closure Notice'}
+            </span>
             <p>
-              Nashik APMC main yard is closed for trading on Sundays. However, <strong>Pimpalgaon Baswant APMC</strong> private yard is fully operational on Sunday with strong Mumbai/Gujarat buyer presence.
+              {language === 'mr-IN' ? (
+                <>
+                  नाशिक मुख्य बाजार समिती आवारात रविवारी लिलाव बंद असतो. तथापि, <strong>पिंपळगाव बसवंत बाजार समिती</strong> खाजगी आवार रविवारी मुंबई व गुजरातच्या मोठ्या खरेदीदारांसह पूर्णपणे चालू असतो.
+                </>
+              ) : (
+                <>
+                  Nashik APMC main yard is closed for trading on Sundays. However, <strong>Pimpalgaon Baswant APMC</strong> private yard is fully operational on Sunday with strong Mumbai/Gujarat buyer presence.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -852,7 +924,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
             title="Listen to recommendation"
           >
             <Volume2 className="w-4 h-4 text-emerald-200 animate-pulse" />
-            <span>{language === 'mr-IN' ? 'ऐका' : language === 'hi-IN' ? 'सुनें' : 'Listen'}</span>
+            <span>{language === 'mr-IN' ? 'ऐका' : 'Listen'}</span>
           </button>
         </div>
 
@@ -941,14 +1013,20 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           <div>
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-emerald-600" />
-              <span>Compare Mandis: Which Market Gives You Highest Profit?</span>
+              <span>
+                {language === 'mr-IN'
+                  ? 'बाजार समित्यांची तुलना: कोणत्या बाजारात सर्वाधिक नफा मिळेल?'
+                  : 'Compare Mandis: Which Market Gives You Highest Profit?'}
+              </span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Net cash in your pocket for {selectedQuantity} qtl {selectedCrop} from {activeLocation.name}
+              {language === 'mr-IN'
+                ? `${activeLocation.label.mr} येथून ${selectedQuantity} क्विंटल ${selectedCrop === 'Tomato' ? 'टोमॅटो' : 'कांदा'} विकल्यास प्रत्यक्ष हातात येणारी रक्कम`
+                : `Net cash in your pocket for ${selectedQuantity} qtl ${selectedCrop} from ${activeLocation.name}`}
             </p>
           </div>
           <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            3 APMC Markets Compared
+            {language === 'mr-IN' ? '३ बाजार समित्यांची तुलना' : '3 APMC Markets Compared'}
           </span>
         </div>
 
@@ -982,28 +1060,42 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                           : 'bg-slate-200 text-slate-700'
                       }`}
                     >
-                      {isBestNetToday ? 'Highest In-Hand 🌟' : isNearest ? '📍 Nearest Mandi' : 'APMC Market'}
+                      {isBestNetToday
+                        ? language === 'mr-IN' ? 'सर्वाधिक निव्वळ नफा 🌟' : 'Highest In-Hand 🌟'
+                        : isNearest
+                        ? language === 'mr-IN' ? '📍 जवळची बाजार समिती' : '📍 Nearest Mandi'
+                        : language === 'mr-IN' ? 'बाजार समिती' : 'APMC Market'}
                     </span>
                     {isSelected && (
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Active
+                        <Check className="w-3 h-3" /> {language === 'mr-IN' ? 'सक्रिय' : 'Active'}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-sm font-black text-slate-900 mt-2">{mId}</h3>
+                  <h3 className="text-sm font-black text-slate-900 mt-2">
+                    {language === 'mr-IN' ? mId.replace(' APMC', ' बाजार समिती') : mId}
+                  </h3>
                   <span className="text-xs text-slate-500 font-medium block mt-0.5">
-                    Road: {distKm} km • Freight: ₹{distFreight}
+                    {language === 'mr-IN'
+                      ? `रस्ता: ${distKm} किमी • भाडे: ₹${distFreight}`
+                      : `Road: ${distKm} km • Freight: ₹${distFreight}`}
                   </span>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-600">Today's Rate:</span>
-                    <span className="font-bold text-slate-900">₹{rate}/qtl</span>
+                    <span className="text-slate-600">
+                      {language === 'mr-IN' ? 'आजचा भाव:' : "Today's Rate:"}
+                    </span>
+                    <span className="font-bold text-slate-900">
+                      ₹{rate}/{language === 'mr-IN' ? 'क्विं.' : 'qtl'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-700">Net in Hand:</span>
+                    <span className="text-slate-700">
+                      {language === 'mr-IN' ? 'हातात निव्वळ:' : 'Net in Hand:'}
+                    </span>
                     <span className="text-sm font-black text-emerald-700">
                       ₹{estNet.toLocaleString('en-IN')}
                     </span>
@@ -1017,7 +1109,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                         : 'bg-white border border-slate-300 text-slate-800 hover:bg-emerald-50 hover:text-emerald-800'
                     }`}
                   >
-                    {isSelected ? 'Currently Selected' : 'Select This Mandi'}
+                    {isSelected
+                      ? language === 'mr-IN' ? 'सध्या निवडलेली' : 'Currently Selected'
+                      : language === 'mr-IN' ? 'ही बाजार समिती निवडा' : 'Select This Mandi'}
                   </button>
                 </div>
               </div>
@@ -1032,14 +1126,22 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           <div>
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-emerald-600" />
-              <span>7-Day Price Forecast & Best Day to Sell</span>
+              <span>
+                {language === 'mr-IN'
+                  ? '७-दिवसीय भाव अंदाज व विक्रीसाठी सर्वोत्तम दिवस'
+                  : '7-Day Price Forecast & Best Day to Sell'}
+              </span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Click any day bar to simulate selling on that day
+              {language === 'mr-IN'
+                ? 'त्या दिवशी विक्री केल्यास काय होईल ते पाहण्यासाठी स्तंभावर क्लिक करा'
+                : 'Click any day bar to simulate selling on that day'}
             </p>
           </div>
           <span className="text-xs font-black text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-            Peak in 2 Days: ₹{futureRate}/qtl
+            {language === 'mr-IN'
+              ? `२ दिवसांत उच्चांक: ₹${futureRate}/क्विंटल`
+              : `Peak in 2 Days: ₹${futureRate}/qtl`}
           </span>
         </div>
 
@@ -1067,7 +1169,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                         : 'text-slate-600'
                     }`}
                   >
-                    {f.isClosed ? '🛑 Closed' : `₹${f.price}`}
+                    {f.isClosed ? (language === 'mr-IN' ? '🛑 बंद' : '🛑 Closed') : `₹${f.price}`}
                   </span>
 
                   <div
@@ -1111,7 +1213,15 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         <div className="p-3 bg-emerald-50/80 rounded-2xl border border-emerald-200 text-xs text-slate-800 flex items-center gap-2">
           <span className="text-base">💡</span>
           <span>
-            <strong>Farmer Takeaway:</strong> Today's rate is ₹{basePrice}. In 2 days, price peaks at ₹{futureRate}/qtl. Note that on Day 4 (Tuesday), APMC is closed for Amavasya Festival. <strong>Waiting 2 days yields maximum net realization!</strong>
+            {language === 'mr-IN' ? (
+              <>
+                <strong>शेतकऱ्यांसाठी महत्त्वाचे:</strong> आजचा भाव ₹{basePrice} आहे. २ दिवसांत भाव उच्चांक गाठून ₹{futureRate}/क्विंटल होईल. लक्षात ठेवा, दिवस ४ (मंगळवार) रोजी दर्श अमावस्येनिमित्त बाजार समिती बंद आहे. <strong>२ दिवस थांबल्यास जास्तीत जास्त निव्वळ नफा मिळतो!</strong>
+              </>
+            ) : (
+              <>
+                <strong>Farmer Takeaway:</strong> Today's rate is ₹{basePrice}. In 2 days, price peaks at ₹{futureRate}/qtl. Note that on Day 4 (Tuesday), APMC is closed for Amavasya Festival. <strong>Waiting 2 days yields maximum net realization!</strong>
+              </>
+            )}
           </span>
         </div>
       </div>
@@ -1304,34 +1414,50 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-3">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Award className="w-5 h-5 text-emerald-600" />
-          <span>Why is this the recommended action?</span>
+          <span>{language === 'mr-IN' ? 'हाच सल्ला का दिला जात आहे?' : 'Why is this the recommended action?'}</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
-            <span className="font-black text-emerald-950 block">📦 Lower Mandi Arrivals Today</span>
+            <span className="font-black text-emerald-950 block">
+              {language === 'mr-IN' ? '📦 बाजारात आज कमी आवक' : '📦 Lower Mandi Arrivals Today'}
+            </span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Arrivals at {selectedMandi} are steady at 142 tonnes. Demand from Mumbai/Pune buyers is strong.
+              {language === 'mr-IN'
+                ? `${selectedMandi.replace(' APMC', '')} येथे आवक स्थिर (१४२ टन) आहे. मुंबई व पुणे खरेदीदारांची मागणी भक्कम आहे.`
+                : `Arrivals at ${selectedMandi} are steady at 142 tonnes. Demand from Mumbai/Pune buyers is strong.`}
             </p>
           </div>
 
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
-            <span className="font-black text-emerald-950 block">⚡ 62.4% Probability of Beating Today</span>
+            <span className="font-black text-emerald-950 block">
+              {language === 'mr-IN' ? '⚡ आजपेक्षा जास्त भाव मिळण्याची ६२.४% शक्यता' : '⚡ 62.4% Probability of Beating Today'}
+            </span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Historical patterns and XGBoost conformal forecasting indicate 62.4% likelihood of higher net cash after travel and holding decay.
+              {language === 'mr-IN'
+                ? 'मागील बाजाराचे कल व एक्सजीबूस्ट (XGBoost) अंदाज दाखवतात की वाहतूक व नासाडी वजा जाता आजपेक्षा जादा निव्वळ नफा मिळण्याची ६२.४% शक्यता आहे.'
+                : 'Historical patterns and XGBoost conformal forecasting indicate 62.4% likelihood of higher net cash after travel and holding decay.'}
             </p>
           </div>
 
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
-            <span className="font-black text-emerald-950 block">🛡️ Guaranteed Break-Even Floor</span>
+            <span className="font-black text-emerald-950 block">
+              {language === 'mr-IN' ? '🛡️ हमी भाव (किमान आरक्षण भाव)' : '🛡️ Guaranteed Break-Even Floor'}
+            </span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Do not sell below ₹{calculatedReservation}/qtl in upcoming trading sessions to guarantee profit over today's sale.
+              {language === 'mr-IN'
+                ? `आजच्या विक्रीपेक्षा जादा फायदा मिळवण्यासाठी पुढील लिलावात ₹${calculatedReservation}/क्विंटल पेक्षा कमी भावात विक्री करू नका.`
+                : `Do not sell below ₹${calculatedReservation}/qtl in upcoming trading sessions to guarantee profit over today's sale.`}
             </p>
           </div>
 
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
-            <span className="font-black text-emerald-950 block">🛑 Festival Closure Protection</span>
+            <span className="font-black text-emerald-950 block">
+              {language === 'mr-IN' ? '🛑 सणाच्या दिवशी बाजार समिती बंद' : '🛑 Festival Closure Protection'}
+            </span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Mandis are closed on Day 4 (Tuesday) for Amavasya Festival. Produce must be auctioned before or held till Wednesday.
+              {language === 'mr-IN'
+                ? 'दिवस ४ (मंगळवार) रोजी दर्श अमावस्येनिमित्त बाजार समिती बंद राहील. माल त्यापूर्वी विकावा किंवा बुधवारपर्यंत साठवावा.'
+                : 'Mandis are closed on Day 4 (Tuesday) for Amavasya Festival. Produce must be auctioned before or held till Wednesday.'}
             </p>
           </div>
         </div>
@@ -1344,7 +1470,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-md transition"
             >
               <Receipt className="w-4 h-4" />
-              <span>View Transparent Cost Bill & Deductions →</span>
+              <span>
+                {language === 'mr-IN' ? 'पारदर्शक खर्च पावती व कपाती पहा →' : 'View Transparent Cost Bill & Deductions →'}
+              </span>
             </button>
           </div>
         )}

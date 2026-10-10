@@ -99,6 +99,24 @@ def test_weather_impact_endpoint():
     assert "harvest_disruption" in data
     assert "storage_spoilage_risk" in data
 
+def test_model_validation_endpoints():
+    res = client.get("/api/model-validation/summary")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_records"] == 10950
+    assert data["total_test_pairs"] > 4000
+    assert len(data["comparisons"]) == 42
+    assert "cutoff_date" in data
+    assert data["cutoff_date"] == "2026-04-22"
+
+    res_series = client.get("/api/model-validation/series?mandi=Nashik%20APMC&crop=Tomato&horizon=1")
+    assert res_series.status_code == 200
+    series_data = res_series.json()
+    assert len(series_data["predictions"]) > 0
+    assert "residual_stats" in series_data
+    assert "xgboost_mae" in series_data
+
+
 def test_websocket_market_feed():
     with client.websocket_connect("/ws/market-feed") as ws:
         msg = ws.receive_json()

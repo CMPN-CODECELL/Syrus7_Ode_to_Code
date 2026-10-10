@@ -7,7 +7,8 @@ import {
   Calendar,
   TrendingUp,
   History,
-  Bot
+  Bot,
+  Award
 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { DemoSwitchBar } from './components/DemoSwitchBar';
@@ -26,18 +27,18 @@ import { AssistantScreen } from './components/AssistantScreen';
 import { BottomNav } from './components/BottomNav';
 import { MyFarmScreen } from './components/MyFarmScreen';
 import { FloatingAssistant } from './components/FloatingAssistant';
+import { ModelValidationScreen } from './components/ModelValidationScreen';
 
-import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus } from './types';
+import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus, SupportedLanguage } from './types';
 import { ApiClient } from './api/client';
 
 import mrDict from './localization/mr.json';
-import hiDict from './localization/hi.json';
 import enDict from './localization/en.json';
 
 export const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'advice' | 'simulator' | 'costs' | 'farm'>('advice');
-  const [language, setLanguage] = useState<'mr-IN' | 'hi-IN' | 'en-IN'>('en-IN');
+  const [language, setLanguage] = useState<SupportedLanguage>('en-IN');
   const [riskProfile, setRiskProfile] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>('BALANCED');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [demoMode, setDemoMode] = useState<DemoFailureMode>('NORMAL');
@@ -52,7 +53,7 @@ export const App: React.FC = () => {
   const [isVoiceOpen, setIsVoiceOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isJudgeModalOpen, setIsJudgeModalOpen] = useState<boolean>(false);
-  const [judgeSubTab, setJudgeSubTab] = useState<'heatmap' | 'forecast' | 'history' | 'scenarios'>('heatmap');
+  const [judgeSubTab, setJudgeSubTab] = useState<'heatmap' | 'forecast' | 'history' | 'validation' | 'scenarios'>('heatmap');
   const [loading, setLoading] = useState<boolean>(true);
 
   const [currentSlots, setCurrentSlots] = useState<SlotSchema>({
@@ -68,7 +69,7 @@ export const App: React.FC = () => {
     ambiguous_slots: []
   });
 
-  const labels = language === 'mr-IN' ? mrDict : language === 'hi-IN' ? hiDict : enDict;
+  const labels = language === 'mr-IN' ? mrDict : enDict;
 
   // Initial Data Fetch
   const loadDecisionData = async (slots: SlotSchema, prof: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE') => {
@@ -307,8 +308,6 @@ export const App: React.FC = () => {
                   <span>
                     {language === 'mr-IN'
                       ? 'सखोल तांत्रिक अहवाल (तज्ज्ञ व परीक्षक साधन)'
-                      : language === 'hi-IN'
-                      ? 'विशेषज्ञ व निर्णायक तकनीकी रिपोर्ट'
                       : 'Judge & Expert Analytics Engine'}
                   </span>
                 </h3>
@@ -331,29 +330,35 @@ export const App: React.FC = () => {
               currentMode={demoMode}
               onModeChange={handleModeChange}
               demoStatus={demoStatus}
+              language={language}
             />
 
-            {/* Expert Sub-tabs (Clean 4 Analytics views; persistent Floating AI Assistant handles conversation) */}
+            {/* Expert Sub-tabs (5 Clean Analytics & Validation views) */}
             <div className="flex items-center gap-2 p-3 bg-slate-100 border-b border-slate-200 overflow-x-auto">
               {[
                 {
                   id: 'heatmap',
-                  label: language === 'mr-IN' ? '३×७ नफा मॅट्रिक्स' : language === 'hi-IN' ? '3×7 मैट्रिक्स' : '3×7 Heatmap',
+                  label: language === 'mr-IN' ? '३×७ नफा मॅट्रिक्स' : '3×7 Heatmap',
                   icon: Calendar
                 },
                 {
                   id: 'forecast',
-                  label: language === 'mr-IN' ? 'XGBoost भाव अंदाज' : language === 'hi-IN' ? 'XGBoost पूर्वानुमान' : 'XGBoost Forecast',
+                  label: language === 'mr-IN' ? 'XGBoost भाव अंदाज' : 'XGBoost Forecast',
                   icon: TrendingUp
                 },
                 {
                   id: 'history',
-                  label: language === 'mr-IN' ? 'ऐतिहासिक भाव कल' : language === 'hi-IN' ? 'ऐतिहासिक रुझान' : 'Historical Trend',
+                  label: language === 'mr-IN' ? 'ऐतिहासिक भाव कल' : 'Historical Trend',
                   icon: History
                 },
                 {
+                  id: 'validation',
+                  label: language === 'mr-IN' ? 'मॉडेल मूल्यांकन व तुलना' : 'Model Validation',
+                  icon: Award
+                },
+                {
                   id: 'scenarios',
-                  label: language === 'mr-IN' ? 'काय घडेल नियोजन' : language === 'hi-IN' ? 'क्या होगा अगर' : 'What-If Simulator',
+                  label: language === 'mr-IN' ? 'काय घडेल नियोजन' : 'What-If Simulator',
                   icon: Sliders
                 }
               ].map((tab) => {
@@ -395,10 +400,17 @@ export const App: React.FC = () => {
                   labels={labels}
                 />
               )}
+              {judgeSubTab === 'validation' && (
+                <ModelValidationScreen
+                  language={language}
+                  labels={labels}
+                />
+              )}
               {judgeSubTab === 'scenarios' && (
                 <ScenarioScreen
                   record={decisionRecord}
                   labels={labels}
+                  language={language}
                 />
               )}
             </div>
@@ -424,6 +436,7 @@ export const App: React.FC = () => {
           loadDecisionData(updated, updated.risk_profile);
         }}
         labels={labels}
+        language={language}
       />
 
       {/* 7. Persistent Floating AI Assistant (Krishi Mitra AI) */}

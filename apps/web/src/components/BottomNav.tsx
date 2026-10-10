@@ -1,11 +1,12 @@
 import React from 'react';
 import { TrendingUp, Sliders, Receipt, Sprout } from 'lucide-react';
+import { SupportedLanguage } from '../types';
 
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   labels: Record<string, string>;
-  language: 'mr-IN' | 'hi-IN' | 'en-IN';
+  language: SupportedLanguage;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
@@ -16,23 +17,23 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   const navItems = [
     {
       id: 'advice',
-      label: 'Advice',
+      label: language === 'mr-IN' ? 'बाजार सल्ला' : 'Advice',
       icon: TrendingUp,
       isHighlight: true
     },
     {
       id: 'simulator',
-      label: 'Planner',
+      label: language === 'mr-IN' ? 'नियोजन' : 'Planner',
       icon: Sliders
     },
     {
       id: 'costs',
-      label: 'Bill',
+      label: language === 'mr-IN' ? 'खर्च पावती' : 'Bill',
       icon: Receipt
     },
     {
       id: 'farm',
-      label: 'My Farm',
+      label: language === 'mr-IN' ? 'माझे शेत' : 'My Farm',
       icon: Sprout
     }
   ];

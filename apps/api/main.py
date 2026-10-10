@@ -19,6 +19,7 @@ from apps.api.routes.market import router as market_router
 from apps.api.routes.scenario import router as scenario_router
 from apps.api.routes.demo import router as demo_router
 from apps.api.routes.health import router as health_router
+from apps.api.routes.model_validation import router as model_validation_router
 
 app = FastAPI(
     title="KrishiNirnay Public Gateway",
@@ -45,6 +46,7 @@ app.include_router(market_router)
 app.include_router(scenario_router)
 app.include_router(demo_router)
 app.include_router(health_router)
+app.include_router(model_validation_router)
 
 @app.get("/")
 def root():
