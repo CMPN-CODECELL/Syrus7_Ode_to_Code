@@ -178,6 +178,8 @@ export interface SlotSchema {
   target_mandi?: string | null;
   requested_wait_days?: number | null;
   risk_profile: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE';
+  farm_location?: string | null;
+  storage_type?: string | null;
   vehicle_type?: string | null;
   vehicle_payload_qtl?: number | null;
   storage_available?: boolean | null;

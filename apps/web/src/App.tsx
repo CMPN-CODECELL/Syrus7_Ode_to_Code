@@ -25,6 +25,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { AssistantScreen } from './components/AssistantScreen';
 import { BottomNav } from './components/BottomNav';
 import { MyFarmScreen } from './components/MyFarmScreen';
+import { FloatingAssistant } from './components/FloatingAssistant';
 
 import { DecisionRecord, HeatmapMatrix, SlotSchema, DemoFailureMode, DemoStatus } from './types';
 import { ApiClient } from './api/client';
@@ -205,9 +206,11 @@ export const App: React.FC = () => {
                 onUpdateSlots={(updated) => {
                   const newSlots = { ...currentSlots, ...updated };
                   setCurrentSlots(newSlots);
+                  const newRisk = (updated.risk_profile as any) || riskProfile;
                   if (updated.risk_profile && updated.risk_profile !== riskProfile) {
-                    setRiskProfile(updated.risk_profile as any);
+                    setRiskProfile(newRisk);
                   }
+                  loadDecisionData(newSlots, newRisk);
                 }}
                 onPlayVoice={handlePlayVoice}
                 onOpenCosts={() => setActiveTab('costs')}
@@ -233,6 +236,7 @@ export const App: React.FC = () => {
             {activeTab === 'costs' && (
               <CostScreen
                 record={decisionRecord}
+                slots={currentSlots}
                 labels={labels}
                 language={language}
               />
@@ -400,6 +404,14 @@ export const App: React.FC = () => {
           loadDecisionData(updated, updated.risk_profile);
         }}
         labels={labels}
+      />
+
+      {/* 7. Persistent Floating AI Assistant (Krishi Mitra AI) */}
+      <FloatingAssistant
+        decisionRecord={decisionRecord}
+        slots={currentSlots}
+        language={language}
+        onPlayVoice={handlePlayVoice}
       />
     </div>
   );

@@ -139,8 +139,10 @@ def get_market_calendar(
     crop: str = Query("Tomato", description="Commodity name"),
     mandi: str = Query("Nashik APMC", description="Mandi name")
 ):
-    """Provides 7-day operating schedule including APMC weekly closures and festive holidays."""
-    base_modal = 1800.0 if "Nashik" in mandi else (1860.0 if "Pimpalgaon" in mandi else 1820.0)
+    if "Onion" in crop:
+        base_modal = 2700.0 if "Nashik" in mandi else (2950.0 if "Pimpalgaon" in mandi else 2050.0)
+    else:
+        base_modal = 1800.0 if "Nashik" in mandi else (1860.0 if "Pimpalgaon" in mandi else 1820.0)
     
     # Day 2 is Sunday (Oct 11); Day 4 is Festival Holiday (Oct 13 Amavasya)
     schedule = [
@@ -235,6 +237,7 @@ def get_weather_impact(
     mandi: str = Query("Nashik APMC", description="Mandi name")
 ):
     """Provides meteorological forecast and its quantified impact on agricultural prices and transit risks."""
+    is_onion = "Onion" in crop
     return WeatherImpactResponse(
         district="Nashik Agricultural District",
         temperature_c=28.4,
@@ -244,7 +247,15 @@ def get_weather_impact(
         weather_summary="IMD Yellow Alert: Moderate rainfall and scattered thunderstorms expected across Niphad, Dindori, and Nashik belt over Day 1 night to Day 2.",
         price_impact_direction="UPWARD_SHORT_TERM",
         harvest_disruption="Wet fields slow picking labor and transport loading by ~25%, causing a temporary drop in early morning arrival volumes.",
-        storage_spoilage_risk="High ambient moisture and humidity (78%) accelerates fungal bacterial softening; tomato holding decay doubles from 1.0% to 2.0%/day.",
-        recommended_action="Harvest and sell on Day 1 (Saturday) before rainfall. If holding till Day 2, use tarpaulin-covered crates and sell early at Pimpalgaon."
+        storage_spoilage_risk=(
+            "Ambient moisture increases neck rot and surface mould in damp storage; onion holding loss in well-aerated chawl remains controlled at ~0.2%/day."
+            if is_onion
+            else "High ambient moisture and humidity (78%) accelerates fungal bacterial softening; perishable tomato holding decay doubles from 1.0% to 2.0%/day."
+        ),
+        recommended_action=(
+            "Ensure covered transport tarpaulins against rainfall. Safe to hold up to 3 days in ventilated dry storage before selling at peak mandi."
+            if is_onion
+            else "Harvest and sell on Day 1 (Saturday) before rainfall. If holding till Day 2, use tarpaulin-covered crates and sell early at Pimpalgaon."
+        )
     )
 

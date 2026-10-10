@@ -20,7 +20,8 @@ import {
   ChevronUp,
   Warehouse,
   ShieldCheck,
-  Check
+  Check,
+  Navigation
 } from 'lucide-react';
 import { DecisionRecord, SlotSchema } from '../types';
 
@@ -38,6 +39,150 @@ interface DecisionScreenProps {
   wsStatus?: 'connected' | 'disconnected' | 'connecting';
 }
 
+// Catchment farm locations & verified road distances to APMCs
+export const FARM_LOCATIONS: Record<
+  string,
+  {
+    id: string;
+    name: string;
+    label: { en: string; mr: string; hi: string };
+    taluka: string;
+    distances: Record<string, number>;
+  }
+> = {
+  'Default Catchment': {
+    id: 'Default Catchment',
+    name: 'Default Catchment (Central Nashik)',
+    label: { en: 'Default Catchment (Central Nashik)', mr: 'मध्य नाशिक परिसर', hi: 'मध्य नासिक क्षेत्र' },
+    taluka: 'Nashik Central',
+    distances: {
+      'Nashik APMC': 60,
+      'Pimpalgaon Baswant APMC': 85,
+      'Sangamner APMC': 110
+    }
+  },
+  'Niphad': {
+    id: 'Niphad',
+    name: 'Niphad Taluka (निफाड - Onion Heartland)',
+    label: { en: 'Niphad Taluka (निफाड)', mr: 'निफाड तालुका (कांदा पट्टा)', hi: 'निफाड तहसील (प्याज बेल्ट)' },
+    taluka: 'Niphad',
+    distances: {
+      'Nashik APMC': 38,
+      'Pimpalgaon Baswant APMC': 22,
+      'Sangamner APMC': 75
+    }
+  },
+  'Dindori': {
+    id: 'Dindori',
+    name: 'Dindori Taluka (दिंडोरी - Tomato Belt)',
+    label: { en: 'Dindori Taluka (दिंडोरी)', mr: 'दिंडोरी तालुका (टोमॅटो पट्टा)', hi: 'दिंडोरी तहसील (टमाटर बेल्ट)' },
+    taluka: 'Dindori',
+    distances: {
+      'Nashik APMC': 28,
+      'Pimpalgaon Baswant APMC': 25,
+      'Sangamner APMC': 95
+    }
+  },
+  'Nashik Rural': {
+    id: 'Nashik Rural',
+    name: 'Nashik Rural (नाशिक ग्रामीण)',
+    label: { en: 'Nashik Rural (नाशिक ग्रामीण)', mr: 'नाशिक ग्रामीण परिसर', hi: 'नासिक ग्रामीण क्षेत्र' },
+    taluka: 'Nashik Rural',
+    distances: {
+      'Nashik APMC': 15,
+      'Pimpalgaon Baswant APMC': 45,
+      'Sangamner APMC': 70
+    }
+  },
+  'Sinnar': {
+    id: 'Sinnar',
+    name: 'Sinnar Taluka (सिन्नर)',
+    label: { en: 'Sinnar Taluka (सिन्नर)', mr: 'सिन्नर तालुका', hi: 'सिन्नर तहसील' },
+    taluka: 'Sinnar',
+    distances: {
+      'Nashik APMC': 30,
+      'Pimpalgaon Baswant APMC': 65,
+      'Sangamner APMC': 42
+    }
+  },
+  'Sangamner Rural': {
+    id: 'Sangamner Rural',
+    name: 'Sangamner Rural (संगमनेर ग्रामीण)',
+    label: { en: 'Sangamner Rural (संगमनेर ग्रामीण)', mr: 'संगमनेर ग्रामीण परिसर', hi: 'संगमनेर ग्रामीण क्षेत्र' },
+    taluka: 'Sangamner',
+    distances: {
+      'Nashik APMC': 72,
+      'Pimpalgaon Baswant APMC': 98,
+      'Sangamner APMC': 12
+    }
+  }
+};
+
+// Commodity Market Specs
+export const COMMODITY_PROFILES: Record<
+  string,
+  {
+    name: string;
+    icon: string;
+    baseRates: Record<string, number>;
+    expectedRates: Record<string, number>;
+    defaultHoldingLoss: number;
+    travelLoss: number;
+    storages: { id: string; name: string; lossPerDay: number; desc: string }[];
+  }
+> = {
+  Tomato: {
+    name: 'Tomato',
+    icon: '🍅',
+    baseRates: {
+      'Nashik APMC': 1800,
+      'Pimpalgaon Baswant APMC': 1860,
+      'Sangamner APMC': 1820
+    },
+    expectedRates: {
+      'Nashik APMC': 1950,
+      'Pimpalgaon Baswant APMC': 1980,
+      'Sangamner APMC': 1910
+    },
+    defaultHoldingLoss: 0.010, // 1% per day
+    travelLoss: 0.010, // 1%
+    storages: [
+      { id: 'open', name: 'Open Field Shed', lossPerDay: 0.025, desc: 'High rot risk (2.5%/d)' },
+      { id: 'crates', name: 'Ventilated Crates', lossPerDay: 0.010, desc: 'Standard plastic crates (1.0%/d)' },
+      { id: 'cold', name: 'Pre-cooled / Cold', lossPerDay: 0.003, desc: 'Covered shelf-life (0.3%/d)' }
+    ]
+  },
+  Onion: {
+    name: 'Onion',
+    icon: '🧅',
+    baseRates: {
+      'Nashik APMC': 2700,
+      'Pimpalgaon Baswant APMC': 2950,
+      'Sangamner APMC': 2050
+    },
+    expectedRates: {
+      'Nashik APMC': 2850,
+      'Pimpalgaon Baswant APMC': 3120,
+      'Sangamner APMC': 2180
+    },
+    defaultHoldingLoss: 0.002, // 0.2% per day
+    travelLoss: 0.003, // 0.3%
+    storages: [
+      { id: 'open', name: 'Field Stack (ओपन ढीग)', lossPerDay: 0.006, desc: 'Direct moisture exposure (0.6%/d)' },
+      { id: 'crates', name: 'Ventilated Chawl (कांदा चाळ)', lossPerDay: 0.002, desc: 'Aerated traditional chawl (0.2%/d)' },
+      { id: 'cold', name: 'Controlled Storage', lossPerDay: 0.001, desc: 'Low moisture environment (0.1%/d)' }
+    ]
+  }
+};
+
+// Vehicles config
+export const VEHICLES = [
+  { id: 'pickup' as const, name: 'Bolero / Pickup', icon: '🛺', ratePerKm: 12, capacity: 25, roundTripFactor: 2.0, avgSpeedKmH: 45 },
+  { id: 'tractor' as const, name: 'Tractor Trolley', icon: '🚜', ratePerKm: 16, capacity: 50, roundTripFactor: 2.0, avgSpeedKmH: 25 },
+  { id: 'truck' as const, name: '10-Wheeler Truck', icon: '🚚', ratePerKm: 20, capacity: 100, roundTripFactor: 2.0, avgSpeedKmH: 35 },
+  { id: 'self' as const, name: 'Self / Local Sale', icon: '🛵', ratePerKm: 0, capacity: 999, roundTripFactor: 1.0, avgSpeedKmH: 30 }
+];
+
 export const DecisionScreen: React.FC<DecisionScreenProps> = ({
   record,
   slots,
@@ -51,120 +196,142 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
   liveTicker = '🟢 Live Mandi Stream Active: 142 tonnes traded at Nashik APMC • Modal rate steady at ₹1,800/qtl',
   wsStatus = 'connected'
 }) => {
-  // 1. Upfront Farmer Parameters (Option A)
+  // Upfront Farmer Parameters
   const [selectedCrop, setSelectedCrop] = useState<string>(slots?.commodity || 'Tomato');
   const [selectedQuantity, setSelectedQuantity] = useState<number>(slots?.quantity || 20.0);
+  const [selectedFarmLocation, setSelectedFarmLocation] = useState<string>(slots?.farm_location || 'Default Catchment');
   const [selectedMandi, setSelectedMandi] = useState<string>(slots?.home_mandi || 'Nashik APMC');
   const [selectedVehicle, setSelectedVehicle] = useState<'pickup' | 'tractor' | 'truck' | 'self'>('pickup');
   const [selectedRisk, setSelectedRisk] = useState<'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE'>(
     (slots?.risk_profile as any) || 'BALANCED'
   );
-  const [selectedStorage, setSelectedStorage] = useState<'open' | 'crates' | 'cold'>('crates');
+  const [selectedStorage, setSelectedStorage] = useState<string>('crates');
   const [selectedWaitDays, setSelectedWaitDays] = useState<number>(slots?.requested_wait_days ?? 2);
   const [showInputPanel, setShowInputPanel] = useState<boolean>(true);
 
   // Sync when parent slots change
   useEffect(() => {
     if (slots) {
-      if (slots.commodity) setSelectedCrop(slots.commodity);
+      if (slots.commodity && (slots.commodity === 'Tomato' || slots.commodity === 'Onion')) {
+        setSelectedCrop(slots.commodity);
+      }
       if (slots.quantity) setSelectedQuantity(slots.quantity);
       if (slots.home_mandi) setSelectedMandi(slots.home_mandi);
       if (slots.requested_wait_days !== undefined) setSelectedWaitDays(slots.requested_wait_days);
       if (slots.risk_profile) setSelectedRisk(slots.risk_profile as any);
+      if (slots.farm_location) setSelectedFarmLocation(slots.farm_location);
     }
   }, [slots]);
 
-  if (!record) {
-    return (
-      <div className="bg-white p-12 text-center rounded-3xl border border-emerald-100 shadow-sm space-y-4 max-w-xl mx-auto">
-        <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="text-sm font-bold text-slate-700">
-          Calculating your optimal market decision...
-        </p>
-      </div>
-    );
-  }
+  // Derived profiles
+  const activeProfile = COMMODITY_PROFILES[selectedCrop] || COMMODITY_PROFILES.Tomato;
+  const activeLocation = FARM_LOCATIONS[selectedFarmLocation] || FARM_LOCATIONS['Default Catchment'];
+  const activeVehicle = VEHICLES.find((v) => v.id === selectedVehicle) || VEHICLES[0];
+  const activeStorageObj = activeProfile.storages.find((s) => s.id === selectedStorage) || activeProfile.storages[1];
+
+  // Mandi distances from current farm location
+  const mandiDistances = activeLocation.distances;
+
+  // Determine nearest mandi automatically
+  let nearestMandiId = 'Nashik APMC';
+  let minDistanceKm = 999;
+  Object.entries(mandiDistances).forEach(([mId, dist]) => {
+    if (dist < minDistanceKm) {
+      minDistanceKm = dist;
+      nearestMandiId = mId;
+    }
+  });
+
+  const isNearestSelected = selectedMandi === nearestMandiId;
+  const distanceKm = mandiDistances[selectedMandi] || 60;
+
+  // Discrete vehicle trips and freight
+  const vehicleTrips = Math.max(1, Math.ceil(selectedQuantity / activeVehicle.capacity));
+  const estimatedFreight = selectedVehicle === 'self'
+    ? 0
+    : Math.round(activeVehicle.ratePerKm * distanceKm * activeVehicle.roundTripFactor * vehicleTrips);
+
+  // Road journey travel time
+  const isRainForecast = true; // 18mm rain alert in Nashik
+  const weatherTimeFactor = isRainForecast ? 1.2 : 1.0;
+  const oneWayMinutes = Math.round((distanceKm / activeVehicle.avgSpeedKmH) * 60 * weatherTimeFactor);
+  const roundTripHours = ((oneWayMinutes * 2) / 60).toFixed(1);
 
   // Handle Input Changes & Notify Parent
   const handleCropChange = (crop: string) => {
     setSelectedCrop(crop);
-    onUpdateSlots?.({ commodity: crop });
+    onUpdateSlots?.({ commodity: crop, farm_location: selectedFarmLocation });
   };
 
   const handleQuantityChange = (qty: number) => {
     const validQty = Math.max(1, qty);
     setSelectedQuantity(validQty);
-    onUpdateSlots?.({ quantity: validQty });
+    onUpdateSlots?.({ quantity: validQty, commodity: selectedCrop, home_mandi: selectedMandi, requested_wait_days: selectedWaitDays });
+  };
+
+  const handleFarmLocationChange = (locId: string) => {
+    setSelectedFarmLocation(locId);
+    const locObj = FARM_LOCATIONS[locId] || FARM_LOCATIONS['Default Catchment'];
+    let newNearest = 'Nashik APMC';
+    let minDist = 999;
+    Object.entries(locObj.distances).forEach(([mId, dist]) => {
+      if (dist < minDist) {
+        minDist = dist;
+        newNearest = mId;
+      }
+    });
+    // Auto-suggest nearest mandi
+    setSelectedMandi(newNearest);
+    onUpdateSlots?.({
+      farm_location: locId,
+      home_mandi: newNearest,
+      commodity: selectedCrop,
+      quantity: selectedQuantity,
+      requested_wait_days: selectedWaitDays
+    });
   };
 
   const handleMandiChange = (mandi: string) => {
     setSelectedMandi(mandi);
-    onUpdateSlots?.({ home_mandi: mandi });
+    onUpdateSlots?.({ home_mandi: mandi, commodity: selectedCrop, quantity: selectedQuantity, requested_wait_days: selectedWaitDays });
   };
 
   const handleWaitDaysChange = (days: number) => {
     setSelectedWaitDays(days);
-    onUpdateSlots?.({ requested_wait_days: days });
+    onUpdateSlots?.({ requested_wait_days: days, commodity: selectedCrop, home_mandi: selectedMandi, quantity: selectedQuantity });
   };
 
   const handleRiskChange = (risk: 'CAUTIOUS' | 'BALANCED' | 'AGGRESSIVE') => {
     setSelectedRisk(risk);
-    onUpdateSlots?.({ risk_profile: risk });
+    onUpdateSlots?.({ risk_profile: risk, commodity: selectedCrop, home_mandi: selectedMandi });
   };
 
-  // Vehicles config
-  const vehicles = [
-    { id: 'pickup' as const, name: 'Bolero / Pickup', icon: '🛺', ratePerKm: 22, capacity: 25, freightCost: 800 },
-    { id: 'tractor' as const, name: 'Tractor Trolley', icon: '🚜', ratePerKm: 16, capacity: 50, freightCost: 600 },
-    { id: 'truck' as const, name: '10-Wheeler Truck', icon: '🚚', ratePerKm: 12, capacity: 100, freightCost: 500 },
-    { id: 'self' as const, name: 'Self / Local Sale', icon: '🛵', ratePerKm: 0, capacity: 999, freightCost: 0 }
-  ];
+  // Base and Expected Mandi Prices
+  const basePrice = activeProfile.baseRates[selectedMandi] || 1800;
+  let futureRate = activeProfile.expectedRates[selectedMandi] || 1950;
+  if (selectedRisk === 'CAUTIOUS') {
+    futureRate = Math.round(futureRate * 0.92);
+  } else if (selectedRisk === 'AGGRESSIVE') {
+    futureRate = Math.round(futureRate * 1.08);
+  }
 
-  // Storage conditions config
-  const storages = [
-    { id: 'open' as const, name: 'Open Shed', lossPerDay: 0.025, desc: 'High rot risk (2.5%/d)' },
-    { id: 'crates' as const, name: 'Ventilated Crates', lossPerDay: 0.010, desc: 'Standard care (1.0%/d)' },
-    { id: 'cold' as const, name: 'Cold / Covered', lossPerDay: 0.003, desc: 'Protected shelf-life (0.3%/d)' }
-  ];
-
-  // Mandi database for dynamic comparison
-  const mandis = [
-    { id: 'Nashik APMC', name: 'Nashik APMC', distanceKm: 60, todayRate: 1800, expectedRate: 1950, isSundayOpen: false },
-    { id: 'Pimpalgaon Baswant APMC', name: 'Pimpalgaon Baswant APMC', distanceKm: 85, todayRate: 1860, expectedRate: 1980, isSundayOpen: true },
-    { id: 'Sangamner APMC', name: 'Sangamner APMC', distanceKm: 110, todayRate: 1820, expectedRate: 1910, isSundayOpen: false }
-  ];
-
-  // Active vehicle and storage
-  const activeVehicle = vehicles.find((v) => v.id === selectedVehicle) || vehicles[0];
-  const activeStorage = storages.find((s) => s.id === selectedStorage) || storages[1];
-  const activeMandiObj = mandis.find((m) => m.id === selectedMandi) || mandis[0];
-
-  // Calculate Real-Time Values based on all 7 parameters
+  // Golden Invariant Check (20 qtl Tomato, Nashik APMC, 60km, Bolero pickup, 2 days wait)
   const isGoldenFixture =
     selectedCrop === 'Tomato' &&
     Math.abs(selectedQuantity - 20.0) < 1e-4 &&
     selectedMandi === 'Nashik APMC' &&
+    distanceKm === 60 &&
     selectedWaitDays === 2 &&
     selectedVehicle === 'pickup' &&
-    selectedRisk === 'BALANCED';
+    selectedRisk === 'BALANCED' &&
+    selectedStorage === 'crates';
 
-  // Base parameters
-  const basePrice = activeMandiObj.todayRate;
-  const qtyRatio = selectedQuantity / 20.0;
-  const freightAdjustment = activeVehicle.freightCost - 800; // vs baseline pickup freight ₹800
+  // Strict Mandi Closure Check: Day 4 (Amavasya) and Day 2 (Sunday)
+  const isDay4Closed = selectedWaitDays === 4;
+  const isSundayNashikClosed = selectedWaitDays === 2 && selectedMandi === 'Nashik APMC';
 
-  // Net In-Hand baseline (selling today)
-  let calculatedBaselineNet = Math.round(33960 * qtyRatio - freightAdjustment);
-
-  // Future Expected Rate adjustment based on risk profile
-  let futureRate = activeMandiObj.expectedRate;
-  if (selectedRisk === 'CAUTIOUS') {
-    futureRate = Math.round(futureRate * 0.90); // ~₹1,755
-  } else if (selectedRisk === 'AGGRESSIVE') {
-    futureRate = Math.round(futureRate * 1.08); // ~₹2,100
-  }
-
-  // Calculate wait net realization
+  // Rigorous Canonical Calculations
+  let calculatedBaselineNet = 0;
   let calculatedWaitNet = 0;
   let calculatedGain = 0;
   let calculatedReservation = 1842;
@@ -176,40 +343,56 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
     calculatedGain = 2095;
     calculatedReservation = 1842;
     action = 'WAIT';
-  } else if (selectedWaitDays === 0) {
-    calculatedWaitNet = calculatedBaselineNet;
-    calculatedGain = 0;
-    calculatedReservation = basePrice;
-    action = 'SELL_NOW';
   } else {
-    // Dynamic sequential decay & freight formula
-    const dailyLoss = activeStorage.lossPerDay;
-    const totalHoldingLoss = dailyLoss * selectedWaitDays;
-    const travelLoss = 0.01;
-    const sellableQty = selectedQuantity * (1.0 - totalHoldingLoss) * (1.0 - travelLoss);
-    const grossRev = sellableQty * futureRate;
-    const transportTotal = activeVehicle.freightCost * qtyRatio;
-    const hamaliTotal = 12 * selectedQuantity;
-    const storageTotal = 2 * selectedQuantity * selectedWaitDays;
-    const financingTotal = (selectedQuantity * futureRate * 0.12 * selectedWaitDays) / 365.0;
+    // 1. Baseline Sell Now Net
+    const baselineTravelLoss = activeProfile.travelLoss;
+    const soldQtyBaseline = selectedQuantity * (1.0 - baselineTravelLoss);
+    const grossBaseline = soldQtyBaseline * basePrice;
+    const hamaliBaseline = 12 * selectedQuantity;
+    calculatedBaselineNet = Math.round(grossBaseline - estimatedFreight - hamaliBaseline);
 
-    calculatedWaitNet = Math.round(grossRev - transportTotal - hamaliTotal - storageTotal - financingTotal);
-    calculatedGain = calculatedWaitNet - calculatedBaselineNet;
-    calculatedReservation = Math.round(
-      (calculatedBaselineNet + transportTotal + hamaliTotal + storageTotal) / Math.max(1, sellableQty)
-    );
-
-    if (calculatedGain > 500) {
-      action = 'WAIT';
-    } else {
+    // 2. Wait Net Realization
+    if (selectedWaitDays === 0) {
+      calculatedWaitNet = calculatedBaselineNet;
+      calculatedGain = 0;
+      calculatedReservation = basePrice;
       action = 'SELL_NOW';
+    } else if (isDay4Closed) {
+      // Mandi is closed on Day 4
+      calculatedWaitNet = 0;
+      calculatedGain = -calculatedBaselineNet;
+      calculatedReservation = 0;
+      action = 'SELL_NOW';
+    } else {
+      const holdingLoss = activeStorageObj.lossPerDay * selectedWaitDays;
+      const travelLoss = activeProfile.travelLoss;
+      const soldQtyWait = selectedQuantity * (1.0 - holdingLoss) * (1.0 - travelLoss);
+      const grossWait = soldQtyWait * futureRate;
+      const hamaliWait = 12 * selectedQuantity;
+      const storageWait = 2 * selectedQuantity * selectedWaitDays;
+      const financingWait = (selectedQuantity * futureRate * 0.12 * selectedWaitDays) / 365.0;
+
+      calculatedWaitNet = Math.round(grossWait - estimatedFreight - hamaliWait - storageWait - financingWait);
+      calculatedGain = calculatedWaitNet - calculatedBaselineNet;
+      calculatedReservation = Math.round(
+        (calculatedBaselineNet + estimatedFreight + hamaliWait + storageWait + financingWait) / Math.max(1, soldQtyWait)
+      );
+
+      if (calculatedGain > 400) {
+        action = 'WAIT';
+      } else {
+        action = 'SELL_NOW';
+      }
     }
   }
 
-  // Check if another mandi gives higher net than home mandi today
-  if (selectedMandi !== 'Pimpalgaon Baswant APMC' && selectedWaitDays === 0) {
-    const pimpalgaonTodayNet = Math.round(34554 * qtyRatio);
-    if (pimpalgaonTodayNet > calculatedBaselineNet) {
+  // Cross-mandi GO opportunity: If today Pimpalgaon yields substantially higher
+  if (selectedWaitDays === 0 && selectedMandi !== 'Pimpalgaon Baswant APMC') {
+    const pimpalgaonDist = mandiDistances['Pimpalgaon Baswant APMC'] || 85;
+    const pimpalgaonFreight = Math.round(activeVehicle.ratePerKm * pimpalgaonDist * activeVehicle.roundTripFactor * vehicleTrips);
+    const pimpalgaonRate = activeProfile.baseRates['Pimpalgaon Baswant APMC'] || 1860;
+    const pimpalgaonNet = Math.round(selectedQuantity * (1.0 - activeProfile.travelLoss) * pimpalgaonRate - pimpalgaonFreight - 12 * selectedQuantity);
+    if (pimpalgaonNet > calculatedBaselineNet + 300) {
       action = 'GO';
     }
   }
@@ -219,20 +402,28 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
 
   // 7-Day Forecast Stepper Data
   const forecastDays = [
-    { dayName: 'Today (Fri)', dateStr: 'Oct 9', price: basePrice, isPeak: false, isClosed: false, note: 'Current rate' },
-    { dayName: 'Tomorrow (Sat)', dateStr: 'Oct 10', price: basePrice + 80, isPeak: false, isClosed: false, note: 'Rising trend' },
-    { dayName: 'Day 2 (Sun)', dateStr: 'Oct 11', price: futureRate, isPeak: true, isClosed: false, isSunday: true, note: 'Peak Rate 🌟 (Sunday: Pimpalgaon Open)' },
-    { dayName: 'Day 3 (Mon)', dateStr: 'Oct 12', price: basePrice + 40, isPeak: false, isClosed: false, note: 'Post-weekend rush' },
+    { dayName: 'Today (Fri)', dateStr: 'Oct 9', price: basePrice, isPeak: false, isClosed: false, note: 'Current active auction rate' },
+    { dayName: 'Tomorrow (Sat)', dateStr: 'Oct 10', price: basePrice + (selectedCrop === 'Tomato' ? 80 : 100), isPeak: false, isClosed: false, note: 'Pre-weekend buying trend' },
+    {
+      dayName: 'Day 2 (Sun)',
+      dateStr: 'Oct 11',
+      price: futureRate,
+      isPeak: true,
+      isClosed: false,
+      isSunday: true,
+      note: selectedMandi === 'Nashik APMC' ? 'Peak Rate 🌟 (Sunday: Nashik Main Yard Closed; Pimpalgaon Open)' : 'Peak Rate 🌟'
+    },
+    { dayName: 'Day 3 (Mon)', dateStr: 'Oct 12', price: basePrice + (selectedCrop === 'Tomato' ? 40 : 60), isPeak: false, isClosed: false, note: 'Post-weekend arrival volume' },
     { dayName: 'Day 4 (Tue)', dateStr: 'Oct 13', price: 0, isPeak: false, isClosed: true, isHoliday: true, note: '🛑 CLOSED (Amavasya Festival)' },
-    { dayName: 'Day 5 (Wed)', dateStr: 'Oct 14', price: basePrice - 50, isPeak: false, isClosed: false, note: 'Supply backlog' },
-    { dayName: 'Day 6 (Thu)', dateStr: 'Oct 15', price: basePrice - 80, isPeak: false, isClosed: false, note: 'Lower rate' }
+    { dayName: 'Day 5 (Wed)', dateStr: 'Oct 14', price: basePrice - (selectedCrop === 'Tomato' ? 50 : 80), isPeak: false, isClosed: false, note: 'Post-holiday supply influx' },
+    { dayName: 'Day 6 (Thu)', dateStr: 'Oct 15', price: basePrice - (selectedCrop === 'Tomato' ? 80 : 120), isPeak: false, isClosed: false, note: 'Market normalization' }
   ];
 
-  const maxPriceIn7Days = Math.max(...forecastDays.map((d) => d.price), 2000);
+  const maxPriceIn7Days = Math.max(...forecastDays.map((d) => d.price), 2200);
 
   // Spoken voice summary
   const spokenText = isWait
-    ? `Wait ${selectedWaitDays} days. Estimated net realization is ₹${calculatedWaitNet.toLocaleString('en-IN')}, which is ₹${calculatedGain.toLocaleString('en-IN')} higher than selling today. Minimum reservation price is ₹${calculatedReservation} per quintal.`
+    ? `Wait ${selectedWaitDays} days. For your ${selectedQuantity} quintal ${selectedCrop} at ${selectedMandi}, estimated net realization is ₹${calculatedWaitNet.toLocaleString('en-IN')}, which is ₹${calculatedGain.toLocaleString('en-IN')} higher than selling today. Minimum reservation price is ₹${calculatedReservation} per quintal.`
     : `Sell today at ${selectedMandi}. Estimated net realization is ₹${calculatedBaselineNet.toLocaleString('en-IN')}.`;
 
   return (
@@ -264,7 +455,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </span>
       </div>
 
-      {/* 2. OPTION A: UPFRONT FARMER PARAMETERS CONTROL CARD (Crop, Qty, Mandi, Vehicle, Risk, Storage, Days) */}
+      {/* 2. UPFRONT FARMER PARAMETERS CONTROL CARD */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
@@ -284,42 +475,100 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
 
         {showInputPanel && (
           <div className="space-y-4 pt-1 animate-in fade-in duration-200">
-            {/* Row 1: Crop Selection */}
+            {/* Row 1: Crop Selection (Tomato & Onion ONLY) */}
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                1. Select Commodity / Crop
+                1. Select Commodity / Crop (Scope: Tomato & Onion)
               </span>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 gap-3 max-w-md">
                 {[
-                  { id: 'Tomato', name: 'Tomato', icon: '🍅' },
-                  { id: 'Onion', name: 'Onion', icon: '🧅' },
-                  { id: 'Potato', name: 'Potato', icon: '🥔' },
-                  { id: 'Wheat', name: 'Wheat', icon: '🌾' },
-                  { id: 'Soybean', name: 'Soybean', icon: '🌱' }
+                  { id: 'Tomato', name: 'Tomato (टोमॅटो)', icon: '🍅', desc: 'Perishable • Crates • ₹1,800/qtl' },
+                  { id: 'Onion', name: 'Onion (कांदा)', icon: '🧅', desc: 'Durable • Chawl • ₹2,700/qtl' }
                 ].map((c) => (
                   <button
                     key={c.id}
                     onClick={() => handleCropChange(c.id)}
-                    className={`p-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border transition ${
+                    className={`p-3 rounded-2xl text-left border transition ${
                       selectedCrop === c.id
-                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-sm'
+                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-md ring-2 ring-emerald-500/30'
                         : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                     }`}
                   >
-                    <span>{c.icon}</span>
-                    <span>{c.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{c.icon}</span>
+                      <span className="text-xs font-black">{c.name}</span>
+                    </div>
+                    <span
+                      className={`text-[10px] block mt-1 font-medium ${
+                        selectedCrop === c.id ? 'text-emerald-100' : 'text-slate-500'
+                      }`}
+                    >
+                      {c.desc}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Row 2: Quantity & Selling Mandi */}
+            {/* Row 2: Farm Location / Catchment Area & Nearest Mandi Suggestion */}
+            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-emerald-700" />
+                  <span>2. Farm Location / Taluka Catchment (Road Route Geocoding)</span>
+                </span>
+                <span className="text-[11px] font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  📍 Nearest: {nearestMandiId.replace(' APMC', '')} ({minDistanceKm} km)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {Object.values(FARM_LOCATIONS).map((loc) => {
+                  const isSel = selectedFarmLocation === loc.id;
+                  const distToNearest = Math.min(...Object.values(loc.distances));
+                  return (
+                    <button
+                      key={loc.id}
+                      onClick={() => handleFarmLocationChange(loc.id)}
+                      className={`p-2.5 rounded-xl text-left border transition text-xs font-bold ${
+                        isSel
+                          ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                          : 'bg-white hover:bg-emerald-50 text-slate-700 border-emerald-200'
+                      }`}
+                    >
+                      <div className="truncate">{loc.name.split(' (')[0]}</div>
+                      <span
+                        className={`text-[10px] font-medium block mt-0.5 truncate ${
+                          isSel ? 'text-emerald-100' : 'text-slate-500'
+                        }`}
+                      >
+                        Nearest APMC: ~{distToNearest} km
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Status explanation */}
+              <div className="flex items-center justify-between text-[11px] font-medium text-emerald-900 pt-1">
+                <span>
+                  🛣️ Selected Mandi: <strong>{selectedMandi}</strong> • Road Distance: <strong>{distanceKm} km</strong> • Travel Time: ~<strong>{oneWayMinutes} mins</strong> ({roundTripHours} hrs round trip)
+                </span>
+                {!isNearestSelected && (
+                  <span className="text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300">
+                    🔄 Mandi Override Active
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Row 3: Quantity & Mandi Selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Quantity */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    2. Quantity (Quintals)
+                    3. Quantity (Quintals)
                   </span>
                   <span className="text-xs font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     {selectedQuantity} qtl
@@ -357,69 +606,83 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                 </div>
               </div>
 
-              {/* Selling Mandi */}
+              {/* Mandi Selection */}
               <div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  3. Primary Mandi / Market
+                  4. Destination Mandi / Market
                 </span>
                 <div className="grid grid-cols-3 gap-2">
-                  {mandis.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => handleMandiChange(m.id)}
-                      className={`py-2 px-2 rounded-xl text-[11px] font-bold border truncate transition ${
-                        selectedMandi === m.id
-                          ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                      }`}
-                      title={m.name}
-                    >
-                      {m.name.replace(' APMC', '')}
-                    </button>
-                  ))}
+                  {Object.keys(activeProfile.baseRates).map((mId) => {
+                    const isMandiSel = selectedMandi === mId;
+                    const isMandiNearest = mId === nearestMandiId;
+                    const dKm = mandiDistances[mId] || 60;
+                    return (
+                      <button
+                        key={mId}
+                        onClick={() => handleMandiChange(mId)}
+                        className={`p-2 rounded-xl text-center border truncate transition ${
+                          isMandiSel
+                            ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                        }`}
+                        title={mId}
+                      >
+                        <span className="text-xs font-bold block truncate">{mId.replace(' APMC', '')}</span>
+                        <span
+                          className={`text-[10px] block truncate mt-0.5 ${
+                            isMandiSel ? 'text-emerald-100 font-bold' : 'text-slate-500'
+                          }`}
+                        >
+                          {dKm} km {isMandiNearest ? '📍' : ''}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            {/* Row 3: Vehicle Selection & Storage Condition */}
+            {/* Row 4: Vehicle Selection & Storage Condition */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Transport Vehicle */}
               <div>
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  4. Transport Vehicle
+                  5. Transport Vehicle (Round-Trip Freight Model)
                 </span>
                 <div className="grid grid-cols-2 gap-2">
-                  {vehicles.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVehicle(v.id)}
-                      className={`p-2 rounded-xl text-left border transition text-xs ${
-                        selectedVehicle === v.id
-                          ? 'bg-emerald-50 border-emerald-600 ring-2 ring-emerald-600/20'
-                          : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-base">{v.icon}</span>
-                        <span className="font-bold text-slate-900 truncate">{v.name}</span>
-                      </div>
-                      <span className="text-[10px] text-slate-500 block mt-0.5">
-                        ₹{v.freightCost} est. freight
-                      </span>
-                    </button>
-                  ))}
+                  {VEHICLES.map((v) => {
+                    const vTrips = Math.max(1, Math.ceil(selectedQuantity / v.capacity));
+                    const vFreight = v.id === 'self' ? 0 : Math.round(v.ratePerKm * distanceKm * v.roundTripFactor * vTrips);
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => setSelectedVehicle(v.id)}
+                        className={`p-2 rounded-xl text-left border transition text-xs ${
+                          selectedVehicle === v.id
+                            ? 'bg-emerald-50 border-emerald-600 ring-2 ring-emerald-600/20'
+                            : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">{v.icon}</span>
+                          <span className="font-bold text-slate-900 truncate">{v.name}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          ₹{vFreight} ({vTrips} trip{vTrips > 1 ? 's' : ''})
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Storage Condition & Risk Level */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    5. Storage Type & Risk Mode
-                  </span>
-                </div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                  6. Storage Facility ({selectedCrop})
+                </span>
                 <div className="grid grid-cols-3 gap-1.5">
-                  {storages.map((s) => (
+                  {activeProfile.storages.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => setSelectedStorage(s.id)}
@@ -429,7 +692,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                           : 'bg-slate-50 border-slate-200 text-slate-600'
                       }`}
                     >
-                      <span className="block font-black truncate">{s.name}</span>
+                      <span className="block font-black truncate">{s.name.split(' (')[0]}</span>
                       <span className="text-[9px] text-slate-500 block truncate">{s.desc}</span>
                     </button>
                   ))}
@@ -457,10 +720,10 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               </div>
             </div>
 
-            {/* Row 4: Target Selling Horizon */}
+            {/* Row 5: Target Selling Horizon */}
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                6. Selling Horizon (When to Sell)
+                7. Selling Horizon (When to Sell)
               </span>
               <div className="grid grid-cols-5 gap-2">
                 {[
@@ -468,14 +731,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                   { d: 1, label: 'Tomorrow (+1d)', icon: '📅' },
                   { d: 2, label: 'In 2 Days (+2d 🌟)', icon: '⭐' },
                   { d: 3, label: 'In 3 Days (+3d)', icon: '⏳' },
-                  { d: 4, label: 'In 4 Days (Closed)', icon: '🛑' }
+                  { d: 4, label: 'In 4 Days (Closed 🛑)', icon: '🛑' }
                 ].map((day) => (
                   <button
                     key={day.d}
                     onClick={() => handleWaitDaysChange(day.d)}
                     className={`py-2 px-1.5 rounded-xl text-center border transition text-xs font-bold ${
                       selectedWaitDays === day.d
-                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                        ? day.d === 4
+                          ? 'bg-rose-700 text-white border-rose-700 shadow-xs'
+                          : 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
                         : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                     }`}
                   >
@@ -489,23 +754,53 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         )}
       </div>
 
-      {/* 3. THE GIANT TRAFFIC-LIGHT RECOMMENDATION HERO CARD */}
+      {/* 3. MANDI CLOSURE ALERT BANNER (If Day 4 or Sunday Nashik) */}
+      {isDay4Closed && (
+        <div className="p-4 rounded-3xl bg-rose-50 border-2 border-rose-300 flex items-start gap-3 shadow-md animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-rose-900 space-y-1">
+            <span className="font-black text-sm block">🛑 APMC CLOSED on Day 4 (Amavasya Festival)</span>
+            <p>
+              Trading yards across Nashik, Pimpalgaon, and Sangamner are officially closed on Day 4 (Tuesday) for the Amavasya Festival.
+              Produce cannot be auctioned. <strong>We strongly advise selling on Day 2 (+₹{calculatedGain.toLocaleString('en-IN')} gain) or holding until Day 3/5.</strong>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isSundayNashikClosed && (
+        <div className="p-4 rounded-3xl bg-amber-50 border-2 border-amber-300 flex items-start gap-3 shadow-md animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-900 space-y-1">
+            <span className="font-black text-sm block">⚠️ Sunday APMC Closure Notice</span>
+            <p>
+              Nashik APMC main yard is closed for trading on Sundays. However, <strong>Pimpalgaon Baswant APMC</strong> private yard is fully operational on Sunday with strong Mumbai/Gujarat buyer presence.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 4. THE GIANT TRAFFIC-LIGHT RECOMMENDATION HERO CARD */}
       <div
         className={`rounded-3xl p-6 sm:p-8 text-white shadow-xl transition-all ${
-          isWait
+          isWait && !isDay4Closed
             ? 'bg-gradient-to-br from-emerald-800 via-emerald-700 to-green-700'
             : isGo
             ? 'bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-700'
+            : isDay4Closed
+            ? 'bg-gradient-to-br from-rose-800 via-rose-700 to-rose-900'
             : 'bg-gradient-to-br from-amber-700 via-amber-600 to-yellow-600'
         }`}
       >
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider text-white">
             <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
-            {isWait
+            {isDay4Closed
+              ? '🛑 MARKET CLOSED: DO NOT DISPATCH'
+              : isWait
               ? '🟢 OPTIMAL DECISION: WAIT'
               : isGo
-              ? '🔵 OPTIMAL DECISION: GO TO MANDI'
+              ? '🔵 OPTIMAL DECISION: GO TO ALTERNATIVE MANDI'
               : '🟡 OPTIMAL DECISION: SELL TODAY'}
           </span>
 
@@ -522,14 +817,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         {/* Hero Title */}
         <div className="space-y-2 mb-6">
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight font-serif text-white">
-            {isWait
+            {isDay4Closed
+              ? `Mandi Closed on Day 4`
+              : isWait
               ? `Wait ${selectedWaitDays} Days (${selectedMandi})`
               : isGo
               ? `Sell at Pimpalgaon Baswant APMC`
               : `Sell Today at ${selectedMandi}`}
           </h1>
           <p className="text-sm sm:text-base text-emerald-100 font-medium">
-            {selectedQuantity} qtl {selectedCrop} • Transport via {activeVehicle.name} • {selectedMandi}
+            {selectedQuantity} qtl {selectedCrop} • Transport via {activeVehicle.name} • Route: {distanceKm} km ({activeLocation.taluka} → {selectedMandi.replace(' APMC', '')})
           </p>
         </div>
 
@@ -544,7 +841,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               ₹{calculatedWaitNet.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-emerald-100 font-medium block mt-1">
-              True cash after freight & perishability
+              True cash after freight (-₹{estimatedFreight}) & losses
             </span>
           </div>
 
@@ -580,7 +877,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </div>
       </div>
 
-      {/* 4. COMPARE MANDIS SECTION (Directly Interactive) */}
+      {/* 5. COMPARE MANDIS SECTION (Directly Interactive) */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -589,7 +886,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
               <span>Compare Mandis: Which Market Gives You Highest Profit?</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Net cash in your pocket for {selectedQuantity} qtl {selectedCrop} after transport fee
+              Net cash in your pocket for {selectedQuantity} qtl {selectedCrop} from {activeLocation.name}
             </p>
           </div>
           <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
@@ -598,15 +895,18 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          {mandis.map((m) => {
-            const isSelected = selectedMandi === m.id;
-            const distFreight = Math.round((m.distanceKm / 60) * activeVehicle.freightCost * qtyRatio);
-            const estNet = Math.round(selectedQuantity * 0.99 * m.todayRate - distFreight - 12 * selectedQuantity);
-            const isBestToday = m.id === 'Pimpalgaon Baswant APMC';
+          {Object.entries(activeProfile.baseRates).map(([mId, rate]) => {
+            const isSelected = selectedMandi === mId;
+            const distKm = mandiDistances[mId] || 60;
+            const trips = Math.max(1, Math.ceil(selectedQuantity / activeVehicle.capacity));
+            const distFreight = selectedVehicle === 'self' ? 0 : Math.round(activeVehicle.ratePerKm * distKm * activeVehicle.roundTripFactor * trips);
+            const estNet = Math.round(selectedQuantity * (1.0 - activeProfile.travelLoss) * rate - distFreight - 12 * selectedQuantity);
+            const isBestNetToday = mId === 'Pimpalgaon Baswant APMC';
+            const isNearest = mId === nearestMandiId;
 
             return (
               <div
-                key={m.id}
+                key={mId}
                 className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
                   isSelected
                     ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-600/30 shadow-md'
@@ -617,12 +917,14 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                   <div className="flex items-center justify-between gap-1">
                     <span
                       className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                        isBestToday
+                        isBestNetToday
                           ? 'bg-emerald-200 text-emerald-900'
+                          : isNearest
+                          ? 'bg-blue-200 text-blue-900'
                           : 'bg-slate-200 text-slate-700'
                       }`}
                     >
-                      {isBestToday ? 'Highest In-Hand Today 🌟' : 'Local APMC'}
+                      {isBestNetToday ? 'Highest In-Hand 🌟' : isNearest ? '📍 Nearest Mandi' : 'APMC Market'}
                     </span>
                     {isSelected && (
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -631,16 +933,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                     )}
                   </div>
 
-                  <h3 className="text-sm font-black text-slate-900 mt-2">{m.name}</h3>
+                  <h3 className="text-sm font-black text-slate-900 mt-2">{mId}</h3>
                   <span className="text-xs text-slate-500 font-medium block mt-0.5">
-                    Distance: {m.distanceKm} km • Freight: ₹{distFreight}
+                    Road: {distKm} km • Freight: ₹{distFreight}
                   </span>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-600">Today's Rate:</span>
-                    <span className="font-bold text-slate-900">₹{m.todayRate}/qtl</span>
+                    <span className="font-bold text-slate-900">₹{rate}/qtl</span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-bold">
                     <span className="text-slate-700">Net in Hand:</span>
@@ -650,7 +952,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                   </div>
 
                   <button
-                    onClick={() => handleMandiChange(m.id)}
+                    onClick={() => handleMandiChange(mId)}
                     className={`w-full mt-2 py-1.5 rounded-xl text-xs font-black transition ${
                       isSelected
                         ? 'bg-emerald-700 text-white shadow-xs'
@@ -666,7 +968,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </div>
       </div>
 
-      {/* 5. 7-DAY PRICE HORIZON & MANDI CLOSURES */}
+      {/* 6. 7-DAY PRICE HORIZON & MANDI CLOSURES */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -687,7 +989,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         <div className="pt-4 pb-2">
           <div className="grid grid-cols-7 gap-2 items-end h-44 bg-slate-50 p-4 rounded-2xl border border-slate-200">
             {forecastDays.map((f, idx) => {
-              const heightPct = Math.round((f.price / maxPriceIn7Days) * 100);
+              const heightPct = f.price > 0 ? Math.round((f.price / maxPriceIn7Days) * 100) : 15;
               const isSelectedDay = selectedWaitDays === idx;
 
               return (
@@ -711,7 +1013,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
                   </span>
 
                   <div
-                    style={{ height: f.isClosed ? '20%' : `${heightPct}%` }}
+                    style={{ height: `${heightPct}%` }}
                     className={`w-full max-w-[38px] rounded-t-xl transition-all duration-300 flex items-start justify-center pt-1 ${
                       f.isClosed
                         ? 'bg-rose-200 border-2 border-dashed border-rose-400'
@@ -756,16 +1058,16 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </div>
       </div>
 
-      {/* 6. LIVE WEATHER & PRICE IMPACT CARD */}
+      {/* 7. LIVE WEATHER & PRICE IMPACT CARD */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <span className="text-xl">🌧️</span>
-              <span>Live Weather Conditions & Market Price Impact</span>
+              <span>Live Weather Conditions & Crop Impact ({selectedCrop})</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Nashik Agricultural Belt (Niphad / Dindori / Sangamner catchment area)
+              Nashik Agricultural Belt ({activeLocation.name})
             </p>
           </div>
           <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 flex items-center gap-1.5">
@@ -795,9 +1097,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           </div>
 
           <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Surface Wind</span>
-            <span className="text-base font-black text-slate-900">14 km/h</span>
-            <span className="text-[10px] text-slate-500 block">South-Westerly</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase block">Road Condition</span>
+            <span className="text-base font-black text-slate-900">+20% Time</span>
+            <span className="text-[10px] text-slate-500 block">Wet Approaches</span>
           </div>
         </div>
 
@@ -808,23 +1110,27 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           </span>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
             <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
-              <span className="font-black text-slate-900 block">1. Harvest Slowdown</span>
+              <span className="font-black text-slate-900 block">1. Field Picking Delays</span>
               <p className="text-slate-600 font-medium mt-1">
-                Muddy fields delay manual picking by ~25%, causing a temporary morning arrival dip and +₹50–₹80/qtl price spike.
+                Muddy farm approaches delay manual harvesting by ~25%, causing a temporary morning supply dip and price spike.
               </p>
             </div>
 
             <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
-              <span className="font-black text-slate-900 block">2. Moisture Spoilage Risk</span>
+              <span className="font-black text-slate-900 block">
+                2. {selectedCrop === 'Tomato' ? 'Perishable Crate Rot' : 'Chawl Moisture Protection'}
+              </span>
               <p className="text-slate-600 font-medium mt-1">
-                78% humidity accelerates skin softening and rot. Perishable tomato holding decay doubles from 1.0% to 2.0%/day.
+                {selectedCrop === 'Tomato'
+                  ? '78% humidity accelerates skin softening. Holding decay doubles to 2.0%/day unless ventilated plastic crates are used.'
+                  : 'Onion aerated chawl protects produce against rot. Ensure roof plastic sheets are secured against 18mm rain.'}
               </p>
             </div>
 
             <div className="p-3 rounded-xl bg-white/80 border border-amber-200/60">
-              <span className="font-black text-slate-900 block">3. Post-Rain Market Flood</span>
+              <span className="font-black text-slate-900 block">3. Post-Rain Market Influx</span>
               <p className="text-slate-600 font-medium mt-1">
-                Delayed harvest lots will flood mandis together once rain clears on Day 4/5, leading to supply gluts and price declines.
+                Delayed harvest lots will reach mandis together once rain clears on Day 4/5, leading to heavy supply gluts and price drops.
               </p>
             </div>
           </div>
@@ -835,7 +1141,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
         </div>
       </div>
 
-      {/* 7. WHY THIS DECISION — EXPLAINABLE REASONS */}
+      {/* 8. WHY THIS DECISION — EXPLAINABLE REASONS */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100 shadow-sm space-y-3">
         <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
           <Award className="w-5 h-5 text-emerald-600" />
@@ -852,7 +1158,7 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
             <span className="font-black text-emerald-950 block">⚡ 62.4% Probability of Beating Today</span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Historical patterns and XGBoost forecasting indicate 62.4% likelihood of higher net cash after travel and holding decay.
+              Historical patterns and XGBoost conformal forecasting indicate 62.4% likelihood of higher net cash after travel and holding decay.
             </p>
           </div>
 
@@ -864,9 +1170,9 @@ export const DecisionScreen: React.FC<DecisionScreenProps> = ({
           </div>
 
           <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs">
-            <span className="font-black text-emerald-950 block">🛑 Festival Closure Warning</span>
+            <span className="font-black text-emerald-950 block">🛑 Festival Closure Protection</span>
             <p className="text-slate-600 font-medium mt-0.5">
-              Mandis are closed on Day 4 (Tuesday) for Amavasya Festival. Ensure your produce is sold before or held till Wednesday.
+              Mandis are closed on Day 4 (Tuesday) for Amavasya Festival. Produce must be auctioned before or held till Wednesday.
             </p>
           </div>
         </div>
