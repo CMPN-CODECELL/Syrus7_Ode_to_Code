@@ -103,7 +103,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
         input_mode: 'text'
       });
 
-      const replyText = resp.spoken_summary || resp.decision_record?.explanation.spoken_summary || 'Analysis complete.';
+      const replyText = resp.assistant_text || resp.spoken_summary || 'Analysis complete.';
 
       const botMsg: Message = {
         sender: 'assistant',

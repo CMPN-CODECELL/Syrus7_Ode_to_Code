@@ -51,9 +51,14 @@ export class ApiClient {
   }
 
   static async getHeatmap(): Promise<HeatmapMatrix> {
-    const res = await fetch(`${API_BASE}/api/heatmap`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/api/heatmap`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      console.warn('Heatmap API failed, using fallback matrix:', e);
+      return this.getCachedFallbackHeatmap();
+    }
   }
 
   static async getMarketCalendar(crop: string = 'Tomato', mandi: string = 'Nashik APMC'): Promise<MarketCalendarResponse> {
