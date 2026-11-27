@@ -1,312 +1,287 @@
-# KrishiNirnay (कृषिनिर्णय)
 <div align="center">
 
 # 🌾 KrishiNirnay (कृषिनिर्णय)
-### *“Sahi Bhav Se, Samriddhi Ki Raah Pe” — From Distress Selling to Informed Prosperity*
+### *“Sahi Bhav Se, Samriddhi Ki Raah Pe” — Turning Distress Selling into Data-Backed Prosperity*
 
 [![Syrus 7.0](https://img.shields.io/badge/Syrus%207.0-Agriculture%20PS__02-2E7D32.svg?style=for-the-badge)](https://github.com/Parth-Chavan-15/Syrus7_Ode_to_Code)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React 18](https://img.shields.io/badge/React-18.3-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
-[![Tests Passing](https://img.shields.io/badge/Tests-72%2F72%20Passed-brightgreen.svg?style=for-the-badge&logo=pytest&logoColor=white)](#-6-testing--verification-suite)
-[![Localization](https://img.shields.io/badge/Language-मराठी%20%7C%20English-FF9933.svg?style=for-the-badge)](#-5-bilingual-ai-copilot--zero-hallucination-number-guard)
+[![Tests Passing](https://img.shields.io/badge/Tests-72%2F72%20Passed-brightgreen.svg?style=for-the-badge&logo=pytest&logoColor=white)](#step-3-verify-installation--run-tests)
+[![Localization](https://img.shields.io/badge/Language-मराठी%20%7C%20English-FF9933.svg?style=for-the-badge)](#-3-interactive-platform-experience)
 
-**A deterministic microeconomic decision, risk intelligence, and spatial price arbitrage engine for smallholder farmers across Maharashtra.**
+**An economic decision, risk intelligence, and spatial price arbitrage platform helping smallholder farmers decide *when* and *where* to sell for maximum take-home profit.**
 
-[Live Prototype](#-7-quick-start--setup-guide) • [Core Problem](#-1-the-distress-selling-crisis) • [Economic Engine](#-3-deterministic-economic--decision-engine) • [Walk-Forward ML](#-4-machine-learning--walk-forward-validation) • [Architecture](#-2-system-architecture) • [Testing](#-6-testing--verification-suite)
+[The Problem](#-1-the-problem-why-farmers-lose-money) • [Worked Example](#-2-real-world-walkthrough-how-it-saves-money) • [Platform Features](#-3-interactive-platform-experience) • [How It Works](#-4-how-the-engine-works) • [Architecture](#-5-system-architecture--tech-stack) • [Quick Start](#-6-quick-start--running-locally)
 
 ---
 
-### 🖥️ Interactive Farmer Decision Dashboard Preview
-<br/>
+### 🖥️ Interactive Farmer Decision Dashboard
 
-<img src="docs/assets/dashboard_preview.png" alt="KrishiNirnay Real-Time Farmer Decision Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);" />
+<img src="docs/assets/dashboard_preview.png" alt="KrishiNirnay Real-Time Farmer Decision Dashboard" width="100%" />
 
-*Real-time interface showing dynamic crop parameters, road route geocoding (Nashik 60 km), round-trip freight selection, storage facility degradation, live APMC stream, and the Krishi Mitra AI Copilot.*
+*Live dashboard displaying commodity inputs, Taluka road-route geocoding (Nashik 60 km), round-trip freight modeling, storage selection, live APMC streaming ticks, and the Krishi Mitra AI Copilot.*
 
 </div>
 
 ---
 
 ## 📌 Table of Contents
-- [1. The Distress Selling Crisis](#-1-the-distress-selling-crisis)
-- [2. System Architecture](#-2-system-architecture)
-- [3. Deterministic Economic & Decision Engine](#-3-deterministic-economic--decision-engine)
-- [4. Machine Learning & Walk-Forward Validation](#-4-machine-learning--walk-forward-validation)
-- [5. Bilingual AI Copilot & Zero-Hallucination Number Guard](#-5-bilingual-ai-copilot--zero-hallucination-number-guard)
-- [6. Testing & Verification Suite](#-6-testing--verification-suite)
-- [7. Quick Start & Setup Guide](#-7-quick-start--setup-guide)
-- [8. Repository Structure](#-8-repository-structure)
-- [9. Canonical Golden Fixture Benchmark](#-9-canonical-golden-fixture-benchmark)
-- [10. API Specification](#-10-api-specification)
+- [1. The Problem: Why Farmers Lose Money](#-1-the-problem-why-farmers-lose-money)
+- [2. Real-World Walkthrough: How It Saves Money](#-2-real-world-walkthrough-how-it-saves-money)
+- [3. Interactive Platform Experience](#-3-interactive-platform-experience)
+- [4. How the Engine Works](#-4-how-the-engine-works)
+- [5. System Architecture & Tech Stack](#-5-system-architecture--tech-stack)
+- [6. Quick Start & Running Locally](#-6-quick-start--running-locally)
+- [7. Repository Structure](#-7-repository-structure)
+- [8. Audit Documentation & Team](#-8-audit-documentation--team)
 
 ---
 
-## 🚨 1. The Distress Selling Crisis
+## 🚨 1. The Problem: Why Farmers Lose Money
 
-Over **86% of Indian farmers are small and marginal**, frequently trapped in post-harvest distress selling. Because smallholders lack transparent logistics economics, microclimate-adjusted spoilage forecasts, and clear cashflow clarity, they offload produce immediately after harvest at steep market lows, losing an estimated **₹89,000+ crore annually**.
+Over **86% of Indian farmers are small and marginal**, frequently forced into post-harvest **distress selling**—offloading freshly harvested crops immediately at local lows due to liquidity pressure, storage fears, and opaque mandi pricing.
 
-### The Fundamental Farmer Question
-> *“I have 20 quintals of harvested tomatoes in Niphad. Should I sell today at Nashik APMC, or store them for 2 days and travel to Pimpalgaon Baswant?”*
+> *“I have 20 quintals of harvested tomatoes in Niphad. Should I sell today at Nashik APMC for ₹1,800/qtl, or wait 2 days and sell when prices are expected to rise?”*
 
-Existing agricultural apps offer static APMC rate sheets or naive price forecasts. However, **a higher sticker price does not equal more money in the farmer's pocket**. 
-Real-world market realization is governed by hidden economic frictions:
-1. **Produce Spoilage Curves:** Perishables deteriorate non-linearly over storage days and road transit vibration.
-2. **True Logistics Friction:** Vehicle capacity constraints (pickup vs. truck), round-trip diesel, toll gates, and *hamali/tolai* (loading/unloading fees).
-3. **Financing / Capital Opportunity Cost:** Delayed cash realization locks working capital and accrues interest on informal crop loans.
-4. **The Reservation Price:** The exact minimum future price ($P_{\text{breakeven}}$) a farmer must receive to justify holding risk.
+Most agricultural apps only display raw daily mandi prices. In reality, **a higher sticker price does not guarantee higher take-home cash**. Every decision involves hidden trade-offs:
+- **Sequential Spoilage:** Perishables shrink every day in storage and during bumpy road transit.
+- **True Logistics Friction:** Round-trip vehicle costs (pickup vs. truck), distance, *hamali* (labour), and *tolai* (weighing charges).
+- **Capital Financing Cost:** Waiting ties up cash that could pay off immediate farm credit.
+- **Downside Risk:** Weather alerts or sudden mandi arrival spikes can crash tomorrow's rate.
 
-**KrishiNirnay replaces guesswork with a mathematical Decision Engine that calculates net in-hand realization.**
+**KrishiNirnay calculates the farmer's exact Net In-Hand Realization after every expense and risk factor—delivering a clear verdict: Sell Now, Wait, or Travel to another mandi.**
 
 ---
 
-## 🏗️ 2. System Architecture
+## 💡 2. Real-World Walkthrough: How It Saves Money
+
+Consider a verified real-world scenario built into KrishiNirnay: **20 quintals of Tomato in Nashik APMC** (current rate **₹1,800/qtl**, 60 km transport at ₹12/km round trip, ₹12/qtl *hamali/tolai*, 12% annual financing rate):
+
+| Decision Option | Gross & Spoilage Flow | Total Expenses Deducted | Net Cash in Hand |
+| :--- | :--- | :--- | :--- |
+| **Sell Today (Baseline)** | `20.00 qtl` sold @ `₹1,800/qtl` = ₹36,000 *(minus 1% transit / handling)* | **₹1,440** transport + **₹240** *hamali* | **₹33,960** |
+| **Wait 2 Days (Recommended)** | Spoilage reduces lot sequentially (`20.0` $\rightarrow$ `19.6` $\rightarrow$ `19.404 qtl`) @ `₹1,950/qtl` | Transport + *hamali* + storage + capital interest | **₹36,055** |
+
+### 🎯 The Actionable Output for the Farmer:
+- **Optimal Action:** `WAIT 2 DAYS`
+- **Extra Profit in Pocket:** **+₹2,095** *(+6.17% above selling today)*
+- **Break-Even Reservation Price:** **~₹1,842 / qtl** — *“Do not accept below ₹1,842/qtl at the mandi; otherwise holding does not pay off.”*
+- **Win Confidence:** **62.4%** probability of beating today's baseline net payout.
+
+---
+
+## 📱 3. Interactive Platform Experience
+
+KrishiNirnay offers a responsive, accessibility-first interface built for both desktop and rural mobile users:
+
+| Feature / Tab | What It Does for the Farmer & Reviewer |
+| :--- | :--- |
+| **📈 Market Advice** | Instant **Sell Now vs. Wait vs. Go** verdict, 3-mandi spatial price comparison (Nashik, Pimpalgaon Baswant, Sangamner), 7-day forecast curve, and live IMD weather alerts. |
+| **🧪 What-If Planner** | Interactive stress-testing sliders to simulate market shocks (e.g., *-10% price crash*, *+20% diesel cost*, *2x mandi arrivals*) without mutating historical records. |
+| **💰 Expense Bill** | Line-by-line transparent receipt separating gross revenue, sequential spoilage loss, round-trip freight, *hamali/tolai*, storage rental, and capital financing cost. |
+| **🌾 My Farm & Localization** | 1-tap switching between **मराठी (Marathi)** and **English**, Taluka catchment geocoding, storage type selection (Open Shed, Crates, Cold Storage), and live WebSocket mandi ticker. |
+| **🤖 Krishi Mitra AI Copilot** | Bilingual voice & chat assistant with progressive slot-filling (asks for missing Crop, Quantity, or Mandi instead of guessing) backed by the **Zero-Hallucination Number Guard**. |
+| **📊 Judge Tools** | Dedicated inspection panel displaying walk-forward backtest comparisons (MAE, RMSE, actual vs. predicted curves), 3×7 spatial heatmap, and live failure-mode switches (`DATA_OUTAGE`, `LLM_OUTAGE`). |
+
+---
+
+## ⚙️ 4. How the Engine Works
+
+### 4.1 Canonical Microeconomic Net-Return Engine (`services/decision/net_return.py`)
+Every financial recommendation enforces strict accounting invariants—most notably **no double-spoilage deduction** (spoilage reduces physical saleable quantity $Q_{\text{sold}}$, never subtracted twice as cash):
+
+$$Q_{\text{after\_holding}} = Q_{\text{initial}} \times \prod (1 - \text{daily\_holding\_loss}[d])$$
+
+$$Q_{\text{sold}} = Q_{\text{after\_holding}} \times \prod (1 - \text{hourly\_travel\_loss}[h])$$
+
+$$\text{Net Realization} = (Q_{\text{sold}} \times P_{\text{mandi}} \times \text{QualityFactor}) - (\text{Transport} + \text{Hamali} + \text{Fees} + \text{Storage} + \text{Financing})$$
+
+### 4.2 Weather-to-Economics Mapping (`services/decision/weather_effects.py`)
+Instead of applying arbitrary price bumps for rain, KrishiNirnay maps physical weather observations (Open-Meteo temperatures/rainfall and IMD `GREEN`/`YELLOW`/`RED` alerts) directly to **holding loss multipliers**, **transit time delays**, and **quality factor adjustments**. If external weather APIs fail, no effects are fabricated.
+
+### 4.3 Six-Family Composite Risk Engine (`services/decision/risk_engine.py`)
+Every Wait/Go recommendation passes through six weighted risk gates (`GREEN = 0.0`, `YELLOW = 0.5`, `RED = 1.0`):
+1. **Price Drop Risk** *(weight `0.25`)* — Downside $q20$ exposure and 3-day momentum drop.
+2. **Arrival Volume Spike** *(weight `0.20`)* — Incoming mandi glut depressing local demand.
+3. **Market Volatility** *(weight `0.15`)* — Recent dispersion across trading sessions.
+4. **Data Freshness** *(weight `0.15`)* — Trading calendar gap between observed APMC sessions.
+5. **Forecast Reliability** *(weight `0.15`)* — Historical out-of-sample confidence width.
+6. **Weather Disruption** *(weight `0.10`)* — Rain/heat degradation and road delay impact.
+
+### 4.4 Honest Walk-Forward ML Evaluation (`reports/forecast/xgboost_walk_forward_summary.json`)
+We do not hide behind opaque black-box claims. Across **42 chronological out-of-sample series-horizon comparisons** (Horizons 1–7 days, cutoff `2026-04-22`):
+- **Last-Observed Baseline Won:** `30` comparisons *(71.4%)*
+- **7-Day Moving Average Won:** `9` comparisons *(21.4%)*
+- **Candidate XGBoost Won:** `3` comparisons *(7.1%)*
+
+Because agricultural spot series exhibit strong short-term persistence, our production gate keeps XGBoost in **experimental validation mode** (`candidate_not_promoted`) and promotes the winning baseline—ensuring reliable, un-overfitted decisions.
+
+### 4.5 🛡️ Bilingual AI & Zero-Hallucination Number Guard (`apps/api/llm/number_guard.py`)
+The LLM layer (Gemini / Groq / Deterministic Fallback) **never performs math**. Every numeric token—supporting both **Arabic (`0–9`)** and **Devanagari (`०–९`)** digits—generated in AI responses is intercepted and verified against the authorized number whitelist of the immutable `DecisionRecord`. Any hallucinated figure is blocked automatically.
+
+---
+
+## 🏗️ 5. System Architecture & Tech Stack
 
 ```text
                     ┌─────────────────────────────────────────────────────────┐
                     │                    Farmer Interfaces                    │
-                    │   • Web PWA Companion (React 18 + Vite + Tailwind)      │
+                    │   • Web Companion PWA (React 18 + Vite + Tailwind)      │
                     │   • Mobile Client (React Native + Expo)                 │
-                    │   • Dual Dialect: Marathi (मराठी) & English (en-IN)    │
+                    │   • Dual Dialect: Marathi (मराठी) & English (en-IN)     │
                     └────────────────────────────┬────────────────────────────┘
                                                  │ HTTP / REST / WebSocket
                     ┌────────────────────────────▼────────────────────────────┐
                     │               FastAPI Public Gateway                    │
-                    │   Validation • Rate Limiting • Correlation ID Tracking  │
+                    │   CORS • Rate Limiting • Security & Correlation IDs     │
                     └────────────────────────────┬────────────────────────────┘
                                                  │
                     ┌────────────────────────────▼────────────────────────────┐
                     │        Bounded AI Orchestration Layer (LLM)             │
-                    │   • Primary: Gemini 3.8 Flash                           │
-                    │   • Fallback: Groq openai/gpt-oss-20b                   │
-                    │   • Offline Fallback: Deterministic Multilingual Text   │
-                    │   🛡️ NUMBER GUARD (Blocks Financial Hallucinations)    │
+                    │   • Intent State Machine + Progressive Slot Filling     │
+                    │   • Primary: Gemini 3.8 Flash | Fallback: Groq / Rules  │
+                    │   • 🛡️ NUMBER GUARD (Arabic & Devanagari Digit Check)  │
                     └────────────────────────────┬────────────────────────────┘
-                                                 │ Bounded High-Level Tool Calls
+                                                 │
                     ┌────────────────────────────▼────────────────────────────┐
                     │            Deterministic Decision Engine                │
-                    │   • Net In-Hand Revenue     • Sequential Degradation    │
-                    │   • Spatial Arbitrage       • 6-Family Risk Scoring     │
-                    │   • Reservation Price       • What-If Scenario Matrix   │
+                    │   • Net Realization & Sequential Spoilage               │
+                    │   • Multi-Mandi Routing & Spatial Arbitrage             │
+                    │   • Reservation Price, 6-Risk Engine & Scenarios        │
                     └───────────────┬─────────────────────────┬───────────────┘
                                     │                         │
           ┌─────────────────────────▼────────┐      ┌─────────▼────────────────────────┐
           │     Data & Forecasting Tier      │      │     External Service Adapters     │
-          │  • AGMARKNET Daily Series        │      │  • OpenRouteService (Geo Routing)│
-          │  • Walk-Forward ML (XGBoost)     │      │  • Open-Meteo & IMD Alerts       │
-          │  • Baseline Evaluator (Last/MA7) │      │  • Cached Offline Fallback Data  │
-          └─────────────────┬────────────────┘      └──────────────────────────────────┘
-                            │
-          ┌─────────────────▼────────────────┐
-          │      Data Store & Snapshots      │
-          │  SQLite • Parquet • CSV Fixtures │
-          └──────────────────────────────────┘
+          │  • AGMARKNET Clean Series        │      │  • OpenRouteService (Geo Routing)│
+          │  • Last / MA-7 Production Rules  │      │  • Open-Meteo & IMD Alerts       │
+          │  • Experimental XGBoost Audit    │      │  • Zero-Key Offline Snapshots    │
+          └──────────────────────────────────┘      └──────────────────────────────────┘
 ```
+
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend Web PWA** | React 18.3, TypeScript 5.7, Vite 6.1, Tailwind CSS 3.4, Lucide Icons |
+| **Mobile Client** | React Native, Expo |
+| **Backend Gateway** | FastAPI 0.115, Uvicorn, Starlette (<0.39), Pydantic v2, WebSockets |
+| **Data & ML** | Pandas, NumPy, Scikit-learn, XGBoost, PyArrow, Parquet/CSV |
+| **AI & Voice** | Gemini Flash, Groq (`openai/gpt-oss-20b`), Groq Whisper ASR, Custom Number Guard |
+| **Testing & QA** | Pytest (72 automated unit, contract, golden-fixture, and E2E tests) |
 
 ---
 
-## 💰 3. Deterministic Economic & Decision Engine
+## 🚀 6. Quick Start & Running Locally
 
-KrishiNirnay’s economics module computes **Net Realized In-Hand Income**, not hypothetical gross value:
+### 6.1 Prerequisites
+- **Python:** `3.10` or `3.11` (with `pip`)
+- **Node.js:** `18.0+` (with `npm`)
 
-$$\text{Net Revenue} = (\text{Quantity} - \text{Spoilage}) \times P_{\text{expected}} - (\text{Storage Cost} + \text{Logistics Cost} + \text{Market Fees} + \text{Financing Cost})$$
-
-### 3.1 Cost & Degradation Breakdown
-
-| Parameter | Mathematical Formulation | Real-World Significance |
-| :--- | :--- | :--- |
-| **Sequential Spoilage** | $Q_{\text{sold}} = Q_{\text{initial}} \times \prod(1 - \text{holding}[d]) \times \prod(1 - \text{transit}[h])$ | Enforces strict **no double-spoilage** invariant across storage and road vibration. |
-| **Freight Economics** | $\text{Cost}_{\text{transport}} = \lceil Q / \text{Cap}_{\text{veh}} \rceil \times \text{Distance} \times \text{Rate}_{\text{km}} \times \text{RoundTripFactor}$ | Accommodates vehicle capacity limits, empty return trips, and diesel inflation. |
-| **Market Handling** | $\text{Cost}_{\text{handling}} = Q \times (\text{Rate}_{\text{hamali}} + \text{Rate}_{\text{tolai}}) + \text{APMC Cess}$ | Local mandi handling and commission charges. |
-| **Financing Cost** | $\text{Cost}_{\text{finance}} = Q \times P_{\text{baseline}} \times \left(\frac{r_{\text{annual}}}{365}\right) \times \text{Days}_{\text{held}}$ | Opportunity cost of capital (12% annual rate) locked during storage. |
-| **Reservation Price** | $P_{\text{breakeven}} = \frac{\text{Net Revenue}_{\text{today}} + \text{All Holding Costs}}{Q_{\text{sold}}}$ | **The Floor Price**: The minimum market price required on Day $N$ to beat selling today. |
-
-### 3.2 Six-Family Composite Risk Matrix
-The engine scores risk along six dimensions before recommending a holding action:
-1. **Price Drop Risk ($R_{\text{price}}$):** Likelihood of price collapsing below reservation threshold.
-2. **Arrival Volume Spike ($R_{\text{arrival}}$):** Surging crop arrivals at the destination mandi depressing rates.
-3. **Market Volatility ($R_{\text{volatility}}$):** Historical standard deviation over the last 14 sessions.
-4. **Data Freshness ($R_{\text{staleness}}$):** Trading calendar session gap (0–1 Fresh, 2 Warning, 3+ Stale).
-5. **Forecast Uncertainty ($R_{\text{forecast}}$):** Confidence interval width around the predicted mean.
-6. **Weather Severity ($R_{\text{weather}}$):** IMD rainfall and temperature alerts accelerating degradation.
-
----
-
-## 📈 4. Machine Learning & Walk-Forward Validation
-
-### 4.1 Rigorous Time-Series Backtesting
-In agricultural commodity forecasting, deep neural networks and complex models frequently overfit to noise. KrishiNirnay validates candidate models through an **honest walk-forward validation framework** evaluated across 42 historical horizons:
-
-```
-Historical Comparisons (42 Out-of-Sample Horizons):
-├── Last-Observed Baseline Won: 29 comparisons (69.0%)
-├── 7-Day Moving Average Won:    9 comparisons (21.4%)
-└── Candidate XGBoost Won:       4 comparisons ( 9.5%)
-```
-
-> **Engineering Principle:** In accordance with production specifications, the system dynamically selects the winning baseline as the primary production forecast while preserving XGBoost in experimental validation mode. We report actual predictive reality instead of marketing artificial model accuracy.
-
----
-
-## 🗣️ 5. Bilingual AI Copilot & Zero-Hallucination Number Guard
-
-KrishiNirnay features an integrated bilingual conversational copilot (**Krishi Mitra / कृषी मित्र**) accessible via voice or chat.
-
-### 5.1 Progressive Dialogue State Machine
-The AI copilot adheres to conversational guardrails:
-- **Greeting & Intent Recognition:** Greets the farmer in Marathi or English and inquires about current harvest details.
-- **Progressive Slot Filling:** Collects missing variables (Crop $\rightarrow$ Quantity $\rightarrow$ Nearest Mandi) step-by-step rather than blurting out unsolicited recommendations.
-- **Analytical Explanations:** Explains *why* an action was recommended (e.g., breakdown of transport cost vs. expected price gain).
-
-### 5.2 🛡️ The Zero-Hallucination Number Guard
-LLMs are notorious for fabricating numerical values. In KrishiNirnay:
-1. **The LLM never calculates money:** All financial math is executed in deterministic Python modules.
-2. **Strict Regex & Semantic Validator:** Every digit output in AI responses is intercepted and verified against the permitted whitelist from the backend `DecisionRecord`. If an unverified number is detected, the response is blocked and reverted to verified deterministic narration.
-
----
-
-## 🧪 6. Testing & Verification Suite
-
-The repository includes a comprehensive automated test suite covering unit tests, contract validation, and economic invariants:
-
-```bash
-# Run all 72 pytest test suites
-python run_tests.py
-```
-
-### Test Suite Execution Output
-```text
-============================= test session starts =============================
-platform win32 -- Python 3.10.11, pytest-9.1.1, pluggy-1.6.0
-rootdir: C:\Users\parth\Documents\KrishiNirnay
-collected 72 items
-
-tests/test_api_gateway.py ...........                                    [ 15%]
-tests/test_contracts.py ...............                                  [ 36%]
-tests/test_decision_engine.py ..................                         [ 61%]
-tests/test_economics_parity.py ..............                            [ 80%]
-tests/test_number_guard.py ..............                                [100%]
-
-======================== 72 passed, 1 warning in 3.14s ========================
-```
-
----
-
-## 🚀 7. Quick Start & Setup Guide
-
-### 7.1 Prerequisites
-- **Python:** 3.10 or 3.11
-- **Node.js:** 18.0 or higher
-- **Package Managers:** `pip` and `npm`
-
-### 7.2 Clone Repository
+### 6.2 Clone the Repository
 ```bash
 git clone https://github.com/Parth-Chavan-15/Syrus7_Ode_to_Code.git
 cd Syrus7_Ode_to_Code
 ```
 
-### 7.3 Backend Setup (FastAPI Gateway)
+### 6.3 Option A: One-Click Windows Launch
+If your environment already has Python and Node dependencies installed, launch both servers in two command windows automatically:
+```cmd
+scripts\start_demo.bat
+```
+
+### 6.4 Option B: Step-by-Step Setup (Windows / Linux / macOS)
+
+#### Step 1: Start the Backend Gateway (`http://localhost:8000`)
 ```bash
 # 1. Create and activate a virtual environment
 python -m venv venv
-# On Windows:
+# Windows:
 venv\Scripts\activate
-# On Linux/macOS:
+# Linux/macOS:
 source venv/bin/activate
 
-# 2. Install dependencies
-pip install fastapi uvicorn pydantic pyyaml pandas numpy scikit-learn xgboost requests pytest
+# 2. Install backend dependencies
+pip install fastapi==0.115.0 "starlette<0.39.0" uvicorn pydantic pyyaml pandas numpy scikit-learn xgboost pyarrow requests joblib jsonschema httpx python-multipart pytest
 
-# 3. Launch the Backend Gateway
+# 3. (Optional) Configure .env for live external API keys
+cp .env.example .env
+
+# 4. Run the FastAPI Gateway
 python run_gateway.py
 ```
-- **Backend API:** [http://localhost:8000](http://localhost:8000)
+- **API Base:** [http://localhost:8000](http://localhost:8000)
 - **Interactive Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Health Check:** [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
-### 7.4 Frontend Setup (React 18 + Vite PWA)
-In a separate terminal window:
+#### Step 2: Start the Web Dashboard (`http://localhost:3000`)
+Open a second terminal in the repository root:
 ```bash
-# 1. Navigate to the web application
 cd apps/web
-
-# 2. Install dependencies
 npm install
-
-# 3. Start development server
 npm run dev
 ```
-- **Web App Dashboard:** [http://localhost:3000](http://localhost:3000)
+- **Web App:** [http://localhost:3000](http://localhost:3000) *(Vite proxies `/api` and `/ws` automatically to port `8000`)*
 
-> **Zero-Key Offline Mode:** KrishiNirnay operates 100% offline using verified historical AGMARKNET series, pre-calculated walk-forward models, and local cached routes even if no external API keys (Gemini, Groq, ORS) are supplied.
+> **Zero-Key Offline Mode:** KrishiNirnay operates **100% offline out-of-the-box** using verified historical AGMARKNET snapshots, local road routes, and deterministic fallback narration—even if `.env` has no API keys!
+
+#### Step 3: Verify Installation & Run Tests
+To confirm all economic invariants, contracts, Number Guard filters, and API routes work properly:
+```bash
+python run_tests.py
+```
+This runs the full 72-test suite across `tests/test_golden_fixture.py`, `tests/test_number_guard.py`, `tests/test_public_api_endpoints.py`, `tests/test_e2e_consistency.py`, `tests/test_failure_modes.py`, `tests/test_glossary_and_slots.py`, and `unit`/`contract`/`integration` subdirectories (`72 passed`).
 
 ---
 
-## 📂 8. Repository Structure
+## 📂 7. Repository Structure
 
 ```text
 KrishiNirnay/
 ├── apps/
-│   ├── api/                      # FastAPI Gateway & Endpoints
-│   │   ├── routes/               # Modular API routes (assist, decision, validation, etc.)
-│   │   └── llm/                  # Bounded LLM orchestrator & Number Guard
-│   ├── web/                      # React 18 + Vite + Tailwind CSS Web Dashboard
-│   │   ├── src/components/       # UI Screens (Advice, What-If, Bill, Model Validation)
-│   │   └── src/api/              # Typed frontend API client with offline fallbacks
+│   ├── api/                      # FastAPI Public Gateway, Routes & Security Middleware
+│   │   ├── llm/                  # Orchestrator, LLM Adapters & Number Guard
+│   │   ├── routes/               # assist, demo, health, market, model_validation, scenario, voice
+│   │   └── voice/                # Whisper ASR, TTS & Agricultural Glossary
+│   ├── web/                      # React 18 + TypeScript + Vite PWA Dashboard
+│   │   └── src/components/       # Decision, Heatmap, What-If, Bill, Assistant & Validation UI
 │   └── mobile/                   # React Native + Expo Mobile Client
-├── configs/                      # Canonical configuration files (costs, risks, routes)
-├── contracts/                    # Pydantic schemas & DecisionRecord data contracts
+├── configs/                      # app_config.yaml, cost_config.yaml, risk_rules.yaml, route_config.yaml
+├── contracts/                    # Canonical Pydantic schemas (DecisionRecord, Assist, Market)
 ├── data/
-│   ├── raw/                      # Raw AGMARKNET mandi records (2024–2026)
-│   └── clean/                    # Cleaned daily time-series & spatial price matrices
+│   ├── raw/                      # AGMARKNET records (Maharashtra Tomato & Onion)
+│   └── clean/                    # Daily analytical model series CSV
 ├── docs/
-│   ├── assets/                   # Architecture diagrams & dashboard screenshots
-│   └── integration/              # Economics audit, dataset audit, and test reports
-├── models/                       # Walk-forward model checkpoints & summary stats
-├── reports/                      # Forecast evaluation & walk-forward comparison CSVs
+│   ├── assets/                   # Dashboard preview screenshot
+│   └── integration/              # Dataset, economics, feature ledger & test audit reports
+├── reports/forecast/             # Walk-forward evaluation summary JSON & comparison CSVs
+├── scripts/                      # start_demo.bat, verify_contracts.py, evaluate_baselines.py
 ├── services/
-│   ├── decision/                 # Canonical microeconomic decision engine
-│   ├── forecast/                 # Time-series baseline & XGBoost predictors
-│   └── adapters/                 # Open-Meteo, IMD, and OpenRouteService adapters
-├── run_gateway.py                # Backend server bootstrap script
-├── run_tests.py                  # Automated test runner (72 tests)
-└── README.md                     # Master project documentation
+│   ├── decision/                 # net_return, risk_engine, weather_effects, reservation_price, route_cost
+│   ├── forecast/                 # Time-series baseline & experimental ML predictors
+│   └── adapters/                 # Integration adapters
+├── tests/                        # 72 automated unit, contract, golden-fixture & E2E tests
+├── run_gateway.py                # FastAPI server entrypoint (port 8000)
+├── run_tests.py                  # Full pytest suite runner
+└── README.md                     # Project documentation
 ```
 
 ---
 
-## 🎯 9. Canonical Golden Fixture Benchmark
+## 📄 8. Audit Documentation & Team
 
-For a standard test case of **20 qtl Tomato harvest in Nashik APMC** (60 km round trip freight, 2-day holding, 1% transit loss, 2% storage loss, ₹12/qtl hamali, ₹2/qtl/day storage, 12% capital financing):
-
-| Key Economic Metric | Verified Engine Output | Real-World Farmer Value |
-| :--- | :--- | :--- |
-| **Sell Now Net Realization** | **₹33,960.00** | Net in-hand payout if sold today at baseline rate. |
-| **Wait 2 Days Expected Net ($q50$)** | **₹36,055.00** | Expected net payout on Day 2 after all costs. |
-| **Net In-Hand Gain** | **+₹2,095.00 (+6.17%)** | Additional net profit directly in the farmer’s pocket. |
-| **Break-Even Reservation Price** | **₹1,842.00 / qtl** | Minimum price needed on Day 2; do not sell below this. |
-| **Probability of Beating Baseline** | **62.4%** | Quantified confidence gate based on historical dispersion. |
+For deep technical reviewers and competition judges, full engineering audits are maintained in `docs/integration/`:
+- [`branch_inventory.md`](docs/integration/branch_inventory.md) — Architectural mapping across data, economics, and AI divisions.
+- [`dataset_audit.md`](docs/integration/dataset_audit.md) — AGMARKNET data schema, date coverage, and deduplication checks.
+- [`economics_audit.md`](docs/integration/economics_audit.md) — Cost parameter audit categorizing verified vs. configurable assumptions.
+- [`test_report.md`](docs/integration/test_report.md) — Detailed integration verification log.
 
 ---
 
-## 🔌 10. API Specification
+<div align="center">
 
-| HTTP Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | Returns service status, version, uptime, and system health. |
-| `POST` | `/api/recommendation` | Computes full economic decision record for given crop & farm parameters. |
-| `GET` | `/api/model-validation/summary` | Serves walk-forward backtest metrics (MAE, RMSE, R²) for judge inspection. |
-| `GET` | `/api/model-validation/series` | Returns 42-horizon actual vs. predicted curves across regional APMCs. |
-| `GET` | `/api/heatmap` | Spatial price dispersion across Maharashtra mandis. |
-| `POST` | `/api/llm/assist` | Bounded conversational assistant with Number Guard verification. |
+**Built for Syrus 7.0 (Ode-to-Code 2026) — Agriculture PS_02**  
+[Parth-Chavan-15/Syrus7_Ode_to_Code](https://github.com/Parth-Chavan-15/Syrus7_Ode_to_Code)
 
----
+*“Sahi Bhav Se, Samriddhi Ki Raah Pe.”*
 
-## 👥 Contributors & Acknowledgments
-- **Project:** KrishiNirnay (कृषिनिर्णय)
-- **Hackathon:** Syrus 7.0 (Ode-to-Code) — 2026
-- **Problem Statement:** Agriculture PS_02: AI Market and Risk Intelligence for Agri Supply Chains
-- **Repository:** [Parth-Chavan-15/Syrus7_Ode_to_Code](https://github.com/Parth-Chavan-15/Syrus7_Ode_to_Code)
-
-*Built with passion to bring financial transparency and economic prosperity to Indian agriculture.*
+</div>
